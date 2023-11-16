@@ -1,0 +1,28 @@
+<.header>
+  Record <%= @record.id %>
+  <:subtitle>This is a record record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/records/#{@record}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit record</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Amount"><%= @record.amount %></:item>
+  <:item title="Description"><%= @record.description %></:item>
+  <:item title="Date"><%= @record.date %></:item>
+</.list>
+
+<.back navigate={~p"/records"}>Back to records</.back>
+
+<.modal :if={@live_action == :edit} id="record-modal" show on_cancel={JS.patch(~p"/records/#{@record}")}>
+  <.live_component
+    module={HousekeepingBookWeb.RecordLive.FormComponent}
+    id={@record.id}
+    title={@page_title}
+    action={@live_action}
+    record={@record}
+    patch={~p"/records/#{@record}"}
+  />
+</.modal>
