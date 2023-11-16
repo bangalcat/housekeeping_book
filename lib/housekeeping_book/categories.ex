@@ -4,6 +4,8 @@ defmodule HousekeepingBook.Categories do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
+
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.Category
@@ -51,7 +53,7 @@ defmodule HousekeepingBook.Categories do
   """
   def create_category(attrs \\ %{}) do
     %Category{}
-    |> Category.changeset(attrs)
+    |> changeset(attrs)
     |> Repo.insert()
   end
 
@@ -69,7 +71,7 @@ defmodule HousekeepingBook.Categories do
   """
   def update_category(%Category{} = category, attrs) do
     category
-    |> Category.changeset(attrs)
+    |> changeset(attrs)
     |> Repo.update()
   end
 
@@ -99,6 +101,13 @@ defmodule HousekeepingBook.Categories do
 
   """
   def change_category(%Category{} = category, attrs \\ %{}) do
-    Category.changeset(category, attrs)
+    changeset(category, attrs)
+  end
+
+  @doc false
+  def changeset(category, attrs) do
+    category
+    |> cast(attrs, [:name, :type])
+    |> validate_required([:name, :type])
   end
 end

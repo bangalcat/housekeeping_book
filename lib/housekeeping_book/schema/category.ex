@@ -1,6 +1,5 @@
 defmodule HousekeepingBook.Schema.Category do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use HousekeepingBook.Schema.Base
 
   schema "categories" do
     field :name, :string
@@ -8,12 +7,5 @@ defmodule HousekeepingBook.Schema.Category do
     field :parent_id, :id
 
     timestamps(type: :utc_datetime)
-  end
-
-  @doc false
-  def changeset(category, attrs) do
-    category
-    |> cast(attrs, [:name, :type])
-    |> validate_required([:name, :type])
   end
 end

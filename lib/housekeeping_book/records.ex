@@ -4,6 +4,7 @@ defmodule HousekeepingBook.Records do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.Record
@@ -51,7 +52,7 @@ defmodule HousekeepingBook.Records do
   """
   def create_record(attrs \\ %{}) do
     %Record{}
-    |> Record.changeset(attrs)
+    |> record_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -69,7 +70,7 @@ defmodule HousekeepingBook.Records do
   """
   def update_record(%Record{} = record, attrs) do
     record
-    |> Record.changeset(attrs)
+    |> record_changeset(attrs)
     |> Repo.update()
   end
 
@@ -99,6 +100,13 @@ defmodule HousekeepingBook.Records do
 
   """
   def change_record(%Record{} = record, attrs \\ %{}) do
-    Record.changeset(record, attrs)
+    record_changeset(record, attrs)
+  end
+
+  @doc false
+  def record_changeset(record, attrs) do
+    record
+    |> cast(attrs, [:amount, :description, :date])
+    |> validate_required([:amount, :description, :date])
   end
 end

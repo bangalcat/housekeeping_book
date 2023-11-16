@@ -1,4 +1,5 @@
 defmodule HousekeepingBook.Application do
+  use Boundary, top_level?: true, deps: [HousekeepingBook, HousekeepingBookWeb]
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -13,7 +14,7 @@ defmodule HousekeepingBook.Application do
       {DNSCluster, query: Application.get_env(:housekeeping_book, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: HousekeepingBook.PubSub},
       # Start the Finch HTTP client for sending emails
-      {Finch, name: HousekeepingBook.Finch},
+      # {Finch, name: HousekeepingBook.Finch},
       # Start a worker by calling: HousekeepingBook.Worker.start_link(arg)
       # {HousekeepingBook.Worker, arg},
       # Start to serve requests, typically the last entry

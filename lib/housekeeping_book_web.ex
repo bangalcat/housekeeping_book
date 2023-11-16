@@ -1,5 +1,7 @@
 defmodule HousekeepingBookWeb do
-  use Boundary, deps: [HousekeepingBook]
+  use Boundary,
+    deps: [HousekeepingBook, Phoenix, Ecto.Changeset],
+    exports: [Endpoint, Telemetry]
 
   @moduledoc """
   The entrypoint for defining your web interface, such

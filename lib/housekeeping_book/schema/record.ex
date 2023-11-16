@@ -1,6 +1,5 @@
 defmodule HousekeepingBook.Schema.Record do
-  use Ecto.Schema
-  import Ecto.Changeset
+  use HousekeepingBook.Schema.Base
 
   alias HousekeepingBook.Schema.User
   alias HousekeepingBook.Schema.Category
@@ -17,12 +16,5 @@ defmodule HousekeepingBook.Schema.Record do
 
     field :tag_ids, {:array, :id}
     field :tags, {:array, :map}, virtual: true
-  end
-
-  @doc false
-  def changeset(record, attrs) do
-    record
-    |> cast(attrs, [:amount, :description, :date])
-    |> validate_required([:amount, :description, :date])
   end
 end
