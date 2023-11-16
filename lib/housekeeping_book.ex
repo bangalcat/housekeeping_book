@@ -1,4 +1,6 @@
 defmodule HousekeepingBook do
+  use Boundary, deps: [], exports: [Accounts, Records, Tags]
+
   @moduledoc """
   HousekeepingBook keeps the contexts that define your domain
   and business logic.
