@@ -4,6 +4,8 @@ defmodule HousekeepingBook.Tags do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
+
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.Tag
@@ -51,7 +53,7 @@ defmodule HousekeepingBook.Tags do
   """
   def create_tag(attrs \\ %{}) do
     %Tag{}
-    |> Tag.changeset(attrs)
+    |> tag_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -69,7 +71,7 @@ defmodule HousekeepingBook.Tags do
   """
   def update_tag(%Tag{} = tag, attrs) do
     tag
-    |> Tag.changeset(attrs)
+    |> tag_changeset(attrs)
     |> Repo.update()
   end
 
@@ -99,6 +101,13 @@ defmodule HousekeepingBook.Tags do
 
   """
   def change_tag(%Tag{} = tag, attrs \\ %{}) do
-    Tag.changeset(tag, attrs)
+    tag_changeset(tag, attrs)
+  end
+
+  @doc false
+  def tag_changeset(tag, attrs) do
+    tag
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
   end
 end

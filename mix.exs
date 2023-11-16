@@ -7,9 +7,18 @@ defmodule HousekeepingBook.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:boundary] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      boundary: [
+        default: [
+          check: [
+            apps: [:phoenix, :ecto],
+            aliases: true
+          ]
+        ]
+      ]
     ]
   end
 
@@ -51,7 +60,7 @@ defmodule HousekeepingBook.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-      {:boundary, "~> 0.10"}
+      {:boundary, "~> 0.10", runtime: false}
     ]
   end
 

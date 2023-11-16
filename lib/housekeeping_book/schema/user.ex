@@ -1,5 +1,5 @@
 defmodule HousekeepingBook.Schema.User do
-  use Ecto.Schema
+  use HousekeepingBook.Schema.Base
   import Ecto.Changeset
 
   schema "users" do
