@@ -105,7 +105,7 @@ defmodule HousekeepingBook.Categories do
   end
 
   @doc false
-  def changeset(category, attrs) do
+  defp changeset(category, attrs) do
     category
     |> cast(attrs, [:name, :type])
     |> validate_required([:name, :type])

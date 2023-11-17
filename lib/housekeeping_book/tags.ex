@@ -105,7 +105,7 @@ defmodule HousekeepingBook.Tags do
   end
 
   @doc false
-  def tag_changeset(tag, attrs) do
+  defp tag_changeset(tag, attrs) do
     tag
     |> cast(attrs, [:name])
     |> validate_required([:name])
