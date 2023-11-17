@@ -104,7 +104,7 @@ defmodule HousekeepingBook.Records do
   end
 
   @doc false
-  def record_changeset(record, attrs) do
+  defp record_changeset(record, attrs) do
     record
     |> cast(attrs, [:amount, :description, :date])
     |> validate_required([:amount, :description, :date])

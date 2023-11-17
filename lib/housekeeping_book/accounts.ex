@@ -4,6 +4,7 @@ defmodule HousekeepingBook.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.User
@@ -51,7 +52,7 @@ defmodule HousekeepingBook.Accounts do
   """
   def create_user(attrs \\ %{}) do
     %User{}
-    |> User.changeset(attrs)
+    |> user_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -69,7 +70,7 @@ defmodule HousekeepingBook.Accounts do
   """
   def update_user(%User{} = user, attrs) do
     user
-    |> User.changeset(attrs)
+    |> user_changeset(attrs)
     |> Repo.update()
   end
 
@@ -99,6 +100,13 @@ defmodule HousekeepingBook.Accounts do
 
   """
   def change_user(%User{} = user, attrs \\ %{}) do
-    User.changeset(user, attrs)
+    user_changeset(user, attrs)
+  end
+
+  @doc false
+  defp user_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email])
+    |> validate_required([:name, :email])
   end
 end
