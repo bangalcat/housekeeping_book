@@ -38,6 +38,28 @@ defmodule HousekeepingBook.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_or_create_user_by_type(type) do
+    case Repo.get_by(User, type: type) do
+      nil -> create_user(%{type: type, name: "share", email: nil})
+      user -> {:ok, user}
+    end
+  end
+
+  def get_or_create_user_by_name(name) do
+    case Repo.get_by(User, name: name) do
+      nil -> create_user(%{type: :normal, name: name, email: nil})
+      user -> {:ok, user}
+    end
+  end
+
+  def get_user_by_type!(type) do
+    Repo.get_by!(User, type: type)
+  end
+
+  def get_user_by_name!(name) do
+    Repo.get_by!(User, name: name)
+  end
+
   @doc """
   Creates a user.
 
@@ -106,7 +128,8 @@ defmodule HousekeepingBook.Accounts do
   @doc false
   defp user_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email])
-    |> validate_required([:name, :email])
+    |> cast(attrs, [:name, :email, :type])
+    |> validate_required([:name, :type])
+    |> validate_format(:email, ~r/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/)
   end
 end
