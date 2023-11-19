@@ -39,6 +39,45 @@ defmodule HousekeepingBook.Categories do
   """
   def get_category!(id), do: Repo.get!(Category, id)
 
+  def get_category_by_name_and_type(name, type) do
+    Repo.get_by(Category, name: name, type: type)
+  end
+
+  def get_category_by_name_and_type!(name, type) do
+    Repo.get_by!(Category, name: name, type: type)
+  end
+
+  def get_or_create_category(name, nil, type) do
+    case get_category_by_name_and_type(name, type) do
+      nil -> create_category(%{name: name, type: type})
+      result -> {:ok, result}
+    end
+  end
+
+  def get_or_create_category(name, parent_name, type) do
+    case get_category_by_name_and_type(name, type) do
+      nil ->
+        with {:ok, parent} <- get_or_create_category(parent_name, nil, type) do
+          create_category(%{parent_id: parent, name: name, type: type})
+        end
+
+      category ->
+        {:ok, category}
+    end
+  end
+
+  def create_categories(category_attrs) do
+    now = DateTime.utc_now()
+
+    category_attrs =
+      Enum.map(
+        category_attrs,
+        &Map.merge(&1, %{inserted_at: {:placeholder, :now}, updated_at: {:placeholder, :now}})
+      )
+
+    Repo.insert_all(Category, category_attrs, placeholders: %{now: now})
+  end
+
   @doc """
   Creates a category.
 
@@ -109,5 +148,10 @@ defmodule HousekeepingBook.Categories do
     category
     |> cast(attrs, [:name, :type])
     |> validate_required([:name, :type])
+  end
+
+  @doc false
+  def delete_all_categories() do
+    Repo.delete_all(Category)
   end
 end
