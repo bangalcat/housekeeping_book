@@ -21,26 +21,6 @@ defmodule HousekeepingBookWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    live "/records", RecordLive.Index, :index
-    live "/records/new", RecordLive.Index, :new
-    live "/records/:id/edit", RecordLive.Index, :edit
-
-    live "/records/:id", RecordLive.Show, :show
-    live "/records/:id/show/edit", RecordLive.Show, :edit
-
-    live "/categories", CategoryLive.Index, :index
-    live "/categories/new", CategoryLive.Index, :new
-    live "/categories/:id/edit", CategoryLive.Index, :edit
-
-    live "/categories/:id", CategoryLive.Show, :show
-    live "/categories/:id/show/edit", CategoryLive.Show, :edit
-
-    live "/tags", TagLive.Index, :index
-    live "/tags/new", TagLive.Index, :new
-    live "/tags/:id/edit", TagLive.Index, :edit
-
-    live "/tags/:id", TagLive.Show, :show
-    live "/tags/:id/show/edit", TagLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -88,6 +68,26 @@ defmodule HousekeepingBookWeb.Router do
       on_mount: [{HousekeepingBookWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/records", RecordLive.Index, :index
+      live "/records/new", RecordLive.Index, :new
+      live "/records/:id/edit", RecordLive.Index, :edit
+
+      live "/records/:id", RecordLive.Show, :show
+      live "/records/:id/show/edit", RecordLive.Show, :edit
+
+      live "/categories", CategoryLive.Index, :index
+      live "/categories/new", CategoryLive.Index, :new
+      live "/categories/:id/edit", CategoryLive.Index, :edit
+
+      live "/categories/:id", CategoryLive.Show, :show
+      live "/categories/:id/show/edit", CategoryLive.Show, :edit
+
+      live "/tags", TagLive.Index, :index
+      live "/tags/new", TagLive.Index, :new
+      live "/tags/:id/edit", TagLive.Index, :edit
+
+      live "/tags/:id", TagLive.Show, :show
+      live "/tags/:id/show/edit", TagLive.Show, :edit
     end
   end
 
