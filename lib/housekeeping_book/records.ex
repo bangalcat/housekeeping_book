@@ -21,6 +21,7 @@ defmodule HousekeepingBook.Records do
       [%Record{}, ...]
 
   """
+  @spec list_records() :: [Record.t()]
   def list_records do
     Repo.all(Record)
   end
