@@ -3,11 +3,15 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   require Logger
 
   alias HousekeepingBook.Records
+  alias HousekeepingBook.Categories
+  alias HousekeepingBook.Accounts
   alias HousekeepingBook.Schema.Record
+  alias HousekeepingBook.Schema.Category
+  alias HousekeepingBook.Schema.User
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket |> assign_options()}
   end
 
   @impl true
@@ -39,6 +43,32 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
         Logger.debug(inspect(meta))
         socket
     end
+  end
+
+  defp assign_options(socket) do
+    categories = Categories.bottom_categories() |> Enum.map(&category_option/1)
+    subjects = Accounts.list_users() |> Enum.map(&subject_option/1)
+    category_types = Categories.category_type_options()
+    payment_types = Records.record_payment_options()
+
+    options = %{
+      category: categories,
+      subject: subjects,
+      payment: payment_types,
+      category_type: category_types,
+      payment_type: payment_types
+    }
+
+    socket
+    |> assign(:options, options)
+  end
+
+  defp category_option(%Category{} = category) do
+    {"#{category.name} (#{category.type})", category.id}
+  end
+
+  defp subject_option(%User{} = subject) do
+    {subject.name, subject.id}
   end
 
   @impl true

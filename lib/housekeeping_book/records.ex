@@ -206,4 +206,10 @@ defmodule HousekeepingBook.Records do
     |> Utils.maybe_put_assoc(attrs, key: :category)
     |> validate_required([:amount, :description, :date])
   end
+
+  @spec record_payment_options() :: [{String.t(), atom()}]
+  def record_payment_options do
+    Ecto.Enum.values(Record, :payment)
+    |> Enum.map(&{Record.payment_enum_name(&1), &1})
+  end
 end

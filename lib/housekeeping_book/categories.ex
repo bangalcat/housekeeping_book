@@ -154,4 +154,18 @@ defmodule HousekeepingBook.Categories do
   def delete_all_categories() do
     Repo.delete_all(Category)
   end
+
+  @spec bottom_categories() :: [Category.t()]
+  def bottom_categories() do
+    from(Category, as: :c)
+    |> join(:left, [c: c], p in assoc(c, :parent), on: c.id == p.parent_id, as: :p)
+    |> where([p: p], is_nil(p.parent_id))
+    |> Repo.all()
+  end
+
+  @spec category_type_options() :: [{String.t(), atom()}]
+  def category_type_options do
+    Ecto.Enum.values(Category, :type)
+    |> Enum.map(fn type -> {Category.category_type_name(type), type} end)
+  end
 end
