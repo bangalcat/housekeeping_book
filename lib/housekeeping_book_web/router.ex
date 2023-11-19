@@ -102,4 +102,18 @@ defmodule HousekeepingBookWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
   end
+
+  scope "/admin", HousekeepingBookWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :admin_require_authenticated_user,
+      on_mount: [{HousekeepingBookWeb.UserAuth, :ensure_authenticated}] do
+      live "/users", UserLive.Index, :index
+      live "/users/new", UserLive.Index, :new
+      live "/users/:id/edit", UserLive.Index, :edit
+
+      live "/users/:id", UserLive.Show, :show
+      live "/users/:id/show/edit", UserLive.Show, :edit
+    end
+  end
 end
