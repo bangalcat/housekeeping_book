@@ -63,7 +63,22 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   end
 
   @impl true
-  def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, record}}, socket) do
-    {:noreply, stream_insert(socket, :records, record)}
+  def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, _record}}, socket) do
+    {:noreply, push_patch(socket, to: ~p"/records")}
   end
+
+  defp category_name(%{category: nil}), do: nil
+  defp category_name(%{category: %{name: name}}), do: name
+
+  defp category_type(%{category: nil}), do: nil
+
+  defp category_type(%{category: %{type: type}}) do
+    case type do
+      :expense -> gettext("Expense")
+      :income -> gettext("Income")
+    end
+  end
+
+  defp subject_name(%{subject: nil}), do: nil
+  defp subject_name(%{subject: %{name: name}}), do: name
 end

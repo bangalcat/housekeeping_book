@@ -22,6 +22,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:date]} type="datetime-local" label="Date" />
+        <.input field={@form[:payment]} type="select" label="Payment" options={[]} />
         <:actions>
           <.button phx-disable-with="Saving...">Save Record</.button>
         </:actions>

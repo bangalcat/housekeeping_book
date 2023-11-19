@@ -55,10 +55,10 @@
   <:col :let={record} label="Date" field={:date}><%= record.date |> DateTime.to_date() %></:col>
   <:col :let={record} label="Description" field={:desciption}><%= record.description %></:col>
   <:col :let={record} label="Amount" field={:amount}><%= record.amount %></:col>
-  <:col :let={record} label="category" field={:category}><%= record.category.name %></:col>
-  <:col :let={record} label="type" field={:type}><%= record.category.type %></:col>
-  <:col :let={record} label="subject" field={:subject}><%= record.subject.name %></:col>
-  <:col :let={record} label="payment" field={:payment}><%= record.payment %></:col>
+  <:col :let={record} label="Category" field={:category}><%= category_name(record) %></:col>
+  <:col :let={record} label="Type" field={:type}><%= category_type(record) %></:col>
+  <:col :let={record} label="Subject" field={:subject}><%= subject_name(record) %></:col>
+  <:col :let={record} label="Payment Type" field={:payment}><%= record.payment %></:col>
 </Flop.Phoenix.table>
 
 <Flop.Phoenix.pagination meta={@meta} path={~p"/records"} />
@@ -78,6 +78,3 @@
     patch={~p"/records"}
   />
 </.modal>
-
-
-  

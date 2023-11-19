@@ -6,6 +6,8 @@ defmodule HousekeepingBook.TagsTest do
   alias HousekeepingBook.Tags
   alias HousekeepingBook.Schema.Tag
 
+  @moduletag :current
+
   describe "tags" do
     @invalid_attrs %{name: nil}
 
