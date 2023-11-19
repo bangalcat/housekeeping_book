@@ -4,6 +4,32 @@ defmodule HousekeepingBook.Schema.Record do
   alias HousekeepingBook.Schema.User
   alias HousekeepingBook.Schema.Category
 
+  @derive {
+    Flop.Schema,
+    filterable: [:date, :amount, :payment, :tags, :category_name, :category_type, :subject_name],
+    sortable: [:date, :amount, :payment],
+    default_limit: 30,
+    adapter_opts: [
+      join_fields: [
+        category_name: [
+          binding: :category,
+          field: :name,
+          ecto_type: :string
+        ],
+        category_type: [
+          binding: :category,
+          field: :type,
+          ecto_type: :string
+        ],
+        subject_name: [
+          binding: :subject,
+          field: :name,
+          ecto_type: :string
+        ]
+      ]
+    ]
+  }
+
   schema "records" do
     field :date, :utc_datetime
     field :description, :string

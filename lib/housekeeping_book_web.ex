@@ -88,6 +88,7 @@ defmodule HousekeepingBookWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
+      import HousekeepingBookWeb.CustomComponents
       import HousekeepingBookWeb.CoreComponents
       import HousekeepingBookWeb.Gettext
 

@@ -7,31 +7,68 @@
   </:actions>
 </.header>
 
-<.table
-  id="records"
-  rows={@streams.records}
-  row_click={fn {_id, record} -> JS.navigate(~p"/records/#{record}") end}
->
-  <:col :let={{_id, record}} label="Amount"><%= record.amount %></:col>
-  <:col :let={{_id, record}} label="Description"><%= record.description %></:col>
-  <:col :let={{_id, record}} label="Date"><%= record.date %></:col>
-  <:action :let={{_id, record}}>
-    <div class="sr-only">
-      <.link navigate={~p"/records/#{record}"}>Show</.link>
-    </div>
-    <.link patch={~p"/records/#{record}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, record}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: record.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
+<.filter_form
+  fields={[
+    date: [label: gettext("After"), op: :>=],
+    date: [label: gettext("Before"), op: :<=],
+    payment: [
+      type: "select",
+      prompt: "All",
+      options: [
+        {gettext("Cash"), :cash},
+        {gettext("Check Card"), :check_card},
+        {gettext("Credit Card"), :credit_card}
+      ]
+    ],
+    subject_name: [
+      label: gettext("Subject"),
+      type: "select",
+      prompt: gettext("All"),
+      op: :=~,
+      options: [
+        {gettext("Share"), "share"},
+        {gettext("Bangal"), "방갈"},
+        {gettext("Hamdoe"), "햄도"}
+      ]
+    ],
+    category_name: [
+      label: gettext("Category"),
+      type: "select",
+      prompt: gettext("All"),
+      options: []
+    ],
+    category_type: [
+      label: gettext("Income/Expense"),
+      type: "select",
+      prompt: gettext("All"),
+      options: [
+        {gettext("Income"), :income},
+        {gettext("Expense"), :expense}
+      ]
+    ]
+  ]}
+  meta={@meta}
+  id="records-filter-form"
+/>
 
-<.modal :if={@live_action in [:new, :edit]} id="record-modal" show on_cancel={JS.patch(~p"/records")}>
+<Flop.Phoenix.table items={@records} meta={@meta} path={~p"/records"}>
+  <:col :let={record} label="Date" field={:date}><%= record.date |> DateTime.to_date() %></:col>
+  <:col :let={record} label="Description" field={:desciption}><%= record.description %></:col>
+  <:col :let={record} label="Amount" field={:amount}><%= record.amount %></:col>
+  <:col :let={record} label="category" field={:category}><%= record.category.name %></:col>
+  <:col :let={record} label="type" field={:type}><%= record.category.type %></:col>
+  <:col :let={record} label="subject" field={:subject}><%= record.subject.name %></:col>
+  <:col :let={record} label="payment" field={:payment}><%= record.payment %></:col>
+</Flop.Phoenix.table>
+
+<Flop.Phoenix.pagination meta={@meta} path={~p"/records"} />
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="record-modal"
+  show
+  on_cancel={JS.patch(~p"/records")}
+>
   <.live_component
     module={HousekeepingBookWeb.RecordLive.FormComponent}
     id={@record.id || :new}
@@ -41,3 +78,6 @@
     patch={~p"/records"}
   />
 </.modal>
+
+
+  
