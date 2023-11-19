@@ -10,7 +10,7 @@ defmodule HousekeepingBook.RecordsTest do
     setup [:setup_records]
 
     test "list_records/0 returns all records", %{records: records} do
-      result_records = Records.list_records()
+      result_records = Records.list_records() |> Enum.sort_by(& &1.id)
 
       for {expect, result} <- Enum.zip(records, result_records) do
         assert_same_schema(expect, result)
@@ -21,7 +21,7 @@ defmodule HousekeepingBook.RecordsTest do
       records: expect_records
     } do
       options = %{page: 1, per_page: 5}
-      result_records = Records.list_records(options)
+      {:ok, {result_records, _meta}} = Records.list_records(options)
 
       for {expect, result} <- expect_records |> Enum.take(5) |> Enum.zip(result_records) do
         assert_same_schema(expect, result)

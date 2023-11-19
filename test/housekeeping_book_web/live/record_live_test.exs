@@ -4,8 +4,17 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
   import Phoenix.LiveViewTest
   import HousekeepingBook.RecordsFixtures
 
-  @create_attrs %{date: "2023-11-15T05:48:00Z", description: "some description", amount: 42}
-  @update_attrs %{date: "2023-11-16T05:48:00Z", description: "some updated description", amount: 43}
+  @create_attrs %{
+    date: "2023-11-15T05:48:00Z",
+    description: "some description",
+    amount: 42,
+    payment: :other
+  }
+  @update_attrs %{
+    date: "2023-11-16T05:48:00Z",
+    description: "some updated description",
+    amount: 43
+  }
   @invalid_attrs %{date: nil, description: nil, amount: nil}
 
   defp create_record(_) do
