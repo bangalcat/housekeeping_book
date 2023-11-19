@@ -14,44 +14,38 @@
     payment: [
       type: "select",
       prompt: "All",
-      options: [
-        {gettext("Cash"), :cash},
-        {gettext("Check Card"), :check_card},
-        {gettext("Credit Card"), :credit_card}
-      ]
+      options: @options[:payment_type]
     ],
     subject_name: [
       label: gettext("Subject"),
       type: "select",
       prompt: gettext("All"),
       op: :=~,
-      options: [
-        {gettext("Share"), "share"},
-        {gettext("Bangal"), "방갈"},
-        {gettext("Hamdoe"), "햄도"}
-      ]
+      options: @options[:subject]
     ],
     category_name: [
       label: gettext("Category"),
       type: "select",
       prompt: gettext("All"),
-      options: []
+      options: @options[:category]
     ],
     category_type: [
       label: gettext("Income/Expense"),
       type: "select",
       prompt: gettext("All"),
-      options: [
-        {gettext("Income"), :income},
-        {gettext("Expense"), :expense}
-      ]
+      options: @options[:category_type]
     ]
   ]}
   meta={@meta}
   id="records-filter-form"
 />
 
-<Flop.Phoenix.table items={@records} meta={@meta} path={~p"/records"}>
+<Flop.Phoenix.table
+  items={@records}
+  meta={@meta}
+  path={~p"/records"}
+  row_click={fn record -> JS.navigate(~p"/records/#{record}") end}
+>
   <:col :let={record} label="Date" field={:date}><%= record.date |> DateTime.to_date() %></:col>
   <:col :let={record} label="Description" field={:desciption}><%= record.description %></:col>
   <:col :let={record} label="Amount" field={:amount}><%= record.amount %></:col>
@@ -59,6 +53,21 @@
   <:col :let={record} label="Type" field={:type}><%= category_type(record) %></:col>
   <:col :let={record} label="Subject" field={:subject}><%= subject_name(record) %></:col>
   <:col :let={record} label="Payment Type" field={:payment}><%= record.payment %></:col>
+
+  <:action :let={record}>
+    <div class="sr-only">
+      <.link navigate={~p"/records/#{record}"}>Show</.link>
+    </div>
+    <.link patch={~p"/records/#{record}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={record}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: record.id}) |> hide("##{record.id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
 </Flop.Phoenix.table>
 
 <Flop.Phoenix.pagination meta={@meta} path={~p"/records"} />
@@ -76,5 +85,6 @@
     action={@live_action}
     record={@record}
     patch={~p"/records"}
+    options={@options}
   />
 </.modal>

@@ -46,4 +46,11 @@ defmodule HousekeepingBook.Schema.Record do
     field :tag_ids, {:array, :id}
     field :tags, {:array, :map}, virtual: true
   end
+
+  def payment_enum_name(:cash), do: "Cash"
+  def payment_enum_name(:check_card), do: "Check Card"
+  def payment_enum_name(:credit_card), do: "Credit Card"
+  def payment_enum_name(:bank_transfer), do: "Bank Transfer"
+  def payment_enum_name(:pay), do: "Pay"
+  def payment_enum_name(:other), do: "Other"
 end
