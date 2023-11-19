@@ -9,3 +9,11 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+alias HousekeepingBook.Records.Importer.CsvImporter
+
+Code.eval_file("priv/repo/categories_seeds.exs")
+
+Application.app_dir(:housekeeping_book, "priv")
+|> Path.join("account-book-records.csv")
+|> File.stream!()
+|> CsvImporter.import_records(mapper: &CsvImporter.my_mapper/1)
