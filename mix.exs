@@ -60,7 +60,10 @@ defmodule HousekeepingBook.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-      {:boundary, "~> 0.10", runtime: false}
+      {:boundary, "~> 0.10", runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test]},
+      {:nimble_csv, "~> 1.2"},
+      {:flop_phoenix, "~> 0.22.4"}
     ]
   end
 

@@ -3,3 +3,22 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+@layer components {
+  .table-container {
+    @apply overflow-x-auto;
+  }
+
+  .table-inner {
+    @apply min-w-full;
+    @apply divide-y-2;
+    @apply divide-gray-200;
+    @apply bg-white;
+    @apply text-sm;
+    @apply table-auto;
+  }
+
+  .pagination-link {
+    @apply mx-2;
+  }
+}

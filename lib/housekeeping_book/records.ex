@@ -25,6 +25,78 @@ defmodule HousekeepingBook.Records do
     Repo.all(Record)
   end
 
+  @spec list_records(map, map) :: {:ok, {[Record.t()], Flop.Meta.t()}} | {:error, Flop.Meta.t()}
+  def list_records(params, opts \\ %{}) do
+    Record
+    |> maybe_with_category(opts)
+    |> maybe_with_subject(opts)
+    |> maybe_with_tags(opts)
+    |> Flop.validate_and_run(params, for: Record)
+  end
+
+  # @type list_options :: %{
+  #         page: integer(),
+  #         per_page: integer(),
+  #         sort_by: atom(),
+  #         sort_order: :asc | :desc,
+  #         with_category: boolean(),
+  #         with_subject: boolean(),
+  #         with_tags: boolean()
+  #       }
+  #
+  # @spec list_records(list_options) :: [Record.t()]
+  # def list_records(options) do
+  #   from(Record)
+  #   |> sort(options)
+  #   |> paginate(options)
+  #   |> Repo.all()
+  #   |> maybe_with_category(options)
+  #   |> maybe_with_subject(options)
+  #   |> maybe_with_tags(options)
+  # end
+  #
+  # defp sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
+  #   order_by(query, {^sort_order, ^sort_by})
+  # end
+  #
+  # defp sort(query, _options), do: query
+  #
+  # defp paginate(query, %{page: page, per_page: per_page}) do
+  #   offset = max(page - 1, 0) * per_page
+  #
+  #   query
+  #   |> limit(^per_page)
+  #   |> offset(^offset)
+  # end
+  #
+  # defp paginate(query, _options), do: query
+  #
+  def maybe_with_category(records, %{with_category: true}) do
+    records
+    |> join(:left, [r], c in assoc(r, :category), as: :category)
+    |> preload([category: c], category: c)
+  end
+
+  def maybe_with_category(records, _options), do: records
+
+  def maybe_with_subject(records, %{with_subject: true}) do
+    records
+    |> join(:left, [r], s in assoc(r, :subject), as: :subject)
+    |> preload([subject: s], subject: s)
+  end
+
+  def maybe_with_subject(records, _options), do: records
+
+  def maybe_with_tags(records, %{with_tags: true}) do
+    records
+  end
+
+  def maybe_with_tags(records, _options), do: records
+
+  def records_count() do
+    Repo.aggregate(Record, :count, :id)
+  end
+
   @doc """
   Gets a single record.
 
