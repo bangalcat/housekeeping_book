@@ -67,6 +67,8 @@ config :flop_phoenix,
   pagination: [opts: {HousekeepingBookWeb.CustomComponents, :pagination_opts}],
   table: [opts: {HousekeepingBookWeb.CustomComponents, :table_opts}]
 
+config :housekeeping_book, :mailer, mailer_sender: "contact@example.com"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
