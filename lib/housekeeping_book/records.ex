@@ -5,9 +5,12 @@ defmodule HousekeepingBook.Records do
 
   import Ecto.Query, warn: false
   import Ecto.Changeset
+  require Logger
+
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.Record
+  alias HousekeepingBook.Utils
 
   @doc """
   Returns the list of records.
@@ -54,6 +57,25 @@ defmodule HousekeepingBook.Records do
     %Record{}
     |> record_changeset(attrs)
     |> Repo.insert()
+  end
+
+  def create_records(records) do
+    Repo.transact(fn ->
+      records
+      |> Stream.map(&create_record/1)
+      |> Enum.find_value(fn
+        {:error, reason} -> reason
+        _ -> nil
+      end)
+      |> case do
+        nil ->
+          :ok
+
+        error_reason ->
+          Logger.error("Failed to create records: #{inspect(error_reason)}")
+          {:error, error_reason}
+      end
+    end)
   end
 
   @doc """
@@ -106,7 +128,9 @@ defmodule HousekeepingBook.Records do
   @doc false
   defp record_changeset(record, attrs) do
     record
-    |> cast(attrs, [:amount, :description, :date])
+    |> cast(attrs, [:amount, :description, :date, :payment, :tags])
+    |> Utils.maybe_put_assoc(attrs, key: :subject)
+    |> Utils.maybe_put_assoc(attrs, key: :category)
     |> validate_required([:amount, :description, :date])
   end
 end
