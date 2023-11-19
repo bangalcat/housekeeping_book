@@ -4,7 +4,11 @@ defmodule HousekeepingBook.Schema.User do
   schema "users" do
     field :name, :string
     field :email, :string
-    field :type, Ecto.Enum, values: [:shared, :normal]
+    field :password, :string, virtual: true, redact: true
+    field :hashed_password, :string, redact: true
+    field :confirmed_at, :naive_datetime
+
+    field :type, Ecto.Enum, values: [:shared, :normal, :admin], default: :normal
 
     timestamps(type: :utc_datetime)
   end
