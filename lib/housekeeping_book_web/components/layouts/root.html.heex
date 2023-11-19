@@ -42,6 +42,38 @@
             Log out
           </.link>
         </li>
+        <li>
+          <.link
+            href={~p"/admin/users"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Users
+          </.link>
+        </li>
+        <li>
+          <.link
+            href={~p"/records"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Records
+          </.link>
+        </li>
+        <li>
+          <.link
+            href={~p"/categories"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Categories
+          </.link>
+        </li>
+        <li>
+          <.link
+            href={~p"/tags"}
+            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          >
+            Tags
+          </.link>
+        </li>
       <% else %>
         <li>
           <.link
@@ -60,38 +92,6 @@
           </.link>
         </li>
       <% end %>
-      <li>
-        <.link
-          href={~p"/users"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Users
-        </.link>
-      </li>
-      <li>
-        <.link
-          href={~p"/records"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Records
-        </.link>
-      </li>
-      <li>
-        <.link
-          href={~p"/categories"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Categories
-        </.link>
-      </li>
-      <li>
-        <.link
-          href={~p"/tags"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-        >
-          Tags
-        </.link>
-      </li>
     </ul>
     <%= @inner_content %>
   </body>

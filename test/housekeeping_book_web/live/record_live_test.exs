@@ -23,7 +23,7 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
   end
 
   describe "Index" do
-    setup [:create_record]
+    setup [:create_record, :register_and_log_in_user]
 
     test "lists all records", %{conn: conn, record: record} do
       {:ok, _index_live, html} = live(conn, ~p"/records")
@@ -87,7 +87,7 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
   end
 
   describe "Show" do
-    setup [:create_record]
+    setup [:create_record, :register_and_log_in_user]
 
     test "displays record", %{conn: conn, record: record} do
       {:ok, _show_live, html} = live(conn, ~p"/records/#{record}")
