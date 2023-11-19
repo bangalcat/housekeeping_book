@@ -3,7 +3,7 @@ defmodule HousekeepingBook.Schema.Category do
 
   schema "categories" do
     field :name, :string
-    field :type, :string
+    field :type, Ecto.Enum, values: [:income, :expense, :saving]
     field :parent_id, :id
 
     timestamps(type: :utc_datetime)
