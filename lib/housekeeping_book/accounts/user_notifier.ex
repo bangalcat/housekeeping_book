@@ -8,7 +8,7 @@ defmodule HousekeepingBook.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"HousekeepingBook", "contact@example.com"})
+      |> from({"HousekeepingBook", env(:mailer_sender)})
       |> subject(subject)
       |> text_body(body)
 
@@ -75,5 +75,9 @@ defmodule HousekeepingBook.Accounts.UserNotifier do
 
     ==============================
     """)
+  end
+
+  defp env(key) do
+    Application.get_env(:housekeeping_book, :mailer) |> Keyword.fetch!(key)
   end
 end

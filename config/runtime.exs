@@ -121,5 +121,7 @@ if config_env() == :prod do
 
   config :swoosh, :api_client, Swoosh.ApiClient.Finch
 
+  config :housekeeping_book, :mailer, mailer_sender: System.get_env("MAILER_SENDER")
+
   config :housekeeping_book, :record_importer, HousekeepingBook.Records.Importer.CsvImporter
 end
