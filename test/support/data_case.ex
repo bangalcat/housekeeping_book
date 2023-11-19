@@ -24,6 +24,8 @@ defmodule HousekeepingBook.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import HousekeepingBook.DataCase
+      import HousekeepingBook.Factory
+      import HousekeepingBook.TestUtils
     end
   end
 
