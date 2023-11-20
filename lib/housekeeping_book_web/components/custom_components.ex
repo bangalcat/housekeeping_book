@@ -54,7 +54,11 @@ defmodule HousekeepingBookWeb.CustomComponents do
       container: true,
       container_attrs: [class: "table-container"],
       no_results_content: content_tag(:p, do: "Nothing found."),
-      table_attrs: [class: "table-inner"]
+      table_attrs: [class: "my-table"],
+      tbody_attrs: [class: "my-table-body"],
+      thead_attrs: [class: "my-thead"],
+      tbody_td_attrs: [class: "my-tbody-td"],
+      tbody_tr_attrs: [class: "my-tbody-tr"]
     ]
   end
 end
