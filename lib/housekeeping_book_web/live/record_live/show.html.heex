@@ -9,8 +9,8 @@
 </.header>
 
 <.list>
-  <:item title="Date"><%= @record.date %></:item>
-  <:item title="Amount"><%= @record.amount %></:item>
+  <:item title="Date"><%= format_date(@record) %></:item>
+  <:item title="Amount"><%= format_amount(@record) %></:item>
   <:item title="Description"><%= @record.description %></:item>
   <:item title="Category"><%= category_name(@record) %></:item>
   <:item title="Type"><%= category_type(@record) %></:item>

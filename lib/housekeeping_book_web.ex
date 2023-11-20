@@ -1,6 +1,6 @@
 defmodule HousekeepingBookWeb do
   use Boundary,
-    deps: [HousekeepingBook, Phoenix, Ecto.Changeset],
+    deps: [HousekeepingBook, HousekeepingBook.Cldr, Phoenix, Ecto.Changeset],
     exports: [Endpoint, Telemetry]
 
   @moduledoc """
@@ -47,7 +47,7 @@ defmodule HousekeepingBookWeb do
         layouts: [html: HousekeepingBookWeb.Layouts]
 
       import Plug.Conn
-      import HousekeepingBookWeb.Gettext
+      import HousekeepingBook.Gettext
 
       unquote(verified_routes())
     end
@@ -90,7 +90,7 @@ defmodule HousekeepingBookWeb do
       # Core UI components and translation
       import HousekeepingBookWeb.CustomComponents
       import HousekeepingBookWeb.CoreComponents
-      import HousekeepingBookWeb.Gettext
+      import HousekeepingBook.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
