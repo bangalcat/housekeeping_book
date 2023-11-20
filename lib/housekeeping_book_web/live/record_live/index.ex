@@ -1,13 +1,10 @@
 defmodule HousekeepingBookWeb.RecordLive.Index do
   use HousekeepingBookWeb, :live_view
+  import HousekeepingBookWeb.RecordLive.Helper
   require Logger
 
   alias HousekeepingBook.Records
-  alias HousekeepingBook.Categories
-  alias HousekeepingBook.Accounts
   alias HousekeepingBook.Schema.Record
-  alias HousekeepingBook.Schema.Category
-  alias HousekeepingBook.Schema.User
 
   @impl true
   def mount(_params, _session, socket) do
@@ -22,13 +19,16 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Record")
-    |> assign(:record, Records.get_record!(id))
+    |> assign(
+      :record,
+      Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
+    )
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Record")
-    |> assign(:record, %Record{})
+    |> assign(:record, %Record{category: nil, subject: nil})
   end
 
   defp apply_action(socket, :index, params) do
@@ -46,29 +46,8 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   end
 
   defp assign_options(socket) do
-    categories = Categories.bottom_categories() |> Enum.map(&category_option/1)
-    subjects = Accounts.list_users() |> Enum.map(&subject_option/1)
-    category_types = Categories.category_type_options()
-    payment_types = Records.record_payment_options()
-
-    options = %{
-      category: categories,
-      subject: subjects,
-      payment: payment_types,
-      category_type: category_types,
-      payment_type: payment_types
-    }
-
     socket
-    |> assign(:options, options)
-  end
-
-  defp category_option(%Category{} = category) do
-    {"#{category.name} (#{category.type})", category.id}
-  end
-
-  defp subject_option(%User{} = subject) do
-    {subject.name, subject.id}
+    |> assign(:options, record_options())
   end
 
   @impl true
@@ -96,19 +75,4 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, _record}}, socket) do
     {:noreply, push_patch(socket, to: ~p"/records")}
   end
-
-  defp category_name(%{category: nil}), do: nil
-  defp category_name(%{category: %{name: name}}), do: name
-
-  defp category_type(%{category: nil}), do: nil
-
-  defp category_type(%{category: %{type: type}}) do
-    case type do
-      :expense -> gettext("Expense")
-      :income -> gettext("Income")
-    end
-  end
-
-  defp subject_name(%{subject: nil}), do: nil
-  defp subject_name(%{subject: %{name: name}}), do: name
 end
