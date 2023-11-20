@@ -38,8 +38,8 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
 
   def category_type(%{category: %{type: type}}) do
     case type do
-      :expense -> gettext("Expense")
-      :income -> gettext("Income")
+      :expense -> gettext("지출")
+      :income -> gettext("수입")
     end
   end
 
@@ -52,4 +52,16 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
 
   def tags(%{tags: nil}), do: nil
   def tags(%{tags: tags}), do: Enum.join(tags, ", ")
+
+  def format_amount(%{amount: amount}) do
+    HousekeepingBook.Cldr.Number.to_string!(amount, format: :currency, currency: :from_locale)
+  end
+
+  def format_date(%{date: date}) do
+    HousekeepingBook.Cldr.DateTime.to_string!(date, format: :short)
+  end
+
+  def new_record do
+    Record.new()
+  end
 end

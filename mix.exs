@@ -62,9 +62,12 @@ defmodule HousekeepingBook.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       {:boundary, "~> 0.10", runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test]},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 1.2"},
-      {:flop_phoenix, "~> 0.22.4"}
+      {:flop_phoenix, "~> 0.22.4"},
+      {:ex_cldr, "~> 2.37"},
+      {:ex_cldr_numbers, ">= 0.0.0"},
+      {:ex_cldr_dates_times, ">= 0.0.0"}
     ]
   end
 
