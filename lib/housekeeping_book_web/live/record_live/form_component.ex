@@ -22,8 +22,13 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:date]} type="datetime-local" label="Date" />
-        <.input field={@form[:category]} type="select" label="Category" options={@options[:category]} />
-        <.input field={@form[:subject]} type="select" label="Subject" options={@options[:subject]} />
+        <.input
+          field={@form[:category_id]}
+          type="select"
+          label="Category"
+          options={@options[:category]}
+        />
+        <.input field={@form[:subject_id]} type="select" label="Subject" options={@options[:subject]} />
         <.input field={@form[:payment]} type="select" label="Payment" options={@options[:payment]} />
         <:actions>
           <.button phx-disable-with="Saving...">Save Record</.button>
@@ -40,6 +45,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     # |> assign_new(:options, fn -> assign_options() end)
      |> assign_form(changeset)}
   end
 

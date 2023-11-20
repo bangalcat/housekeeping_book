@@ -6,5 +6,4 @@ defmodule HousekeepingBook.Schema.Tag do
 
     timestamps(type: :utc_datetime)
   end
-
 end

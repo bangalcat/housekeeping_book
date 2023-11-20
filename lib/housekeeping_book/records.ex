@@ -72,27 +72,27 @@ defmodule HousekeepingBook.Records do
   #
   # defp paginate(query, _options), do: query
   #
-  def maybe_with_category(records, %{with_category: true}) do
-    records
+  def maybe_with_category(record_or_records, %{with_category: true}) do
+    record_or_records
     |> join(:left, [r], c in assoc(r, :category), as: :category)
     |> preload([category: c], category: c)
   end
 
-  def maybe_with_category(records, _options), do: records
+  def maybe_with_category(record_or_records, _options), do: record_or_records
 
-  def maybe_with_subject(records, %{with_subject: true}) do
-    records
+  def maybe_with_subject(record_or_records, %{with_subject: true}) do
+    record_or_records
     |> join(:left, [r], s in assoc(r, :subject), as: :subject)
     |> preload([subject: s], subject: s)
   end
 
-  def maybe_with_subject(records, _options), do: records
+  def maybe_with_subject(record_or_records, _options), do: record_or_records
 
-  def maybe_with_tags(records, %{with_tags: true}) do
-    records
+  def maybe_with_tags(record_or_records, %{with_tags: true}) do
+    record_or_records
   end
 
-  def maybe_with_tags(records, _options), do: records
+  def maybe_with_tags(record_or_records, _options), do: record_or_records
 
   def records_count() do
     Repo.aggregate(Record, :count, :id)
@@ -112,7 +112,28 @@ defmodule HousekeepingBook.Records do
       ** (Ecto.NoResultsError)
 
   """
-  def get_record!(id), do: Repo.get!(Record, id)
+  def get_record!(id, opts \\ %{}) do
+    case get_record(id, opts) do
+      {:error, _} ->
+        raise Ecto.NoResultsError
+
+      {:ok, record} ->
+        record
+    end
+  end
+
+  def get_record(id, opts \\ %{}) do
+    from(Record)
+    |> where([r], r.id == ^id)
+    |> maybe_with_category(opts)
+    |> maybe_with_subject(opts)
+    |> maybe_with_tags(opts)
+    |> Repo.one()
+    |> case do
+      nil -> {:error, :not_found}
+      record -> {:ok, record}
+    end
+  end
 
   @doc """
   Creates a record.
@@ -201,7 +222,7 @@ defmodule HousekeepingBook.Records do
   @doc false
   defp record_changeset(record, attrs) do
     record
-    |> cast(attrs, [:amount, :description, :date, :payment, :tags])
+    |> cast(attrs, [:amount, :description, :date, :payment, :tags, :category_id, :subject_id])
     |> Utils.maybe_put_assoc(attrs, key: :subject)
     |> Utils.maybe_put_assoc(attrs, key: :category)
     |> validate_required([:amount, :description, :date])
