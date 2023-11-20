@@ -4,8 +4,6 @@ defmodule HousekeepingBook.RecordsTest do
   alias HousekeepingBook.Records
   alias HousekeepingBook.Schema.Record
 
-  @moduletag :current
-
   describe "list_records" do
     setup [:setup_records]
 

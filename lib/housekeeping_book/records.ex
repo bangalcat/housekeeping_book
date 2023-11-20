@@ -113,26 +113,18 @@ defmodule HousekeepingBook.Records do
 
   """
   def get_record!(id, opts \\ %{}) do
-    case get_record(id, opts) do
-      {:error, _} ->
-        raise Ecto.NoResultsError
-
-      {:ok, record} ->
-        record
-    end
-  end
-
-  def get_record(id, opts \\ %{}) do
     from(Record)
     |> where([r], r.id == ^id)
     |> maybe_with_category(opts)
     |> maybe_with_subject(opts)
     |> maybe_with_tags(opts)
-    |> Repo.one()
-    |> case do
-      nil -> {:error, :not_found}
-      record -> {:ok, record}
-    end
+    |> Repo.one!()
+  end
+
+  def get_record(id, opts \\ %{}) do
+    {:ok, get_record!(id, opts)}
+  rescue
+    Ecto.NoResultsError -> {:error, :not_fund}
   end
 
   @doc """

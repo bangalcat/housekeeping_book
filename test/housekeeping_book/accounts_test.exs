@@ -71,10 +71,11 @@ defmodule HousekeepingBook.AccountsTest do
     end
 
     test "returns the user if the email and password are valid" do
-      %{id: id} = user = user_fixture()
+      pswd = valid_user_password()
+      %{id: id} = user = user_fixture(%{password: pswd})
 
       assert %User{id: ^id} =
-               Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+               Accounts.get_user_by_email_and_password(user.email, pswd)
     end
   end
 
@@ -168,27 +169,25 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "apply_user_email/3" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
-    test "requires email to change", %{user: user} do
-      {:error, changeset} = Accounts.apply_user_email(user, valid_user_password(), %{})
+    test "requires email to change", %{user: user, password: pswd} do
+      {:error, changeset} = Accounts.apply_user_email(user, pswd, %{})
       assert %{email: ["did not change"]} = errors_on(changeset)
     end
 
-    test "validates email", %{user: user} do
+    test "validates email", %{user: user, password: pswd} do
       {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: "not valid"})
+        Accounts.apply_user_email(user, pswd, %{email: "not valid"})
 
       assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
     end
 
-    test "validates maximum value for email for security", %{user: user} do
+    test "validates maximum value for email for security", %{user: user, password: pswd} do
       too_long = String.duplicate("db", 100)
 
       {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: too_long})
+        Accounts.apply_user_email(user, pswd, %{email: too_long})
 
       assert "should be at most 160 character(s)" in errors_on(changeset).email
     end
@@ -209,9 +208,9 @@ defmodule HousekeepingBook.AccountsTest do
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "applies the email without persisting it", %{user: user} do
+    test "applies the email without persisting it", %{user: user, password: pswd} do
       email = unique_user_email()
-      {:ok, user} = Accounts.apply_user_email(user, valid_user_password(), %{email: email})
+      {:ok, user} = Accounts.apply_user_email(user, pswd, %{email: email})
       assert user.email == email
       assert Accounts.get_user!(user.id).email != email
     end
@@ -298,13 +297,11 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "update_user_password/3" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
-    test "validates password", %{user: user} do
+    test "validates password", %{user: user, password: pswd} do
       {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, pswd, %{
           password: "not valid",
           password_confirmation: "another"
         })
@@ -315,11 +312,11 @@ defmodule HousekeepingBook.AccountsTest do
              } = errors_on(changeset)
     end
 
-    test "validates maximum values for password for security", %{user: user} do
+    test "validates maximum values for password for security", %{user: user, password: pswd} do
       too_long = String.duplicate("db", 100)
 
       {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{password: too_long})
+        Accounts.update_user_password(user, pswd, %{password: too_long})
 
       assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
@@ -331,9 +328,9 @@ defmodule HousekeepingBook.AccountsTest do
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "updates the password", %{user: user} do
+    test "updates the password", %{user: user, password: pswd} do
       {:ok, user} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, pswd, %{
           password: "new valid password"
         })
 
@@ -341,11 +338,11 @@ defmodule HousekeepingBook.AccountsTest do
       assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
     end
 
-    test "deletes all tokens for the given user", %{user: user} do
+    test "deletes all tokens for the given user", %{user: user, password: pswd} do
       _ = Accounts.generate_user_session_token(user)
 
       {:ok, _} =
-        Accounts.update_user_password(user, valid_user_password(), %{
+        Accounts.update_user_password(user, pswd, %{
           password: "new valid password"
         })
 
@@ -354,9 +351,7 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "generate_user_session_token/1" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
     test "generates a token", %{user: user} do
       token = Accounts.generate_user_session_token(user)
@@ -375,10 +370,11 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "get_user_by_session_token/1" do
-    setup do
-      user = user_fixture()
+    setup [:setup_user]
+
+    setup %{user: user} do
       token = Accounts.generate_user_session_token(user)
-      %{user: user, token: token}
+      %{token: token}
     end
 
     test "returns user by token", %{user: user, token: token} do
@@ -406,9 +402,7 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "deliver_user_confirmation_instructions/2" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
     test "sends token through notification", %{user: user} do
       token =
@@ -459,9 +453,7 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "deliver_user_reset_password_instructions/2" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
     test "sends token through notification", %{user: user} do
       token =
@@ -507,9 +499,7 @@ defmodule HousekeepingBook.AccountsTest do
   end
 
   describe "reset_user_password/2" do
-    setup do
-      %{user: user_fixture()}
-    end
+    setup [:setup_user]
 
     test "validates password", %{user: user} do
       {:error, changeset} =
@@ -547,5 +537,10 @@ defmodule HousekeepingBook.AccountsTest do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
+  end
+
+  def setup_user(_) do
+    password = valid_user_password()
+    %{user: user_fixture(%{password: password}), password: password}
   end
 end

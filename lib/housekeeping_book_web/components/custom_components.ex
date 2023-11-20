@@ -20,7 +20,7 @@ defmodule HousekeepingBookWeb.CustomComponents do
         <.input field={i.field} label={i.label} type={i.type} phx-debounce={120} {i.rest} />
       </.filter_fields>
 
-      <.button class="my-2" name="reset">reset</.button>
+      <.button class="my-2" name="reset" type="reset">reset</.button>
     </.form>
     """
   end

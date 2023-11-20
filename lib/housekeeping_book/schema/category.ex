@@ -7,7 +7,12 @@ defmodule HousekeepingBook.Schema.Category do
     # field :is_leaf, :boolean
 
     belongs_to :parent, __MODULE__
+
     timestamps(type: :utc_datetime)
+  end
+
+  def new(attrs \\ %{}) do
+    struct!(__MODULE__, attrs)
   end
 
   def category_type_name(:income), do: "수입"

@@ -12,11 +12,18 @@ defmodule HousekeepingBook.CategoriesTest do
 
     test "list_categories/0 returns all categories" do
       category = insert!(:category)
-      assert Categories.list_categories() == [category]
+      [res_cat] = Categories.list_categories()
+      assert_same_schema(category, res_cat)
     end
 
-    test "get_category!/1 returns the category with given id" do
-      category = insert!(:category)
+    test "list_categories/0 returns all categories with parent preload" do
+      cat = insert!(:category) |> Repo.preload(:parent)
+      [res_cat] = Categories.list_categories()
+      assert_same_fields(cat, res_cat)
+    end
+
+    test "get_category!/1 returns the category with given id and parent preloaded" do
+      category = insert!(:category) |> Repo.preload(:parent)
       assert Categories.get_category!(category.id) == category
     end
 
@@ -42,7 +49,7 @@ defmodule HousekeepingBook.CategoriesTest do
     end
 
     test "update_category/2 with invalid data returns error changeset" do
-      category = insert!(:category)
+      category = insert!(:category) |> Repo.preload(:parent)
       assert {:error, %Ecto.Changeset{}} = Categories.update_category(category, @invalid_attrs)
       assert category == Categories.get_category!(category.id)
     end

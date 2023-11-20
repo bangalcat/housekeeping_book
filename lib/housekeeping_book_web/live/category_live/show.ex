@@ -1,5 +1,6 @@
 defmodule HousekeepingBookWeb.CategoryLive.Show do
   use HousekeepingBookWeb, :live_view
+  import HousekeepingBookWeb.CategoryLive.Helper
 
   alias HousekeepingBook.Categories
 
