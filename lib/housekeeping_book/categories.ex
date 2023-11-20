@@ -20,7 +20,9 @@ defmodule HousekeepingBook.Categories do
 
   """
   def list_categories do
-    Repo.all(Category)
+    from(Category)
+    |> preload(:parent)
+    |> Repo.all()
   end
 
   @doc """
@@ -37,7 +39,12 @@ defmodule HousekeepingBook.Categories do
       ** (Ecto.NoResultsError)
 
   """
-  def get_category!(id), do: Repo.get!(Category, id)
+  def get_category!(id) do
+    from(Category)
+    |> where([c], c.id == ^id)
+    |> preload([c], :parent)
+    |> Repo.one!()
+  end
 
   def get_category_by_name_and_type(name, type) do
     Repo.get_by(Category, name: name, type: type)
@@ -146,7 +153,7 @@ defmodule HousekeepingBook.Categories do
   @doc false
   defp changeset(category, attrs) do
     category
-    |> cast(attrs, [:name, :type])
+    |> cast(attrs, [:name, :type, :parent_id])
     |> validate_required([:name, :type])
   end
 
@@ -159,7 +166,7 @@ defmodule HousekeepingBook.Categories do
   def bottom_categories() do
     from(Category, as: :c)
     |> join(:left, [c: c], p in assoc(c, :parent), on: c.id == p.parent_id, as: :p)
-    |> where([p: p], is_nil(p.parent_id))
+    |> where([p: p], is_nil(p.id))
     |> Repo.all()
   end
 
@@ -167,5 +174,14 @@ defmodule HousekeepingBook.Categories do
   def category_type_options do
     Ecto.Enum.values(Category, :type)
     |> Enum.map(fn type -> {Category.category_type_name(type), type} end)
+  end
+
+  def new_category(attrs \\ %{}) do
+    Category.new(attrs)
+  end
+
+  def ensure_with_parent(category) do
+    category
+    |> Repo.preload(:parent)
   end
 end

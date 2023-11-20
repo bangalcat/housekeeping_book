@@ -13,7 +13,8 @@ defmodule HousekeepingBook.RecordsFixtures do
       |> Enum.into(%{
         amount: 42,
         date: ~U[2023-11-15 05:48:00Z],
-        description: "some description"
+        description: "some description",
+        payment: :cash
       })
       |> HousekeepingBook.Records.create_record()
 

@@ -11,6 +11,7 @@
 <.list>
   <:item title="Name"><%= @category.name %></:item>
   <:item title="Type"><%= @category.type %></:item>
+  <:item title="Parent"><%= parent_name(@category) %></:item>
 </.list>
 
 <.back navigate={~p"/categories"}>Back to categories</.back>

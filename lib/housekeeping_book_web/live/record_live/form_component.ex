@@ -19,17 +19,30 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
+        <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input
           field={@form[:category_id]}
           type="select"
           label="Category"
           options={@options[:category]}
+          prompt="Choose a category"
         />
-        <.input field={@form[:subject_id]} type="select" label="Subject" options={@options[:subject]} />
-        <.input field={@form[:payment]} type="select" label="Payment" options={@options[:payment]} />
+        <.input
+          field={@form[:subject_id]}
+          type="select"
+          label="Subject"
+          options={@options[:subject]}
+          prompt="Choose a user"
+        />
+        <.input
+          field={@form[:payment]}
+          type="select"
+          label="Payment"
+          options={@options[:payment]}
+          prompt="Choose a payment type"
+        />
         <:actions>
           <.button phx-disable-with="Saving...">Save Record</.button>
         </:actions>

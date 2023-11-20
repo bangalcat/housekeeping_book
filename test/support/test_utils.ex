@@ -15,6 +15,16 @@ defmodule HousekeepingBook.TestUtils do
     end
   end
 
+  def assert_same_fields(a, b) do
+    unless same_fields?(a, b, Map.keys(a)),
+      do:
+        raise(ExUnit.AssertionError,
+          message: "The two records have different fields",
+          left: a,
+          right: b
+        )
+  end
+
   def assert_same_schema(a, b) do
     unless same_schema?(a, b) do
       raise ExUnit.AssertionError,

@@ -17,7 +17,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import HousekeepingBookWeb.Gettext
+  import HousekeepingBook.Gettext
 
   @doc """
   Renders a modal.
@@ -659,9 +659,9 @@ defmodule HousekeepingBookWeb.CoreComponents do
     # with our gettext backend as first argument. Translations are
     # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
-      Gettext.dngettext(HousekeepingBookWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(HousekeepingBook.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(HousekeepingBookWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(HousekeepingBook.Gettext, "errors", msg, opts)
     end
   end
 

@@ -4,7 +4,6 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   require Logger
 
   alias HousekeepingBook.Records
-  alias HousekeepingBook.Schema.Record
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,6 +12,21 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
+    socket =
+      case Records.list_records(params, %{
+             with_category: true,
+             with_subject: true,
+             with_tags: true
+           }) do
+        {:ok, {records, meta}} ->
+          socket
+          |> assign(%{records: records, meta: meta})
+
+        {:error, meta} ->
+          socket
+          |> assign(:meta, meta)
+      end
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -28,21 +42,13 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Record")
-    |> assign(:record, %Record{category: nil, subject: nil})
+    |> assign(:record, new_record())
   end
 
-  defp apply_action(socket, :index, params) do
-    case Records.list_records(params, %{with_category: true, with_subject: true, with_tags: true}) do
-      {:ok, {records, meta}} ->
-        socket
-        |> assign(:page_title, "Listing Records")
-        |> assign(:record, nil)
-        |> assign(%{records: records, meta: meta})
-
-      {:error, meta} ->
-        Logger.debug(inspect(meta))
-        socket
-    end
+  defp apply_action(socket, :index, _params) do
+    socket
+    |> assign(:page_title, "Listing Records")
+    |> assign(:record, nil)
   end
 
   defp assign_options(socket) do
@@ -68,7 +74,7 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
     record = Records.get_record!(id)
     {:ok, _} = Records.delete_record(record)
 
-    {:noreply, stream_delete(socket, :records, record)}
+    {:noreply, push_patch(socket, to: ~p"/records")}
   end
 
   @impl true

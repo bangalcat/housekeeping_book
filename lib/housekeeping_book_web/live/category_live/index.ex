@@ -1,12 +1,14 @@
 defmodule HousekeepingBookWeb.CategoryLive.Index do
   use HousekeepingBookWeb, :live_view
+  import HousekeepingBookWeb.CategoryLive.Helper
 
   alias HousekeepingBook.Categories
-  alias HousekeepingBook.Schema.Category
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :categories, Categories.list_categories())}
+    categories = Categories.list_categories()
+    options = %{category: categories |> Enum.map(&{&1.name, &1.id})}
+    {:ok, stream(socket, :categories, categories) |> assign(:options, options)}
   end
 
   @impl true
@@ -23,7 +25,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Category")
-    |> assign(:category, %Category{})
+    |> assign(:category, new_category())
   end
 
   defp apply_action(socket, :index, _params) do
@@ -34,6 +36,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
 
   @impl true
   def handle_info({HousekeepingBookWeb.CategoryLive.FormComponent, {:saved, category}}, socket) do
+    category = Categories.ensure_with_parent(category)
     {:noreply, stream_insert(socket, :categories, category)}
   end
 

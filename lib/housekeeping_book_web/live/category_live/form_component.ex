@@ -21,6 +21,13 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
       >
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:type]} type="text" label="Type" />
+        <.input
+          field={@form[:parent_id]}
+          type="select"
+          label="Parent"
+          options={@options[:category]}
+          prompt="Choose Parent Category"
+        />
         <:actions>
           <.button phx-disable-with="Saving...">Save Category</.button>
         </:actions>
@@ -36,6 +43,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign_new(:options, fn -> category_options() end)
      |> assign_form(changeset)}
   end
 
@@ -88,4 +96,9 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp category_options do
+    categories = Categories.list_categories()
+    %{category: categories |> Enum.map(&{&1.name, &1.id})}
+  end
 end

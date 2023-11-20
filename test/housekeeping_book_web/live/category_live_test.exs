@@ -3,7 +3,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
   import Phoenix.LiveViewTest
 
-  @create_attrs %{name: "some name", type: "income"}
+  @create_attrs %{name: "some name", type: "income", parent_id: nil}
   @update_attrs %{name: "some updated name", type: "expense"}
   @invalid_attrs %{name: nil, type: nil}
 
