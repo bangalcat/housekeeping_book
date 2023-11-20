@@ -9,13 +9,47 @@
     @apply overflow-x-auto;
   }
 
-  .table-inner {
+  .my-table {
     @apply min-w-full;
     @apply divide-y-2;
     @apply divide-gray-200;
     @apply bg-white;
     @apply text-sm;
     @apply table-auto;
+
+  }
+  .my-table thead {
+    @apply ltr:text-left;
+    @apply rtl:text-right;
+  }
+  .my-table thead tr th{
+    @apply whitespace-nowrap;
+    @apply px-4;
+    @apply py-2;
+    @apply font-medium;
+    @apply text-gray-900;
+  }
+  .my-table thead tr th span a{
+    @apply cursor-pointer;
+  }
+
+  .my-table tbody {
+    @apply divide-y;
+    @apply divide-gray-200;
+  }
+
+  .my-table tbody tr {
+    @apply hover:bg-gray-300;
+    @apply odd:hover:bg-gray-300;
+    @apply cursor-pointer;
+    @apply odd:bg-gray-50
+  }
+
+  .my-table tbody tr td {
+    @apply whitespace-nowrap;
+    @apply px-4;
+    @apply py-1;
+    @apply text-center;
   }
 
   .pagination-link {
