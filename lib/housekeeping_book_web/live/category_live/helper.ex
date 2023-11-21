@@ -10,4 +10,8 @@ defmodule HousekeepingBookWeb.CategoryLive.Helper do
   def new_category do
     Categories.new_category(%{parent: nil})
   end
+
+  def category_type_options do
+    Categories.category_type_options()
+  end
 end

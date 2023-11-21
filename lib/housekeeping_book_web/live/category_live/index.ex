@@ -7,8 +7,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     categories = Categories.list_categories()
-    options = %{category: categories |> Enum.map(&{&1.name, &1.id})}
-    {:ok, stream(socket, :categories, categories) |> assign(:options, options)}
+    {:ok, stream(socket, :categories, categories)}
   end
 
   @impl true
