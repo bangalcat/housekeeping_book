@@ -8,6 +8,7 @@
 </.header>
 
 <.filter_form
+  :if={@meta}
   fields={[
     date: [label: gettext("After"), op: :>=],
     date: [label: gettext("Before"), op: :<=],
@@ -23,7 +24,7 @@
       op: :=~,
       options: @options[:subject]
     ],
-    category_name: [
+    category_id: [
       label: gettext("Category"),
       type: "select",
       prompt: gettext("All"),
