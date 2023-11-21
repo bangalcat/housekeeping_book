@@ -12,21 +12,7 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    socket =
-      case Records.list_records(params, %{
-             with_category: true,
-             with_subject: true,
-             with_tags: true
-           }) do
-        {:ok, {records, meta}} ->
-          socket
-          |> assign(%{records: records, meta: meta})
-
-        {:error, meta} ->
-          socket
-          |> assign(:meta, meta)
-      end
-
+    # socket = socket |> assign_list_records(params)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -45,10 +31,27 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
     |> assign(:record, new_record())
   end
 
-  defp apply_action(socket, :index, _params) do
+  defp apply_action(socket, :index, params) do
     socket
+    |> assign_list_records(params)
     |> assign(:page_title, "Listing Records")
     |> assign(:record, nil)
+  end
+
+  def assign_list_records(socket, params) do
+    case Records.list_records(params, %{
+           with_category: true,
+           with_subject: true,
+           with_tags: true
+         }) do
+      {:ok, {records, meta}} ->
+        socket
+        |> assign(%{records: records, meta: meta})
+
+      {:error, meta} ->
+        socket
+        |> assign(:meta, meta)
+    end
   end
 
   defp assign_options(socket) do

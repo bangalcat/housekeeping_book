@@ -17,6 +17,11 @@ defmodule HousekeepingBook.Schema.Record do
           field: :name,
           ecto_type: :string
         ],
+        category_id: [
+          binding: :category,
+          field: :id,
+          ecto_type: :id
+        ],
         category_type: [
           binding: :category,
           field: :type,

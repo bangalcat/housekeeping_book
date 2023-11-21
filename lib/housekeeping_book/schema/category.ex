@@ -4,9 +4,9 @@ defmodule HousekeepingBook.Schema.Category do
   schema "categories" do
     field :name, :string
     field :type, Ecto.Enum, values: [:income, :expense, :saving]
-    # field :is_leaf, :boolean
 
     belongs_to :parent, __MODULE__
+    has_many :children, __MODULE__, foreign_key: :parent_id
 
     timestamps(type: :utc_datetime)
   end
