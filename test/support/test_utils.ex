@@ -25,7 +25,11 @@ defmodule HousekeepingBook.TestUtils do
         )
   end
 
-  def assert_same_schema(a, b) do
+  def assert_same_schema(al, bl) when is_list(al) and is_list(bl) and length(al) == length(bl) do
+    for {a, b} <- Enum.zip(al, bl), do: assert_same_schema(a, b)
+  end
+
+  def assert_same_schema(%{} = a, %{} = b) do
     unless same_schema?(a, b) do
       raise ExUnit.AssertionError,
         message: "The two records have different primary keys",
