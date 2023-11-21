@@ -1,6 +1,8 @@
 defmodule HousekeepingBook.CategoriesTest do
   use HousekeepingBook.DataCase
 
+  import HousekeepingBook.TestUtils
+
   alias HousekeepingBook.Categories
 
   alias HousekeepingBook.Schema.Category
@@ -27,6 +29,38 @@ defmodule HousekeepingBook.CategoriesTest do
       assert Categories.get_category!(category.id) == category
     end
 
+    test "delete_category/1 deletes the category" do
+      category = insert!(:category)
+      assert {:ok, %Category{}} = Categories.delete_category(category)
+      assert_raise Ecto.NoResultsError, fn -> Categories.get_category!(category.id) end
+    end
+
+    test "bottom_categories/0 should returns only categories without children" do
+      top_category = insert!(:category)
+      parent_category = insert!(:category, %{parent_id: top_category.id})
+      leaf_category = insert!(:category, %{parent_id: parent_category.id})
+
+      assert_same_schema([leaf_category], Categories.bottom_categories())
+    end
+
+    test "top_categories/0 should returns only categories without parent" do
+      top_category = insert!(:category)
+      parent_category = insert!(:category, %{parent_id: top_category.id})
+      _leaf_category = insert!(:category, %{parent_id: parent_category.id})
+
+      assert_same_schema([top_category], Categories.top_categories())
+    end
+
+    test "child_categories/1 should returns only children categories with given parent" do
+      top_category = insert!(:category)
+      cat_1 = insert!(:category, %{parent_id: top_category.id})
+      cat_2 = insert!(:category, %{parent_id: top_category.id})
+      assert_same_schema([cat_1, cat_2], Categories.child_categories(top_category))
+      assert_same_schema([cat_1, cat_2], Categories.child_categories(top_category.id))
+    end
+  end
+
+  describe "create and update categories" do
     test "create_category/1 with valid data creates a category" do
       valid_attrs = %{name: "some name", type: :income}
 
@@ -54,15 +88,39 @@ defmodule HousekeepingBook.CategoriesTest do
       assert category == Categories.get_category!(category.id)
     end
 
-    test "delete_category/1 deletes the category" do
-      category = insert!(:category)
-      assert {:ok, %Category{}} = Categories.delete_category(category)
-      assert_raise Ecto.NoResultsError, fn -> Categories.get_category!(category.id) end
-    end
-
     test "change_category/1 returns a category changeset" do
       category = insert!(:category)
       assert %Ecto.Changeset{} = Categories.change_category(category)
+    end
+
+    test "it should have the same type as it's parent category" do
+      %{id: cat_id} = cat = insert!(:category, %{type: :income})
+      %{id: cat2_id} = cat2 = insert!(:category, %{type: :expense})
+      new_attrs = %{name: "test", parent: cat}
+
+      assert {:ok, %{parent_id: ^cat_id, type: :income} = child_cat} =
+               Categories.create_category(new_attrs)
+
+      assert %Ecto.Changeset{changes: %{type: :expense, parent_id: ^cat2_id}} =
+               Categories.change_category(child_cat, %{parent: cat2})
+
+      assert {:ok, %{parent_id: ^cat2_id, type: :expense}} =
+               Categories.update_category(child_cat, %{parent: cat2})
+    end
+
+    test "it could not have itself as parent" do
+      {:ok, cat} = Categories.create_category(%{name: "cat"})
+      assert %Ecto.Changeset{valid?: false} = Categories.change_category(cat, %{parent: cat})
+    end
+
+    test "it should pass the parent in attrs instead of parent_id" do
+      {:ok, cat} = Categories.create_category(%{name: "cat", type: :income})
+
+      assert {:error, %Ecto.Changeset{} = changeset} =
+               Categories.create_category(%{name: "bat", parent_id: cat.id})
+
+      assert %{parent: [msg]} = errors_on(changeset)
+      assert msg =~ "should be set parent"
     end
   end
 end

@@ -99,7 +99,7 @@ defmodule HousekeepingBook.Categories do
   """
   def create_category(attrs \\ %{}) do
     %Category{}
-    |> changeset(attrs)
+    |> changeset(attrs, attrs[:parent] || attrs["parent"])
     |> Repo.insert()
   end
 
@@ -117,7 +117,7 @@ defmodule HousekeepingBook.Categories do
   """
   def update_category(%Category{} = category, attrs) do
     category
-    |> changeset(attrs)
+    |> changeset(attrs, attrs[:parent] || attrs["parent"])
     |> Repo.update()
   end
 
@@ -147,14 +147,52 @@ defmodule HousekeepingBook.Categories do
 
   """
   def change_category(%Category{} = category, attrs \\ %{}) do
-    changeset(category, attrs)
+    changeset(category, attrs, attrs[:parent] || attrs["parent"])
   end
 
   @doc false
-  defp changeset(category, attrs) do
+  defp changeset(category, attrs, parent) do
     category
-    |> cast(attrs, [:name, :type, :parent_id])
-    |> validate_required([:name, :type])
+    |> cast(attrs, [:name, :type])
+    |> validate_required([:name])
+    |> cast_and_validate_parent(attrs, parent)
+    |> maybe_follow_parent_type(parent)
+  end
+
+  defp cast_and_validate_parent(changeset, attrs, parent) do
+    case parent do
+      parent when parent != nil ->
+        changeset
+        |> put_change(:parent_id, parent.id)
+
+      nil ->
+        changeset
+    end
+    |> validate_parent(attrs)
+  end
+
+  def validate_parent(changeset, attrs) do
+    cond do
+      not is_nil(attrs[:parent_id] || attrs["parent_id"]) ->
+        add_error(changeset, :parent, "should be set parent instead of parent_id")
+
+      (parent_id = get_change(changeset, :parent_id)) && parent_id == changeset.data.id ->
+        add_error(changeset, :parent, "can't be the same as the category itself")
+
+      true ->
+        changeset
+    end
+  end
+
+  defp maybe_follow_parent_type(changeset, parent) do
+    case changeset do
+      %Ecto.Changeset{changes: %{parent_id: parent_id}} when parent_id != nil ->
+        changeset
+        |> put_change(:type, parent.type)
+
+      _ ->
+        changeset
+    end
   end
 
   @doc false
@@ -162,11 +200,31 @@ defmodule HousekeepingBook.Categories do
     Repo.delete_all(Category)
   end
 
+  @spec top_categories() :: [Category.t()]
+  def top_categories do
+    from(Category)
+    |> where([c], is_nil(c.parent_id))
+    |> Repo.all()
+  end
+
   @spec bottom_categories() :: [Category.t()]
-  def bottom_categories() do
+  def bottom_categories do
     from(Category, as: :c)
-    |> join(:left, [c: c], p in assoc(c, :parent), on: c.id == p.parent_id, as: :p)
+    |> join(:left, [c: c], p in assoc(c, :children), as: :p)
     |> where([p: p], is_nil(p.id))
+    |> Repo.all()
+  end
+
+  @spec child_categories(Category.t() | integer()) :: [Category.t()]
+  def child_categories(%Category{} = parent_category) do
+    parent_category
+    |> Repo.preload(:children)
+    |> Map.get(:children)
+  end
+
+  def child_categories(parent_id) when is_integer(parent_id) do
+    from(Category)
+    |> where([c], c.parent_id == ^parent_id)
     |> Repo.all()
   end
 
@@ -178,6 +236,11 @@ defmodule HousekeepingBook.Categories do
 
   def new_category(attrs \\ %{}) do
     Category.new(attrs)
+  end
+
+  def ensure_with_parent(%{parent: nil, parent_id: pid} = category) when pid != nil do
+    category
+    |> Repo.preload(:parent, force: true)
   end
 
   def ensure_with_parent(category) do
