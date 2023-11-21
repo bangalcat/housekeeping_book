@@ -1,6 +1,9 @@
 defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
   use HousekeepingBookWeb, :live_component
 
+  import HousekeepingBookWeb.CategoryLive.Helper
+  import HousekeepingBookWeb.CategoryLive.Component
+  alias HousekeepingBookWeb.CategoryLive.Component.Tree
   alias HousekeepingBook.Categories
 
   @impl true
@@ -20,18 +23,40 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:type]} type="text" label="Type" />
-        <.input
-          field={@form[:parent_id]}
-          type="select"
-          label="Parent"
-          options={@options[:category]}
-          prompt="Choose Parent Category"
-        />
+        <.input field={@form[:type]} type="select" label="Type" options={category_type_options()} />
+        <div phx-feedback-for="parent">
+          Parent Category:
+          <input
+            id="parent-category-name"
+            type="text"
+            name="parent"
+            disabled
+            value={if @last_select, do: @last_select.name, else: "None"}
+          />
+          <.error :for={msg <- @form[:parent].errors}><%= msg %></.error>
+          <.button type="button" phx-click="toggle-tree-modal" phx-target={@myself}>
+            Select Parent Category
+          </.button>
+        </div>
         <:actions>
           <.button phx-disable-with="Saving...">Save Category</.button>
         </:actions>
       </.simple_form>
+
+      <.modal
+        :if={@open_tree_modal}
+        id="category-tree-modal"
+        show
+        on_cancel={JS.push("toggle-tree-modal", target: @myself)}
+      >
+        <.columns_tree
+          tree={@tree}
+          last_select={@last_select}
+          target={@myself}
+          select_item_event="tree-select-item"
+          select_done_event="tree-select-done"
+        />
+      </.modal>
     </div>
     """
   end
@@ -43,12 +68,22 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_new(:options, fn -> category_options() end)
+     |> assign(tree: Tree.new(), open_tree_modal: false, last_select: category.parent)
+     # |> assign_new(:options, fn -> category_options() end)
      |> assign_form(changeset)}
+  end
+
+  def update(%{parent_select: parent} = _assigns, socket) do
+    changeset =
+      Categories.change_category(socket.assigns.category, %{parent_id: parent.id, parent: parent})
+
+    {:ok, assign_form(socket, changeset)}
   end
 
   @impl true
   def handle_event("validate", %{"category" => category_params}, socket) do
+    category_params = category_params |> Map.put("parent", socket.assigns.last_select)
+
     changeset =
       socket.assigns.category
       |> Categories.change_category(category_params)
@@ -58,7 +93,35 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
   end
 
   def handle_event("save", %{"category" => category_params}, socket) do
+    category_params = category_params |> Map.put("parent", socket.assigns.last_select) |> dbg()
     save_category(socket, socket.assigns.action, category_params)
+  end
+
+  def handle_event("toggle-tree-modal", _, socket) do
+    socket =
+      case socket.assigns.open_tree_modal do
+        false ->
+          top_categories = Categories.top_categories()
+
+          socket
+          |> assign(:tree, Tree.add_column(Tree.new(), top_categories, nil))
+          |> assign(:open_tree_modal, true)
+
+        true ->
+          socket
+          |> assign(:open_tree_modal, false)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("tree-select-item", %{"id" => id, "level" => level}, socket) do
+    socket = handle_select_item(socket, String.to_integer(id), String.to_integer(level))
+    {:noreply, socket}
+  end
+
+  def handle_event("tree-select-done", _, socket) do
+    {:noreply, socket |> assign(:open_tree_modal, false)}
   end
 
   defp save_category(socket, :edit, category_params) do
@@ -97,8 +160,16 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  defp category_options do
-    categories = Categories.list_categories()
-    %{category: categories |> Enum.map(&{&1.name, &1.id})}
+  defp handle_select_item(socket, id, level) do
+    items = Categories.child_categories(id)
+
+    tree =
+      socket.assigns.tree
+      |> Tree.drop_columns_below(level)
+      |> Tree.add_column(items, id)
+
+    socket
+    |> assign(:tree, tree)
+    |> assign(:last_select, Tree.last_select_item(tree))
   end
 end
