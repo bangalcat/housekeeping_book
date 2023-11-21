@@ -1,6 +1,8 @@
 defmodule HousekeepingBook.Accounts.Users do
   import Ecto.Changeset
 
+  alias HousekeepingBook.Schema.User
+
   @doc """
   A user changeset for registration.
 
@@ -126,7 +128,7 @@ defmodule HousekeepingBook.Accounts.Users do
   If there is no user or the user doesn't have a password, we call
   `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%HousekeepingBook.Schema.User{hashed_password: hashed_password}, password)
+  def valid_password?(%User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end
@@ -145,5 +147,19 @@ defmodule HousekeepingBook.Accounts.Users do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def info_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:type])
+    |> validate_inclusion(:type, [:normal, :admin])
+    |> name_changeset(attrs)
+    |> email_changeset(attrs)
+  end
+
+  def name_changeset(changeset, attrs) do
+    changeset
+    |> cast(attrs, [:name])
+    |> validate_length(:name, min: 2, max: 100)
   end
 end

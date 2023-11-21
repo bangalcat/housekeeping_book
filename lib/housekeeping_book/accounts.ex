@@ -4,7 +4,6 @@ defmodule HousekeepingBook.Accounts do
   """
 
   import Ecto.Query, warn: false
-  import Ecto.Changeset
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.User
@@ -62,25 +61,6 @@ defmodule HousekeepingBook.Accounts do
     Repo.get_by!(User, name: name)
   end
 
-  @deprecated "in favor of `register_user/1`"
-  @doc """
-  Creates a user.
-
-  ## Examples
-
-      iex> create_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> create_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_user(attrs \\ %{}) do
-    %User{}
-    |> user_changeset(attrs)
-    |> Repo.insert()
-  end
-
   @doc """
   Updates a user.
 
@@ -95,7 +75,7 @@ defmodule HousekeepingBook.Accounts do
   """
   def update_user(%User{} = user, attrs) do
     user
-    |> user_changeset(attrs)
+    |> Users.info_changeset(attrs)
     |> Repo.update()
   end
 
@@ -125,15 +105,7 @@ defmodule HousekeepingBook.Accounts do
 
   """
   def change_user(%User{} = user, attrs \\ %{}) do
-    user_changeset(user, attrs)
-  end
-
-  @doc false
-  defp user_changeset(user, attrs) do
-    user
-    |> cast(attrs, [:name, :email, :type])
-    |> validate_required([:name, :type])
-    |> validate_format(:email, ~r/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/)
+    Users.info_changeset(user, attrs)
   end
 
   ## Database getters
