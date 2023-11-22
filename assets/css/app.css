@@ -55,4 +55,20 @@
   .pagination-link {
     @apply mx-2;
   }
+
+  .bg-sidebar {
+    @apply bg-[#3d68ff];
+  }
+  .cta-btn {
+    @apply text-[#3d68ff];
+  }
+  .ative-na-link {
+    @apply bg-[#1947ee];
+  }
+  .nav-item {
+    @apply hover:bg-[#1947ee];
+  }
+  .accounts-link {
+    @apply hover:bg-[#3d68ff];
+  }
 }

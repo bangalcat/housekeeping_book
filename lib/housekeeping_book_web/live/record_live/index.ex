@@ -7,7 +7,7 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    socket = assign_user_device(socket, session)
+    # socket = assign_user_device(socket, session)
     {:ok, socket |> assign(records: nil, meta: nil) |> assign_options()}
   end
 

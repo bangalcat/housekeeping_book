@@ -11,88 +11,84 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body>
-    <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-      <li>
+  <body class="flex bg-gray-100">
+    <.nav>
+      <:top_button>
         <.link
-          href={~p"/"}
-          class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+          href={~p"/records/new"}
+          class="w-full bg-white cta-btn font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center"
         >
-          Home
+          <.icon name="hero-plus-mini" /> New Record
         </.link>
-      </li>
-      <%= if assigns[:current_user] do %>
-        <li class="text-[0.8125rem] leading-6 text-zinc-900">
-          <%= @current_user.email %>
-        </li>
-        <li>
+      </:top_button>
+      <:menu_item :if={@current_user}>
+        <.link href={~p"/records"}>
+          Records
+        </.link>
+      </:menu_item>
+      <:menu_item :if={@current_user}>
+        <.link href={~p"/categories"}>
+          Categories
+        </.link>
+      </:menu_item>
+      <:menu_item :if={@current_user}>
+        <.link href={~p"/admin/users"}>
+          Users
+        </.link>
+      </:menu_item>
+      <:menu_item :if={@current_user}>
+        <.link href={~p"/tags"}>
+          Tags
+        </.link>
+      </:menu_item>
+      <:menu_item :if={!@current_user}>
+        <.link href={~p"/users/log_in"}>
+          Log In
+        </.link>
+      </:menu_item>
+      <:top_profile :if={@current_user}>
+        <div class="flex-row text-center">
+          <button
+            phx-click={JS.toggle(to: ".profile-openable")}
+            class="realtive z-10 w-10 h-10 rounded-full overflow-hidden border-4 border-gray-400 hover:border-gray-300 focus:border-gray-300 focus:outline-none"
+          >
+            <img src="https://source.unsplash.com/uJ8LNVCBjFQ/400x400" />
+          </button>
+          <span class="text-xs flex"><%= @current_user.name %></span>
+        </div>
+        <button
+          phx-click={JS.hide(to: ".profile-openable")}
+          class="hidden h-full w-full fixed inset-0 cursor-default"
+        >
+        </button>
+        <div
+          phx-click-away={JS.hide()}
+          class="profile-openable absolute w-32 bg-white rounded-lg shadow-lg py-2 mt-16 hidden"
+        >
           <.link
             href={~p"/users/settings"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            class="block px-4 py-2 account-link hover:text-zinc-100"
           >
             Settings
           </.link>
-        </li>
-        <li>
           <.link
+            method="DELETE"
             href={~p"/users/log_out"}
-            method="delete"
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            class="block px-4 py-2 account-link hover:text-zinc-100"
           >
-            Log out
+            Log Out
           </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/admin/users"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Users
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/records"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Records
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/categories"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Categories
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/tags"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Tags
-          </.link>
-        </li>
-      <% else %>
-        <li>
-          <.link
-            href={~p"/users/register"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Register
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/users/log_in"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Log in
-          </.link>
-        </li>
-      <% end %>
-    </ul>
-    <%= @inner_content %>
+        </div>
+      </:top_profile>
+      <:top_profile :if={!@current_user}>
+        <.link href={~p"/users/log_in"} class="block px-4 py-2 hover:text-zinc-100">Log In</.link>
+        <.link href={~p"/users/register"} class="block px-4 py-2 hover:text-zinc-100">
+          Register
+        </.link>
+      </:top_profile>
+      <div class="w-full overflow-x-hidden border-t flex flex-col">
+        <%= @inner_content %>
+      </div>
+    </.nav>
   </body>
 </html>
