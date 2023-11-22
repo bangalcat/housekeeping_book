@@ -2,6 +2,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   use HousekeepingBookWeb, :live_component
 
   alias HousekeepingBook.Records
+  alias HousekeepingBookWeb.CategoryLive.Component.Tree
 
   @impl true
   def render(assigns) do
@@ -22,13 +23,20 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:description]} type="text" label="Description" />
-        <.input
-          field={@form[:category_id]}
-          type="select"
-          label="Category"
-          options={@options[:category]}
-          prompt="Choose a category"
-        />
+        <div phx-feedback-for="category">
+          Category:
+          <input
+            id="category-name"
+            type="text"
+            name="parent"
+            disabled
+            value={if @last_select_category, do: @last_select_category.name, else: "None"}
+          />
+          <.error :for={msg <- @form[:category_id].errors}><%= msg %></.error>
+          <.button type="button" phx-click="toggle-tree-modal" phx-target={@myself}>
+            Select Category
+          </.button>
+        </div>
         <.input
           field={@form[:subject_id]}
           type="select"
@@ -47,6 +55,20 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
           <.button phx-disable-with="Saving...">Save Record</.button>
         </:actions>
       </.simple_form>
+      <.modal
+        :if={@open_tree_modal}
+        id="category-tree-modal"
+        show
+        on_cancel={JS.push("toggle-tree-modal", target: @myself)}
+      >
+        <HousekeepingBookWeb.CategoryLive.Component.columns_tree
+          tree={@tree}
+          last_select={@last_select_category}
+          target={@myself}
+          select_item_event="tree-select-item"
+          select_done_event="tree-select-done"
+        />
+      </.modal>
     </div>
     """
   end
@@ -59,6 +81,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
      socket
      |> assign(assigns)
      # |> assign_new(:options, fn -> assign_options() end)
+     |> assign(tree: Tree.new(), open_tree_modal: false, last_select_category: record.category)
      |> assign_form(changeset)}
   end
 
@@ -73,7 +96,48 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   end
 
   def handle_event("save", %{"record" => record_params}, socket) do
+    record_params = Map.put(record_params, "category_id", socket.assigns.last_select_category.id)
     save_record(socket, socket.assigns.action, record_params)
+  end
+
+  def handle_event("toggle-tree-modal", _, socket) do
+    socket =
+      case socket.assigns.open_tree_modal do
+        false ->
+          top_categories = HousekeepingBook.Categories.top_categories()
+
+          socket
+          |> assign(:tree, Tree.add_column(Tree.new(), top_categories, nil))
+          |> assign(:open_tree_modal, true)
+
+        true ->
+          socket
+          |> assign(:open_tree_modal, false)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("tree-select-item", %{"id" => id, "level" => level}, socket) do
+    socket = handle_select_item(socket, String.to_integer(id), String.to_integer(level))
+    {:noreply, socket}
+  end
+
+  def handle_event("tree-select-done", _, socket) do
+    {:noreply, socket |> assign(:open_tree_modal, false)}
+  end
+
+  defp handle_select_item(socket, id, level) do
+    items = HousekeepingBook.Categories.child_categories(id)
+
+    tree =
+      socket.assigns.tree
+      |> Tree.drop_columns_below(level)
+      |> Tree.add_column(items, id)
+
+    socket
+    |> assign(:tree, tree)
+    |> assign(:last_select_category, Tree.last_select_item(tree))
   end
 
   defp save_record(socket, :edit, record_params) do
