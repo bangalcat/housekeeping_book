@@ -14,7 +14,7 @@ config :housekeeping_book,
 # Configures the endpoint
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   url: [host: "localhost"],
-  adapter: Phoenix.Endpoint.Cowboy2Adapter,
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: HousekeepingBookWeb.ErrorHTML, json: HousekeepingBookWeb.ErrorJSON],
     layout: false
