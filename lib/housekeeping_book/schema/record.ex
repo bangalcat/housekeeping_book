@@ -6,7 +6,16 @@ defmodule HousekeepingBook.Schema.Record do
 
   @derive {
     Flop.Schema,
-    filterable: [:date, :amount, :payment, :tags, :category_name, :category_type, :subject_name],
+    filterable: [
+      :date,
+      :amount,
+      :payment,
+      :tags,
+      :category_id,
+      :category_name,
+      :category_type,
+      :subject_name
+    ],
     sortable: [:date, :amount, :payment],
     default_limit: 30,
     default_order: %{order_by: [:date], order_directions: [:desc, :asc]},
