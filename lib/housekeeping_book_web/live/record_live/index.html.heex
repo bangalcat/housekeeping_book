@@ -42,6 +42,7 @@
 />
 
 <Flop.Phoenix.table
+  :if={@records}
   items={@records}
   meta={@meta}
   path={~p"/records"}
@@ -77,7 +78,7 @@
   </:action>
 </Flop.Phoenix.table>
 
-<Flop.Phoenix.pagination meta={@meta} path={~p"/records"} />
+<Flop.Phoenix.pagination :if={@meta} meta={@meta} path={~p"/records"} />
 
 <.modal
   :if={@live_action in [:new, :edit]}

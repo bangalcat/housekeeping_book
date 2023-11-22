@@ -25,7 +25,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Component do
         Done
       </.button>
       <div class="flex flex-row flex-nowrap">
-        <%= for {selected_id, items, i} <- Tree.pair_list_with_index(@tree) |> dbg do %>
+        <%= for {selected_id, items, i} <- Tree.pair_list_with_index(@tree)  do %>
           <.column
             items={items}
             selected={selected_id}
@@ -51,7 +51,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Component do
       <%= for item <- @items do %>
         <li
           id={"item-#{ item.id }"}
-          class={"px-4 py-2 cursor-pointer bg-white hover:bg-sky-100 hover:text-sky-900 border-b last:border-none border-gray-200 transition-all duration-300 ease-in-out" <> select_class(@selected == item.id)}
+          class={"px-4 py-2 cursor-pointer hover:bg-sky-100 hover:text-sky-900 border-b last:border-none border-gray-200 transition-all duration-300 ease-in-out" <> select_class(@selected == item.id)}
           phx-target={@target}
           phx-click={@select_item_event}
           phx-value-id={item.id}
@@ -65,5 +65,5 @@ defmodule HousekeepingBookWeb.CategoryLive.Component do
   end
 
   defp select_class(true), do: " bg-sky-200 text-sky-900"
-  defp select_class(false), do: ""
+  defp select_class(false), do: " bg-white bg-white"
 end

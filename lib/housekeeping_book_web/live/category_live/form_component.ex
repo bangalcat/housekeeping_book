@@ -69,15 +69,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(tree: Tree.new(), open_tree_modal: false, last_select: category.parent)
-     # |> assign_new(:options, fn -> category_options() end)
      |> assign_form(changeset)}
-  end
-
-  def update(%{parent_select: parent} = _assigns, socket) do
-    changeset =
-      Categories.change_category(socket.assigns.category, %{parent_id: parent.id, parent: parent})
-
-    {:ok, assign_form(socket, changeset)}
   end
 
   @impl true
@@ -93,7 +85,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
   end
 
   def handle_event("save", %{"category" => category_params}, socket) do
-    category_params = category_params |> Map.put("parent", socket.assigns.last_select) |> dbg()
+    category_params = category_params |> Map.put("parent", socket.assigns.last_select)
     save_category(socket, socket.assigns.action, category_params)
   end
 

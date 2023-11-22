@@ -5,7 +5,7 @@ defmodule HousekeepingBook.Utils do
   def maybe_put_assoc(changeset, attrs, opts) do
     key = Keyword.fetch!(opts, :key)
 
-    case Map.get(attrs, key) do
+    case attrs[key] || attrs["#{key}"] do
       nil -> changeset
       value -> changeset |> put_assoc(key, value)
     end
