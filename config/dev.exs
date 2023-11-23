@@ -26,7 +26,8 @@ config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   secret_key_base: "3749x9GQ1uJcudagG+Cab/ayYDmzXcz3X5m3ywPkE9wxaaiRR0sJkHKU2v/xvyO0",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]},
+    storybook_tailwind: {Tailwind, :install_and_run, [:storybook, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -58,7 +59,8 @@ config :housekeeping_book, HousekeepingBookWeb.Endpoint,
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/housekeeping_book_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/housekeeping_book_web/(controllers|live|components)/.*(ex|heex)$",
+      ~r"storybook/.*(exs)$"
     ]
   ]
 

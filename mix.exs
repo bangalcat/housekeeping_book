@@ -68,7 +68,8 @@ defmodule HousekeepingBook.MixProject do
       {:flop_phoenix, "~> 0.22.4"},
       {:ex_cldr, "~> 2.37"},
       {:ex_cldr_numbers, ">= 0.0.0"},
-      {:ex_cldr_dates_times, ">= 0.0.0"}
+      {:ex_cldr_dates_times, ">= 0.0.0"},
+      {:phoenix_storybook, "~> 0.5.0"}
     ]
   end
 
@@ -86,7 +87,12 @@ defmodule HousekeepingBook.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.deploy": [
+        "tailwind default --minify",
+        "esbuild default --minify",
+        "tailwind storybook --minify",
+        "phx.digest"
+      ]
     ]
   end
 end

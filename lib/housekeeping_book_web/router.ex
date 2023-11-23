@@ -116,4 +116,13 @@ defmodule HousekeepingBookWeb.Router do
       live "/users/:id/show/edit", UserLive.Show, :edit
     end
   end
+
+  scope "/" do
+    storybook_assets()
+  end
+
+  scope "/", HousekeepingBookWeb do
+    pipe_through(:browser)
+    live_storybook("/storybook", backend_module: HousekeepingBookWeb.Storybook)
+  end
 end
