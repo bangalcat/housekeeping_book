@@ -12,11 +12,11 @@
     </script>
   </head>
   <body class="flex bg-gray-100">
-    <.nav>
+    <.nav_layout>
       <:top_button>
         <.link
           href={~p"/records/new"}
-          class="w-full bg-white cta-btn font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center"
+          class="w-full bg-white hover:text-primary font-semibold py-2 mt-5 rounded-br-lg rounded-bl-lg rounded-tr-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center"
         >
           <.icon name="hero-plus-mini" /> New Record
         </.link>
@@ -81,7 +81,9 @@
         </div>
       </:top_profile>
       <:top_profile :if={!@current_user}>
-        <.link href={~p"/users/log_in"} class="block px-4 py-2 hover:text-zinc-100">Log In</.link>
+        <.link href={~p"/users/log_in"} class="block px-4 py-2 hover:text-zinc-100">
+          Log In
+        </.link>
         <.link href={~p"/users/register"} class="block px-4 py-2 hover:text-zinc-100">
           Register
         </.link>
@@ -89,6 +91,6 @@
       <div class="w-full overflow-x-hidden border-t flex flex-col">
         <%= @inner_content %>
       </div>
-    </.nav>
+    </.nav_layout>
   </body>
 </html>
