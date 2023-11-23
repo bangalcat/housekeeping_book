@@ -15,6 +15,8 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+        primary: "#1947ee",
+        second: "#3d68ff",
       }
     },
   },
