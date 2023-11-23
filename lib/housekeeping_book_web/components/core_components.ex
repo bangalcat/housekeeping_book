@@ -231,7 +231,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
       type={@type}
       class={[
         "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "text-sm font-semibold leading-6 text-white active:text-white/80 disabled:bg-zinc-300",
         @class
       ]}
       {@rest}
@@ -473,8 +473,8 @@ defmodule HousekeepingBookWeb.CoreComponents do
       end
 
     ~H"""
-    <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-[40rem] mt-11 sm:w-full">
+    <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0 w-full">
+      <table class="w-[40rem] mt-11 sm:w-full table-auto">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>

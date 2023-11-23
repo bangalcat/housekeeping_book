@@ -9,9 +9,9 @@ defmodule HousekeepingBookWeb.Layouts do
   slot :inner_block, required: true
   slot :top_button
 
-  def nav(assigns) do
+  def nav_layout(assigns) do
     ~H"""
-    <aside class="relative bg-sidebar h-screen w-64 hidden sm:block shadow-xl">
+    <aside class="relative bg-second w-64 h-screen hidden sm:block shadow-xl">
       <div class="p-6">
         <a href="/" class="text-white text-3xl font-semibold uppercase hover:text-gray-300">
           Home
@@ -22,7 +22,7 @@ defmodule HousekeepingBookWeb.Layouts do
         <ul class="">
           <li
             :for={item <- @menu_item}
-            class="items-center active-nav-link text-white py-4 pl-6 nav-item"
+            class="items-center active-nav-link text-white py-4 pl-6 hover:bg-primary"
           >
             <%= render_slot(item) %>
           </li>
@@ -30,18 +30,17 @@ defmodule HousekeepingBookWeb.Layouts do
       </nav>
     </aside>
 
-    <div class="w-full flex flex-col h-screen overflow-y-hidden">
+    <div class="relative w-full flex flex-col h-screen overflow-y-hidden">
       <!-- Desktop Header -->
       <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex">
-        <div class="w-1/2"></div>
-        <div class="openable relative w-1/2 flex justify-end">
+        <div class="openable relative w-full flex justify-end">
           <%= render_slot(@top_profile) %>
         </div>
       </header>
       <!-- Mobile Header & Nav -->
-      <header class="w-full bg-sidebar py-5 px-6 sm:hidden">
+      <header class="w-full bg-second py-3 px-6 sm:hidden">
         <div class="flex items-center justify-between">
-          <a href="/" class="text-white text-3xl font-semibold uppercase hover:text-gray-300">
+          <a href="/" class="text-white text-xl font-semibold uppercase hover:text-gray-300">
             Home
           </a>
           <button
@@ -75,7 +74,7 @@ defmodule HousekeepingBookWeb.Layouts do
       <ul>
         <li
           :for={item <- @dropdown_item}
-          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 nav-item"
+          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 hover:bg-primary"
         >
           <%= render_slot(item) %>
         </li>

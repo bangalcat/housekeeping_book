@@ -10,14 +10,29 @@ defmodule HousekeepingBookWeb.CustomComponents do
   attr :on_change, :string, default: "update-filter"
   attr :target, :string, default: nil
   attr :fields, :list
+  attr :rest, :global, include: [~w(class)]
 
   def filter_form(%{meta: meta} = assigns) do
     assigns = assign(assigns, form: Phoenix.Component.to_form(meta), meta: nil)
 
     ~H"""
-    <.form for={@form} id={@id} phx-target={@target} phx-change={@on_change} phx-submit={@on_change}>
+    <.form
+      for={@form}
+      id={@id}
+      phx-target={@target}
+      phx-change={@on_change}
+      phx-submit={@on_change}
+      {@rest}
+    >
       <.filter_fields :let={i} form={@form} fields={@fields}>
-        <.input field={i.field} label={i.label} type={i.type} phx-debounce={120} {i.rest} />
+        <.input
+          field={i.field}
+          label={i.label}
+          type={i.type}
+          phx-debounce={120}
+          class="flex-auto"
+          {i.rest}
+        />
       </.filter_fields>
 
       <.button class="my-2" name="reset" type="reset">reset</.button>
