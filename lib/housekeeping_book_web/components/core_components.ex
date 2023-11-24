@@ -201,7 +201,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-10 space-y-8">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
@@ -374,7 +374,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
         type={@type}
         name={@name}
         id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        value={normalize_value(@type, @value)}
         class={[
           "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
@@ -386,6 +386,10 @@ defmodule HousekeepingBookWeb.CoreComponents do
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
+  end
+
+  def normalize_value(type, value) do
+    Phoenix.HTML.Form.normalize_value(type, value)
   end
 
   @doc """
@@ -535,7 +539,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
 
   def list(assigns) do
     ~H"""
-    <div class="mt-14">
+    <div class="mt-14 w-full">
       <dl class="-my-4 divide-y divide-zinc-100">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
           <dt class="w-1/4 flex-none text-zinc-500"><%= item.title %></dt>
