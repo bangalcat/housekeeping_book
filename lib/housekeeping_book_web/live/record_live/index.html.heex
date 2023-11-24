@@ -44,14 +44,14 @@
 
 <div class="w-full mt-6">
   <Flop.Phoenix.table
-    :if={@streams.records}
+    :if={@meta}
     items={@streams.records}
     meta={@meta}
     path={~p"/records"}
     row_click={fn {_, record} -> JS.navigate(~p"/records/#{record}") end}
   >
     <:col :let={{_, record}} label="Date" field={:date}>
-      <%= record.date |> DateTime.to_date() %>
+      <%= record |> format_datetime(@timezone) %>
     </:col>
     <:col :let={{_, record}} label="Description" field={:desciption}>
       <%= record.description %>
@@ -102,5 +102,7 @@
     record={@record}
     patch={~p"/records"}
     options={@options}
+    timezone={@timezone}
+    timezone_offset={@timezone_offset}
   />
 </.modal>

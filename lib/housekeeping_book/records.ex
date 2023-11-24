@@ -217,7 +217,7 @@ defmodule HousekeepingBook.Records do
     |> cast(attrs, [:amount, :description, :date, :payment, :tags, :category_id, :subject_id])
     |> Utils.maybe_put_assoc(attrs, key: :subject)
     |> Utils.maybe_put_assoc(attrs, key: :category)
-    |> validate_required([:amount, :description, :date])
+    |> validate_required([:amount, :description, :date, :category_id, :subject_id])
   end
 
   @spec record_payment_options() :: [{String.t(), atom()}]

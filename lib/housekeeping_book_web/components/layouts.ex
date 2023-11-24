@@ -32,8 +32,8 @@ defmodule HousekeepingBookWeb.Layouts do
 
     <div class="relative w-full flex flex-col h-screen overflow-y-hidden">
       <!-- Desktop Header -->
-      <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex">
-        <div class="openable relative w-full flex justify-end">
+      <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex flex-row-reverse">
+        <div class="openable z-10">
           <%= render_slot(@top_profile) %>
         </div>
       </header>

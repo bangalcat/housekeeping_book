@@ -69,7 +69,9 @@ defmodule HousekeepingBook.MixProject do
       {:ex_cldr, "~> 2.37"},
       {:ex_cldr_numbers, ">= 0.0.0"},
       {:ex_cldr_dates_times, ">= 0.0.0"},
-      {:phoenix_storybook, "~> 0.5.0"}
+      {:ua_parser, "~> 1.0"},
+      {:phoenix_storybook, "~> 0.5.0"},
+      {:tzdata, ">= 0.0.0"}
     ]
   end
 

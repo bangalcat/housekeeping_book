@@ -9,7 +9,7 @@
 </.header>
 
 <.list>
-  <:item title="Date"><%= format_date(@record) %></:item>
+  <:item title="Date"><%= format_datetime(@record, @timezone) %></:item>
   <:item title="Amount"><%= format_amount(@record) %></:item>
   <:item title="Description"><%= @record.description %></:item>
   <:item title="Category"><%= category_name(@record) %></:item>
@@ -36,5 +36,7 @@
     record={@record}
     patch={~p"/records/#{@record}"}
     options={record_options()}
+    timezone={@timezone}
+    timezone_offset={@timezone_offset}
   />
 </.modal>

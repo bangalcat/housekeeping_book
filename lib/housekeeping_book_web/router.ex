@@ -2,6 +2,7 @@ defmodule HousekeepingBookWeb.Router do
   use HousekeepingBookWeb, :router
 
   import HousekeepingBookWeb.UserAuth
+  import PhoenixStorybook.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -23,6 +24,10 @@ defmodule HousekeepingBookWeb.Router do
     get "/", PageController, :home
   end
 
+  scope "/" do
+    storybook_assets()
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", HousekeepingBookWeb do
   #   pipe_through :api
@@ -42,6 +47,12 @@ defmodule HousekeepingBookWeb.Router do
 
       live_dashboard "/dashboard", metrics: HousekeepingBookWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+
+    scope "/", HousekeepingBookWeb do
+      pipe_through :browser
+
+      live_storybook("/storybook", backend_module: HousekeepingBookWeb.Storybook)
     end
   end
 
@@ -115,14 +126,5 @@ defmodule HousekeepingBookWeb.Router do
       live "/users/:id", UserLive.Show, :show
       live "/users/:id/show/edit", UserLive.Show, :edit
     end
-  end
-
-  scope "/" do
-    storybook_assets()
-  end
-
-  scope "/", HousekeepingBookWeb do
-    pipe_through(:browser)
-    live_storybook("/storybook", backend_module: HousekeepingBookWeb.Storybook)
   end
 end
