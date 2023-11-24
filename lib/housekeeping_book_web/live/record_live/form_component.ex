@@ -21,21 +21,31 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:date]} type="datetime-local" label="Date" />
+        <.input
+          type="hidden"
+          id="timezone-offset"
+          field={@form[:timezone_offset]}
+          value={@timezone_offset}
+        />
         <.input field={@form[:amount]} type="number" label="Amount" />
         <.input field={@form[:description]} type="text" label="Description" />
         <div phx-feedback-for="category">
-          Category:
-          <input
-            id="category-name"
-            type="text"
-            name="parent"
-            disabled
-            value={if @last_select_category, do: @last_select_category.name, else: "None"}
-          />
-          <.error :for={msg <- @form[:category_id].errors}><%= msg %></.error>
-          <.button type="button" phx-click="toggle-tree-modal" phx-target={@myself}>
-            Select Category
+          <.label>
+            Category
+          </.label>
+          <.button
+            type="button"
+            phx-click="toggle-tree-modal"
+            phx-target={@myself}
+            class="py-1 rounded-sm bg-primary hover:bg-second"
+          >
+            <%= if @last_select_category do %>
+              <%= @last_select_category.name %>
+            <% else %>
+              Select Category
+            <% end %>
           </.button>
+          <.error :for={error <- @form[:category_id].errors}><%= translate_error(error) %></.error>
         </div>
         <.input
           field={@form[:subject_id]}
@@ -96,7 +106,20 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   end
 
   def handle_event("save", %{"record" => record_params}, socket) do
-    record_params = Map.put(record_params, "category_id", socket.assigns.last_select_category.id)
+    record_params =
+      record_params
+      |> Map.put(
+        "category_id",
+        socket.assigns.last_select_category && socket.assigns.last_select_category.id
+      )
+      |> Map.update("date", nil, fn
+        nil ->
+          nil
+
+        date ->
+          date <> ":00" <> record_params["timezone_offset"]
+      end)
+
     save_record(socket, socket.assigns.action, record_params)
   end
 

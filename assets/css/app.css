@@ -6,7 +6,7 @@
 
 @layer components {
   .table-container {
-    @apply overflow-x-auto;
+    @apply overflow-auto;
   }
 
   .my-table {

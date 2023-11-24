@@ -6,7 +6,7 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket |> assign_timezone()}
   end
 
   @impl true
@@ -18,6 +18,14 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
        :record,
        Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
      )}
+  end
+
+  def assign_timezone(socket) do
+    {timezone, offset} = get_timezone_with_offset(socket)
+
+    socket
+    |> assign(:timezone, timezone)
+    |> assign(:timezone_offset, offset)
   end
 
   defp page_title(:show), do: "Show Record"

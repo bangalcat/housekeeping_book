@@ -7,8 +7,14 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
-    # socket = assign_user_device(socket, session)
-    {:ok, socket |> assign(records: nil, meta: nil) |> assign_options()}
+    socket = assign_user_device(socket, session)
+
+    {:ok,
+     socket
+     |> assign_timezone()
+     |> assign(:meta, nil)
+     |> stream(:records, [])
+     |> assign_options()}
   end
 
   @impl true
@@ -20,10 +26,7 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Record")
-    |> assign(
-      :record,
-      Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
-    )
+    |> assign(:record, get_record!(id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -47,7 +50,8 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
          }) do
       {:ok, {records, meta}} ->
         socket
-        |> assign(%{records: records, meta: meta})
+        |> assign(%{meta: meta})
+        |> stream(:records, records, reset: true)
 
       {:error, meta} ->
         socket
@@ -60,6 +64,14 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
     |> assign(:options, record_options())
   end
 
+  def assign_timezone(socket) do
+    {timezone, offset} = get_timezone_with_offset(socket)
+
+    socket
+    |> assign(:timezone, timezone)
+    |> assign(:timezone_offset, offset)
+  end
+
   @impl true
   def handle_event("update-filter", params, socket) do
     params = Map.delete(params, "_target")
@@ -67,22 +79,16 @@ defmodule HousekeepingBookWeb.RecordLive.Index do
   end
 
   @impl true
-  def handle_event("select-per-page", %{"page-size" => per_page} = _params, socket) do
-    params = %{socket.assigns.options | per_page: per_page}
-    socket = push_patch(socket, to: ~p"/records?#{params}")
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     record = Records.get_record!(id)
     {:ok, _} = Records.delete_record(record)
 
-    {:noreply, push_patch(socket, to: ~p"/records")}
+    {:noreply, stream_delete(socket, :records, record)}
   end
 
   @impl true
-  def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, _record}}, socket) do
-    {:noreply, push_patch(socket, to: ~p"/records")}
+  def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, record}}, socket) do
+    record = get_record!(record.id)
+    {:noreply, stream_insert(socket, :records, record)}
   end
 end
