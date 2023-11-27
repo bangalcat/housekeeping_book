@@ -20,6 +20,7 @@ config :housekeeping_book, HousekeepingBook.Repo,
 # you can enable the server option below.
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
+  https: [port: 4001],
   secret_key_base: "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/",
   server: false
 
@@ -34,3 +35,5 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :housekeeping_book, :secret_code, ""
