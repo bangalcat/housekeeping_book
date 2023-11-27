@@ -55,6 +55,12 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   def tags(%{tags: tags}), do: Enum.join(tags, ", ")
 
   def format_amount(%{amount: amount}) do
+    format_amount(amount)
+  end
+
+  def format_amount(nil), do: nil
+
+  def format_amount(amount) do
     HousekeepingBook.Cldr.Number.to_string!(amount, format: :currency, currency: :from_locale)
   end
 
@@ -92,5 +98,28 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
 
   def get_timezone_with_offset(socket) do
     {get_connect_params(socket)["timezone"], get_connect_params(socket)["timezone_offset"]}
+  end
+
+  def get_amount_sum(records, category_type) do
+    records
+    |> Enum.filter(&(&1.category.type == category_type))
+    |> Enum.map(& &1.amount)
+    |> Enum.sum()
+    |> then(fn
+      0 -> nil
+      amount -> format_amount(amount)
+    end)
+  end
+
+  def find_nearest_record(records_map, date) when is_map_key(records_map, date),
+    do: records_map[date] |> hd()
+
+  def find_nearest_record(records_map, date) do
+    records_map
+    |> Enum.sort_by(fn {key, _} -> abs(Date.diff(date, key)) end)
+    |> case do
+      [] -> nil
+      [record | _] -> record
+    end
   end
 end

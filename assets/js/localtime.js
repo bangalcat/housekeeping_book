@@ -9,4 +9,4 @@ let LocalTime = {
   }
 }
 
-return LocalTime;
+export default LocalTime;

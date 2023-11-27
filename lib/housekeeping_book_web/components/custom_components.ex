@@ -12,17 +12,18 @@ defmodule HousekeepingBookWeb.CustomComponents do
   attr :body_class, :string, default: ""
   attr :header_class, :string, default: ""
   attr :footer_class, :string, default: ""
+  attr :rest, :global, include: ~w(id)
 
   def card(assigns) do
     ~H"""
-    <div class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]}>
-      <div class={["flex items-center space-x-2 text-sm", @header_class]}>
+    <div phx-update="stream" class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]} {@rest}>
+      <div class={["flex items-center space-x-2 text-sm dark:text-slate-50", @header_class]}>
         <%= render_slot(@card_header) %>
       </div>
-      <div class={["flex flex-wrap justify-stretch", @body_class]}>
+      <div class={["flex flex-wrap justify-stretch dark:text-slate-100", @body_class]}>
         <%= render_slot(@card_body) %>
       </div>
-      <div class={["text-sm font-medium", @footer_class]}>
+      <div class={["text-sm font-medium dark:text-slate-200", @footer_class]}>
         <%= render_slot(@card_footer) %>
       </div>
     </div>
@@ -109,34 +110,37 @@ defmodule HousekeepingBookWeb.CustomComponents do
   attr :day_content_fn, :any, default: &__MODULE__.always_nil/1
   attr :month_click_event, :string, default: "month-click-event"
   attr :day_click_event, :string, default: "day-click-event"
-  attr :prev_month_click, :string, default: "prev-month-click"
-  attr :next_month_click, :string, default: "next-month-click"
+  attr :prev_month_event, :string, default: "prev-month-click"
+  attr :next_month_event, :string, default: "next-month-click"
+  attr :calendar_click_event, :string, default: "calendar-event"
+  attr :class, :string
 
   def calendar(%{current_year: y, current_month: m} = assigns)
       when m in 1..12 and y in 1900..2100 do
-    {dow, 1, 7} = Calendar.ISO.day_of_week(y, m, 1, :monday)
-    blank_days_before = List.duplicate(0, dow - 1)
-    end_day = Calendar.ISO.days_in_month(y, m)
-
-    month_name = Enum.at(@months, m - 1)
+    first_day = Date.new!(y, m, 1)
+    dow = Date.day_of_week(first_day)
+    blank_days_before = List.duplicate(nil, dow - 1)
+    end_day = Date.days_in_month(first_day)
 
     weeks =
-      (blank_days_before ++ Enum.to_list(1..end_day//1))
-      |> Enum.chunk_every(7, 7, Stream.cycle([0]))
+      blank_days_before
+      |> Enum.concat(Date.range(first_day, Date.new!(y, m, end_day)))
+      |> Enum.chunk_every(7, 7, Stream.cycle([nil]))
 
-    assigns = Map.put(assigns, :weeks, weeks) |> Map.put(:month_name, month_name)
+    assigns = Map.put(assigns, :weeks, weeks) |> Map.put(:months, @months)
 
     ~H"""
-    <div class="md:p-8 p-5 dark:bg-gray-800 bg-white rounded-t w-full">
+    <div class={["md:p-8 py-3 px-1 dark:bg-gray-800 bg-white rounded-t w-full", @class]}>
       <!-- Top Bar -->
       <div class="px-4 flex items-center justify-between">
         <!-- Month Year -->
         <span
           tabindex="0"
           class="focus:outline-none text-base dark:text-gray-100 text-gray-800 cursor-pointer hover:text-gray-400"
-          phx-click={@month_click_event}
+          phx-click={@calendar_click_event}
+          phx-value-event={@month_click_event}
         >
-          <span class="text-lg font-bold"><%= @month_name %></span>
+          <span class="text-lg font-bold"><%= Enum.at(@months, @current_month - 1) %></span>
           <span><%= @current_year %></span>
         </span>
         <!-- Arrow Buttons -->
@@ -145,7 +149,8 @@ defmodule HousekeepingBookWeb.CustomComponents do
             type="button"
             aria-label="calendar backward"
             class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100"
-            phx-click={@prev_month_click}
+            phx-click={@calendar_click_event}
+            phx-value-event={@prev_month_event}
           >
             <.icon name="hero-chevron-left" />
           </button>
@@ -153,7 +158,8 @@ defmodule HousekeepingBookWeb.CustomComponents do
             type="button"
             aria-label="calendar forward"
             class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-100"
-            phx-click={@prev_month_click}
+            phx-click={@calendar_click_event}
+            phx-value-event={@next_month_event}
           >
             <.icon name="hero-chevron-right" />
           </button>
@@ -177,12 +183,13 @@ defmodule HousekeepingBookWeb.CustomComponents do
             <tr :for={days <- @weeks}>
               <.day
                 :for={day <- days}
-                day={day}
-                selected?={@selected_date && @selected_date.day == day}
+                date={day}
+                selected?={@selected_date && day && Date.compare(day, @selected_date) == :eq}
+                calendar_click_event={@calendar_click_event}
                 day_click_event={@day_click_event}
               >
-                <:day_content :if={day != 0}>
-                  <%= @day_content_fn.({@current_year, @current_month, day}) %>
+                <:day_content :if={day}>
+                  <%= @day_content_fn.(day) %>
                 </:day_content>
               </.day>
             </tr>
@@ -193,26 +200,28 @@ defmodule HousekeepingBookWeb.CustomComponents do
     """
   end
 
-  attr :day, :integer, required: true
+  attr :date, Date
   attr :selected?, :boolean, default: false
   attr :day_click_event, :string, required: true
+  attr :calendar_click_event, :string, required: true
   slot :day_content
 
   def day(assigns) do
     ~H"""
     <td class="align-top h-14">
       <div
-        class="px-2 py-2 cursor-pointer flex flex-col w-full justify-center items-center"
-        phx-click={@day_click_event}
+        :if={@date}
+        id={@date}
+        class="px-1 cursor-pointer flex flex-col w-full justify-center items-center"
+        phx-click={@calendar_click_event}
+        phx-value-event={@day_click_event}
+        phx-value-date={@date}
       >
-        <p
-          :if={@day != 0}
-          class={[
-            "text-base text-gray-500 dark:text-gray-100 font-medium hover:text-gray-400",
-            if(@selected?, do: focus_day_class())
-          ]}
-        >
-          <%= @day %>
+        <p class={[
+          "text-base text-gray-500 dark:text-gray-100 font-medium hover:text-gray-400 my-1",
+          if(@selected?, do: focus_day_class())
+        ]}>
+          <%= @date.day %>
         </p>
         <%= render_slot(@day_content) %>
       </div>
@@ -234,11 +243,11 @@ defmodule HousekeepingBookWeb.CustomComponents do
 
   def my_day_content(assigns) do
     ~H"""
-    <div class="flex flex-col w-fit text-center">
-      <span class="text-green-500 text-xs">
+    <div class="flex flex-col w-full text-center">
+      <span :if={@income} class="text-green-500 text-xs whitespace-nowrap">
         <%= @income %>
       </span>
-      <span class="text-red-500 text-xs">
+      <span :if={@expense} class="text-red-500 text-xs whitespace-nowrap">
         -<%= @expense %>
       </span>
     </div>

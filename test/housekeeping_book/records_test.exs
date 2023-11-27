@@ -1,6 +1,10 @@
 defmodule HousekeepingBook.RecordsTest do
   use HousekeepingBook.DataCase
 
+  import HousekeepingBook.AccountsFixtures
+  import HousekeepingBook.RecordsFixtures
+  import HousekeepingBook.CategoriesFixtures
+
   alias HousekeepingBook.Records
   alias HousekeepingBook.Schema.Record
 
@@ -36,7 +40,13 @@ defmodule HousekeepingBook.RecordsTest do
     end
 
     test "create_record/1 with valid data creates a record" do
-      valid_attrs = %{date: ~U[2023-11-15 05:48:00Z], description: "some description", amount: 42}
+      valid_attrs = %{
+        date: ~U[2023-11-15 05:48:00Z],
+        description: "some description",
+        amount: 42,
+        subject_id: user_fixture().id,
+        category_id: category_fixture().id
+      }
 
       assert {:ok, %Record{} = record} = Records.create_record(valid_attrs)
       assert record.date == ~U[2023-11-15 05:48:00Z]
@@ -49,7 +59,9 @@ defmodule HousekeepingBook.RecordsTest do
     end
 
     test "update_record/2 with valid data updates the record" do
-      record = insert!(:record)
+      user = user_fixture()
+      category = category_fixture()
+      record = record_fixture(user, category)
 
       update_attrs = %{
         date: ~U[2023-11-16 05:48:00Z],
@@ -82,9 +94,12 @@ defmodule HousekeepingBook.RecordsTest do
   end
 
   def setup_records(_) do
+    user = user_fixture()
+    category = category_fixture()
+
     records =
       for _ <- 1..10 do
-        insert!(:record, %{})
+        record_fixture(user, category)
       end
 
     {:ok, [records: records]}
