@@ -17,6 +17,15 @@ module.exports = {
         brand: "#FD4F00",
         primary: "#1947ee",
         second: "#3d68ff",
+      },
+      fontSize: {
+        xs: [
+          "0.6rem", {
+            lineHeight: "0.7rem",
+            letterSpacing: '-0.1em',
+            fontWeight: '300'
+          }
+        ],
       }
     },
   },

@@ -83,6 +83,8 @@ defmodule HousekeepingBookWeb.Router do
       live "/records/new", RecordLive.Index, :new
       live "/records/:id/edit", RecordLive.Index, :edit
 
+      live "/monthly_records", RecordLive.NewIndex, :index
+
       live "/records/:id", RecordLive.Show, :show
       live "/records/:id/show/edit", RecordLive.Show, :edit
 

@@ -6,5 +6,5 @@ defmodule HousekeepingBook.Cldr do
     default_locale: "ko",
     otp_app: :housekeeping_book,
     gettext: HousekeepingBook.Gettext,
-    providers: [Cldr.Number, Cldr.Calendar, Cldr.Date, Cldr.DateTime]
+    providers: [Cldr.Number, Cldr.Calendar, Cldr.DateTime]
 end

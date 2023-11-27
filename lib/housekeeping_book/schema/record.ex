@@ -3,6 +3,7 @@ defmodule HousekeepingBook.Schema.Record do
 
   alias HousekeepingBook.Schema.User
   alias HousekeepingBook.Schema.Category
+  alias HousekeepingBook.Flop.CustomFilters
 
   @derive {
     Flop.Schema,
@@ -14,12 +15,19 @@ defmodule HousekeepingBook.Schema.Record do
       :category_id,
       :category_name,
       :category_type,
-      :subject_name
+      :subject_name,
+      :date_month
     ],
     sortable: [:date, :amount, :payment],
-    default_limit: 30,
+    default_limit: 20,
     default_order: %{order_by: [:date], order_directions: [:desc, :asc]},
     adapter_opts: [
+      custom_fields: [
+        date_month: [
+          filter: {CustomFilters, :date_month_filter, [source: :date]},
+          operators: [:<=, :>=, :==]
+        ]
+      ],
       join_fields: [
         category_name: [
           binding: :category,

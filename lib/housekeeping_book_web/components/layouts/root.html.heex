@@ -27,6 +27,11 @@
         </.link>
       </:menu_item>
       <:menu_item :if={@current_user}>
+        <.link href={~p"/monthly_records"}>
+          Monthly
+        </.link>
+      </:menu_item>
+      <:menu_item :if={@current_user}>
         <.link href={~p"/categories"}>
           Categories
         </.link>

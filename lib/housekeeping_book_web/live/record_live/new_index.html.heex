@@ -1,0 +1,48 @@
+<div class="flex flex-col max-h-screen">
+  <.calendar
+    current_year={@year}
+    current_month={@month}
+    selected_date={@selected_date}
+    day_content_fn={&day_content(&1, @records_map)}
+    calendar_click_event="calendar-click"
+    day_click_event="select-day"
+    prev_month_event="prev-month"
+    next_month_event="next-month"
+    month_click_event="select-month"
+    class=""
+  />
+
+  <div
+    id="record-list"
+    class="space-y-3 pt-4 bg-slate-100 w-full overflow-y-scroll shrink snap-y snap-mandatory relative"
+    phx-hook="Scrolling"
+  >
+    <.card
+      :for={{_id, record} <- @streams.records}
+      id={"records-#{ record.id }"}
+      class="bg-orange-50 dark:bg-slate-700 snap-start scroll-m-2"
+    >
+      <:card_header>
+        <span>
+          <%= format_date(record) %>
+        </span>
+      </:card_header>
+      <:card_body>
+        <span class="grow text-ellipsis max-w-full">
+          <%= record.description %>
+        </span>
+        <span class="flex-none text-sm font-bold">
+          <%= format_amount(record) %>
+        </span>
+      </:card_body>
+      <:card_footer>
+        <span class="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-700 border text-sm">
+          <%= category_name(record) %>
+        </span>
+        <span class="ml-2 px-3 py-1 rounded-full bg-cyan-50 border text-zinc-800">
+          <%= subject_name(record) %>
+        </span>
+      </:card_footer>
+    </.card>
+  </div>
+</div>

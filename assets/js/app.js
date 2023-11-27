@@ -21,6 +21,7 @@ import "phoenix_html"
 import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import LocalTime from "./localtime"
+import Scrolling from "./scroll"
 import topbar from "../vendor/topbar"
 
 const offset = new Date().getTimezoneOffset()
@@ -28,7 +29,7 @@ const timezoneOffset = (offset > 0 ? '-' : '+') + Math.abs(offset / 60).toFixed(
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: { LocalTime },
+  hooks: { LocalTime, Scrolling },
   params: {
     _csrf_token: csrfToken,
     locale: Intl.NumberFormat().resolvedOptions().locale,
