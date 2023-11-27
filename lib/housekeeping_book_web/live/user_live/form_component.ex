@@ -23,6 +23,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         <.input field={@form[:email]} type="text" label="Email" />
         <.input field={@form[:password]} type="text" label="Password" />
         <.input field={@form[:type]} type="text" label="Type" />
+        <.input field={@form[:secret_code]} type="text" label="Secret Code" />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>
@@ -71,7 +72,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
   end
 
   defp save_user(socket, :new, user_params) do
-    case Accounts.register_user(user_params) do
+    case Accounts.register_user(user_params, secret_code: user_params["secret_code"]) do
       {:ok, user} ->
         notify_parent({:saved, user})
 

@@ -4,6 +4,8 @@ defmodule HousekeepingBook.CategoriesFixtures do
   entities via the `HousekeepingBook.Categories` context.
   """
 
+  def unique_name, do: "category-#{System.unique_integer()}"
+
   @doc """
   Generate a category.
   """
@@ -11,8 +13,8 @@ defmodule HousekeepingBook.CategoriesFixtures do
     {:ok, category} =
       attrs
       |> Enum.into(%{
-        name: "some name",
-        type: "some type"
+        name: unique_name(),
+        type: :income
       })
       |> HousekeepingBook.Categories.create_category()
 

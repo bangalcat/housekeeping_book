@@ -3,9 +3,9 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
   import Phoenix.LiveViewTest
 
-  @create_attrs %{name: "some name", type: "income", parent_id: nil}
+  @create_attrs %{name: "some name", type: "income"}
   @update_attrs %{name: "some updated name", type: "expense"}
-  @invalid_attrs %{name: nil, type: nil}
+  @invalid_attrs %{name: nil}
 
   defp create_category(_) do
     category = insert!(:category)

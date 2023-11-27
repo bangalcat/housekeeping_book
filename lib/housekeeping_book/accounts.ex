@@ -158,10 +158,16 @@ defmodule HousekeepingBook.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def register_user(attrs) do
-    %User{}
-    |> Users.registration_changeset(attrs)
-    |> Repo.insert()
+  def register_user(attrs, opts \\ []) do
+    secret_code = opts[:secret_code]
+
+    if secret_code == Application.get_env(:housekeeping_book, :secret_code) do
+      %User{}
+      |> Users.registration_changeset(attrs)
+      |> Repo.insert()
+    else
+      {:error, {:invalid_secret_code, secret_code}}
+    end
   end
 
   @doc """

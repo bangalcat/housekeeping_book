@@ -35,6 +35,7 @@ defmodule HousekeepingBookWeb.UserRegistrationLive do
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
         <.input field={@form[:type]} type="hidden" value="normal" />
+        <.input field={@form[:promo_code]} type="text" label="Secret Code" required />
 
         <:actions>
           <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
@@ -56,7 +57,7 @@ defmodule HousekeepingBookWeb.UserRegistrationLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    case Accounts.register_user(user_params) do
+    case Accounts.register_user(user_params, secret_code: user_params["promo_code"]) do
       {:ok, user} ->
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(
@@ -69,6 +70,9 @@ defmodule HousekeepingBookWeb.UserRegistrationLive do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
+
+      {:error, {:invalid_secret_code, _}} ->
+        {:noreply, socket |> assign(check_errors: true)}
     end
   end
 

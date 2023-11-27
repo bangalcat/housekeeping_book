@@ -25,7 +25,9 @@ defmodule HousekeepingBook.AccountsFixtures do
     {:ok, user} =
       attrs
       |> valid_user_attributes()
-      |> HousekeepingBook.Accounts.register_user()
+      |> HousekeepingBook.Accounts.register_user(
+        secret_code: Application.get_env(:housekeeping_book, :secret_code)
+      )
 
     user
   end
