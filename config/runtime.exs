@@ -50,6 +50,7 @@ if config_env() == :prod do
 
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
+  https_port = String.to_integer(System.get_env("HTTPS_PORT") || "4040")
 
   config :housekeeping_book, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
@@ -63,7 +64,15 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    https: [port: https_port, cipher_suite: :strong, transport_options: [socket_opts: [:inet6]]],
     secret_key_base: secret_key_base
+
+  config :housekeeping_book, :cert_path, "/opt/site_encrypt_db"
+  config :housekeeping_book, :cert_mode, "production"
+
+  config :housekeeping_book, :lets_encrypt,
+    domains: System.fetch_env!("DOMAINS") |> String.split(","),
+    emails: System.fetch_env!("EMAILS") |> String.split(",")
 
   # ## SSL Support
   #
