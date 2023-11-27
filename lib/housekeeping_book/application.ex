@@ -18,7 +18,7 @@ defmodule HousekeepingBook.Application do
       # Start a worker by calling: HousekeepingBook.Worker.start_link(arg)
       # {HousekeepingBook.Worker, arg},
       # Start to serve requests, typically the last entry
-      HousekeepingBookWeb.Endpoint
+      {SiteEncrypt.Phoenix, HousekeepingBookWeb.Endpoint}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
