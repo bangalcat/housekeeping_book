@@ -64,7 +64,7 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    https: [port: https_port, cipher_suite: :strong, transport_options: [socket_opts: [:inet6]]],
+    https: [port: https_port, cipher_suite: :strong],
     secret_key_base: secret_key_base
 
   config :housekeeping_book, :cert_path, "/opt/site_encrypt_db"
