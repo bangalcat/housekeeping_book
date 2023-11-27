@@ -2,6 +2,7 @@ defmodule HousekeepingBookWeb.Router do
   use HousekeepingBookWeb, :router
 
   import HousekeepingBookWeb.UserAuth
+  import HousekeepingBookWeb.UserAgent
   import PhoenixStorybook.Router
 
   pipeline :browser do
@@ -12,6 +13,7 @@ defmodule HousekeepingBookWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :fetch_user_device
   end
 
   pipeline :api do
