@@ -1,4 +1,4 @@
-defmodule Storybook.Root do
+defmodule Storybook do
   use Boundary, check: [in: false, out: false]
   # See https://hexdocs.pm/phoenix_storybook/PhoenixStorybook.Index.html for full index
   # documentation.
