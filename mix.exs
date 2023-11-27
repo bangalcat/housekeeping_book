@@ -71,7 +71,8 @@ defmodule HousekeepingBook.MixProject do
       {:ex_cldr_dates_times, ">= 0.0.0"},
       {:ua_parser, "~> 1.0"},
       {:phoenix_storybook, "~> 0.5.0"},
-      {:tzdata, ">= 0.0.0"}
+      {:tzdata, ">= 0.0.0"},
+      {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"}
     ]
   end
 

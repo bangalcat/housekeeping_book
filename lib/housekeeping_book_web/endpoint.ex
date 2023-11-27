@@ -1,5 +1,6 @@
 defmodule HousekeepingBookWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :housekeeping_book
+  use SiteEncrypt.Phoenix
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -11,7 +12,46 @@ defmodule HousekeepingBookWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  @impl Phoenix.Endpoint
+  def init(_key, config) do
+    {:ok, SiteEncrypt.Phoenix.configure_https(config)}
+  end
+
+  @impl SiteEncrypt
+  def certification do
+    SiteEncrypt.configure(
+      client: :native,
+      domains: Application.get_env(:housekeeping_book, :site_encrypt)[:domains],
+      emails: Application.get_env(:housekeeping_book, :site_encrypt)[:emails],
+      db_folder: Application.get_env(:housekeeping_book, :cert_path, "tmp/site_encrypt_db"),
+      directory_url:
+        case Application.get_env(:housekeeping_book, :cert_mode, "local") do
+          "local" ->
+            {:internal, port: 4002}
+
+          "staing" ->
+            "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+          "production" ->
+            "https://acme-v02.api.letsencrypt.org/directory"
+        end
+    )
+  end
+
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [:user_agent, session: @session_options]]
+
+  def www_redirect(conn, _options) do
+    if String.starts_with?(conn.host, "www.#{host()}") do
+      conn
+      |> Phoenix.Controller.redirect(external: "https://#{host()}")
+      |> halt()
+    else
+      conn
+    end
+  end
+
+  plug :www_redirect
 
   # Serve at "/" the static files from "priv/static" directory.
   #
