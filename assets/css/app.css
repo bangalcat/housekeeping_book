@@ -56,4 +56,18 @@
     @apply mx-2;
   }
 
+  *::-webkit-scrollbar {
+    width: 0.0em;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: "#3b82f6";
+    border-radius: 10px;
+    background-clip: padding-box;
+    boder: 2px solid transparent;
+  }
+  *::-webkit-scrollbar-track {
+    background-color: #3b82f613;
+    box-shadow: inset 0 0 6px #3b82f6A8;
+    border-radius: 10px;
+  }
 }
