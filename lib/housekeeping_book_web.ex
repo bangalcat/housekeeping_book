@@ -58,6 +58,7 @@ defmodule HousekeepingBookWeb do
       use Phoenix.LiveView,
         layout: {HousekeepingBookWeb.Layouts, :app}
 
+      import HousekeepingBookWeb.UserAgent, only: [assign_user_device: 2]
       unquote(html_helpers())
     end
   end
