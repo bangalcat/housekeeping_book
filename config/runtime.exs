@@ -70,7 +70,7 @@ if config_env() == :prod do
   config :housekeeping_book, :cert_path, "/opt/site_encrypt_db"
   config :housekeeping_book, :cert_mode, "production"
 
-  config :housekeeping_book, :lets_encrypt,
+  config :housekeeping_book, :site_encrypt,
     domains: System.fetch_env!("DOMAINS") |> String.split(","),
     emails: System.fetch_env!("EMAILS") |> String.split(",")
 

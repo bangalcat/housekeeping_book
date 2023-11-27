@@ -16,8 +16,9 @@ export MIX_ENV=prod
 mix assets.deploy
 current_release=$(ls ../releases | sort -nr | head -n 1)
 now_in_unix_seconds=$(date +'%s')
-if [[ $current_release == '']]; then
-current_release=$now_in_unix_seconds; fi
+if [[ $current_release == '']]; 
+then current_release=$now_in_unix_seconds; 
+fi
 
 # Create release
 mix release --path ../releases/${now_in_unix_seconds}
