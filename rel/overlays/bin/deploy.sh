@@ -58,7 +58,7 @@ echo "RELEASE=${now_in_unix_seconds}" >>../env_vars
 mix ecto.migrate
 
 # Boot the new version of the app
-sudo systemctl start my_app@${http}
+sudo systemctl start housekeepinb_book@${http}
 # Wait for the new version to boot
 until $(curl --output /dev/null --silent --head --fail localhost:${http}); do
 	echo 'Waiting for app to boot...'
