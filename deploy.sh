@@ -41,6 +41,8 @@ else
 fi
 
 # Put env vars with the ports to forward to, and set non-conflicting node name
+rm ../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
+touch ../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo "export DEPLOY_HTTP_PORT=${http}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo "export DEPLOY_HTTPS_PORT=${https}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo "export RELEASE_NAME=${http}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
@@ -69,8 +71,8 @@ sudo iptables -t nat -R PREROUTING 1 -p tcp --dport 80 -j REDIRECT --to-port ${h
 sudo iptables -t nat -R PREROUTING 2 -p tcp --dport 443 -j REDIRECT --to-port ${https}
 
 # Stop the old version
-sudo systemctl stop my_app@${old_port}
+sudo systemctl stop housekeeping_book@${old_port}
 # Just in case the old version was started by systemd after a server
 # reboot, also stop the server_reboot version
-sudo systemctl stop my_app@server_reboot
+sudo systemctl stop housekeeping_book@server_reboot
 echo 'Deployed!'
