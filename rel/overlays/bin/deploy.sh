@@ -19,7 +19,9 @@ echo 'Assets deploy..'
 mix assets.deploy
 current_release=$(ls ../releases | sort -nr | head -n 1)
 now_in_unix_seconds=$(date +'%s')
-if [[ $current_release == '']]; then current_release=$now_in_unix_seconds; fi
+if [[ $current_release == '']]; then 
+  current_release=$now_in_unix_seconds
+fi
 
 echo 'Current Release: ' $current_release
 
@@ -28,8 +30,7 @@ mix release --path ../releases/${now_in_unix_seconds}
 
 source ../releases/${current_release}/releases/0.1.0/env.sh
 
-if [[ $HTTP_PORT == '4000']]
-then
+if [[ $HTTP_PORT == '4000']]; then
   http=4001
   https=4041
   old_port=4000
