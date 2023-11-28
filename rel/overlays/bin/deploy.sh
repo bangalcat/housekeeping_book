@@ -7,6 +7,7 @@ set -e
 cd /home/donghyun/housekeeping_book
 git fetch
 git reset --hard origin/main
+chmod u+x rel/overlays/bin/*
 mix deps.get --only prod
 
 # CI Steps
@@ -41,8 +42,8 @@ else
 fi
 
 # Put env vars with the ports to forward to, and set non-conflicting node name
-echo "export HTTP_PORT=${http}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
-echo "export HTTPS_PORT=${https}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
+echo "export DEPLOY_HTTP_PORT=${http}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
+echo "export DEPLOY_HTTPS_PORT=${https}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo "export RELEASE_NAME=${http}" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo 'export RELEASE_DISTRIBUTION="name"' >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
 echo "export RELEASE_NODE=bangl${http}@0.0.0.0" >>../releases/${now_in_unix_seconds}/releases/0.1.0/env.sh
