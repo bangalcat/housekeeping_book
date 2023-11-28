@@ -16,7 +16,7 @@ defmodule HousekeepingBookWeb.CustomComponents do
 
   def card(assigns) do
     ~H"""
-    <div phx-update="stream" class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]} {@rest}>
+    <div class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]} {@rest}>
       <div class={["flex items-center space-x-2 text-sm dark:text-slate-50", @header_class]}>
         <%= render_slot(@card_header) %>
       </div>

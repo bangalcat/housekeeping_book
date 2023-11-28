@@ -16,6 +16,7 @@
     id="record-list"
     class="space-y-3 pt-4 bg-slate-100 w-full overflow-y-scroll shrink snap-y snap-mandatory relative"
     phx-hook="Scrolling"
+    phx-update="stream"
   >
     <.card
       :for={{_id, record} <- @streams.records}
