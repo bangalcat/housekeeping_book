@@ -7,7 +7,6 @@ set -e
 cd /home/donghyun/housekeeping_book
 git fetch
 git reset --hard origin/main
-chmod u+x rel/overlays/bin/*
 mix deps.get --only prod
 
 # CI Steps
