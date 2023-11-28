@@ -4,7 +4,7 @@ set -e
 # This script is for deploying the app to a baremetal server.
 
 # Update to latest version of code
-cd /home/donghyun/housekeeping_book
+cd $APP_DIR
 git fetch
 git reset --hard origin/main
 mix deps.get --only prod
