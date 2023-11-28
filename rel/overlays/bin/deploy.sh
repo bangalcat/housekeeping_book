@@ -30,7 +30,7 @@ mix release --path ../releases/${now_in_unix_seconds}
 
 source ../releases/${current_release}/releases/0.1.0/env.sh
 
-if [[ $HTTP_PORT == '4000' ]]; then
+if [[ $DEPLOY_HTTP_PORT == '4000' ]]; then
 	http=4001
 	https=4041
 	old_port=4000
@@ -57,7 +57,7 @@ echo "RELEASE=${now_in_unix_seconds}" >>../env_vars
 mix ecto.migrate
 
 # Boot the new version of the app
-sudo systemctl start housekeepinb_book@${http}
+sudo systemctl start housekeeping_book@${http}
 # Wait for the new version to boot
 until $(curl --output /dev/null --silent --head --fail localhost:${http}); do
 	echo 'Waiting for app to boot...'
