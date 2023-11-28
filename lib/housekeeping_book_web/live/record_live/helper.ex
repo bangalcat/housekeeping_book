@@ -116,10 +116,11 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
 
   def find_nearest_record(records_map, date) do
     records_map
-    |> Enum.sort_by(fn {key, _} -> abs(Date.diff(date, key)) end)
+    |> Enum.filter(fn {key, _} -> Date.compare(key, date) != :gt end)
+    |> Enum.sort_by(fn {key, _} -> Date.diff(date, key) end)
     |> case do
       [] -> nil
-      [record | _] -> record
+      [{_date, [record | _]} | _] -> record
     end
   end
 end

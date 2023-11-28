@@ -96,14 +96,20 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     date = Date.from_iso8601!(date)
 
     socket =
-      assign(socket, :selected_date, select_date(date, socket.assigns.selected_date))
+      socket
+      |> assign(:selected_date, select_date(date, socket.assigns.selected_date))
+      |> maybe_scroll_to_date(date)
 
+    {:noreply, socket}
+  end
+
+  def maybe_scroll_to_date(socket, %Date{} = date) do
     nearest_record = find_nearest_record(socket.assigns.records_map, date)
 
     if nearest_record do
-      {:noreply, push_event(socket, "scroll_to", %{id: "records-#{nearest_record.id}"})}
+      push_event(socket, "scroll_to", %{id: "records-#{nearest_record.id}"})
     else
-      {:noreply, socket}
+      socket
     end
   end
 
