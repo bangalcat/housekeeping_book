@@ -108,12 +108,10 @@ defmodule HousekeepingBookWeb.CustomComponents do
   attr :current_year, :integer, default: 2000
   attr :selected_date, Date
   attr :day_content_fn, :any, default: &__MODULE__.always_nil/1
-  attr :month_click_event, :string, default: "month-click-event"
   attr :day_click_event, :string, default: "day-click-event"
-  attr :prev_month_event, :string, default: "prev-month-click"
-  attr :next_month_event, :string, default: "next-month-click"
   attr :calendar_click_event, :string, default: "calendar-event"
   attr :class, :string
+  slot :calendar_header
 
   def calendar(%{current_year: y, current_month: m} = assigns)
       when m in 1..12 and y in 1900..2100 do
@@ -130,43 +128,11 @@ defmodule HousekeepingBookWeb.CustomComponents do
     assigns = Map.put(assigns, :weeks, weeks) |> Map.put(:months, @months)
 
     ~H"""
-    <div class={["md:p-8 py-3 px-1 dark:bg-gray-800 bg-white rounded-t w-full", @class]}>
-      <!-- Top Bar -->
-      <div class="px-4 flex items-center justify-between">
-        <!-- Month Year -->
-        <span
-          tabindex="0"
-          class="focus:outline-none text-base dark:text-gray-100 text-gray-800 cursor-pointer hover:text-gray-400"
-          phx-click={@calendar_click_event}
-          phx-value-event={@month_click_event}
-        >
-          <span class="text-lg font-bold"><%= Enum.at(@months, @current_month - 1) %></span>
-          <span><%= @current_year %></span>
-        </span>
-        <!-- Arrow Buttons -->
-        <div class="flex items-center">
-          <button
-            type="button"
-            aria-label="calendar backward"
-            class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100"
-            phx-click={@calendar_click_event}
-            phx-value-event={@prev_month_event}
-          >
-            <.icon name="hero-chevron-left" />
-          </button>
-          <button
-            type="button"
-            aria-label="calendar forward"
-            class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-100"
-            phx-click={@calendar_click_event}
-            phx-value-event={@next_month_event}
-          >
-            <.icon name="hero-chevron-right" />
-          </button>
-        </div>
-      </div>
+    <div class={["md:p-4 py-3 px-1 rounded-t w-full", @class]}>
+      <!-- Header -->
+      <%= render_slot(@calendar_header) %>
       <!-- Calendar -->
-      <div class="flex items-center justify-between pt-12 overflow-x-auto">
+      <div class="flex items-center justify-between pt-6 overflow-x-auto">
         <table class="w-full table-fixed">
           <thead>
             <tr>
@@ -231,9 +197,9 @@ defmodule HousekeepingBookWeb.CustomComponents do
 
   defp focus_day_class,
     do: [
-      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:bg-second",
-      "hover:bg-second text-base w-8 h-8 flex items-center justify-center",
-      "font-medium text-white bg-primary rounded-full"
+      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:bg-primary-400",
+      "hover:bg-primary-400 text-base p-2 leading-tight flex items-center justify-center",
+      "font-medium text-white bg-primary-500 rounded-full"
     ]
 
   def always_nil(_), do: nil
@@ -250,6 +216,89 @@ defmodule HousekeepingBookWeb.CustomComponents do
       <span :if={@expense} class="text-red-500 text-xs whitespace-nowrap">
         -<%= @expense %>
       </span>
+    </div>
+    """
+  end
+
+  attr :class, :string, default: nil
+  attr :rest, :global, include: ~w(disabled form name value)
+
+  slot :inner_block, required: true
+
+  def floating_button(assigns) do
+    ~H"""
+    <button
+      type="button"
+      class={[
+        "p-0 w-10 h-10 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow",
+        "transition ease-in duration-200 focus:outline-none",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </button>
+    """
+  end
+
+  attr :rest, :global, include: ~w(disabled form name value)
+
+  slot :main_button, required: true do
+    attr :class, :string
+  end
+
+  slot :left_button do
+    attr :class, :string
+  end
+
+  slot :top_button do
+    attr :class, :string
+  end
+
+  slot :middle_button do
+    attr :class, :string
+  end
+
+  def floating_button_group(assigns) do
+    ~H"""
+    <div class="group fixed bottom-0 right-0 p-2 flex items-end justify-end w-24 h-24 ">
+      <!-- main -->
+      <div class={[
+        "text-white shadow-xl flex items-center justify-center p-3 rounded-full",
+        "bg-gradient-to-r from-cyan-500 to-blue-500 z-50 absolute"
+      ]}>
+        <%= render_slot(@main_button) %>
+      </div>
+      <!-- sub left -->
+      <div
+        :if={@left_button != []}
+        class={[
+          "absolute rounded-full transition-all duration-[0.2s] ease-out scale-y-0",
+          "group-hover:scale-y-100 group-hover:-translate-x-16 flex p-2 hover:p-3 bg-green-300 scale-100 hover:bg-green-400 text-white"
+        ]}
+      >
+        <%= render_slot(@left_button) %>
+      </div>
+      <!-- sub top -->
+      <div
+        :if={@top_button != []}
+        class={[
+          "absolute rounded-full transition-all duration-[0.2s] ease-out scale-x-0",
+          "group-hover:scale-x-100 group-hover:-translate-y-16 flex p-2 hover:p-3 bg-blue-300 hover:bg-blue-400 text-white"
+        ]}
+      >
+        <%= render_slot(@top_button) %>
+      </div>
+      <!-- sub middle -->
+      <div
+        :if={@middle_button != []}
+        class={[
+          "absolute rounded-full transition-all duration-[0.2s] ease-out scale-x-0 group-hover:scale-x-100",
+          "group-hover:-translate-y-14 group-hover:-translate-x-14 flex p-2 hover:p-3 bg-yellow-300 hover:bg-yellow-400 text-white"
+        ]}
+      >
+        <%= render_slot(@middle_button) %>
+      </div>
     </div>
     """
   end

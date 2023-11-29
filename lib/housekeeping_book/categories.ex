@@ -228,6 +228,13 @@ defmodule HousekeepingBook.Categories do
     |> Repo.all()
   end
 
+  def leaf_category?(%Category{} = category) do
+    from(Category)
+    |> where([c], c.parent_id == ^category.id)
+    |> Repo.exists?()
+    |> Kernel.not()
+  end
+
   @spec category_type_options() :: [{String.t(), atom()}]
   def category_type_options do
     Ecto.Enum.values(Category, :type)

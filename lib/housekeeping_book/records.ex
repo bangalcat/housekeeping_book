@@ -12,6 +12,60 @@ defmodule HousekeepingBook.Records do
   alias HousekeepingBook.Schema.Record
   alias HousekeepingBook.Utils
 
+  @spec get_amount_sum_group_by_date_and_type(map) :: [Record.t()]
+  def get_amount_sum_group_by_date_and_type(params \\ %{}) do
+    from(Record, as: :record)
+    |> join(:inner, [record: r], c in assoc(r, :category), as: :category)
+    |> select(
+      [record: r, category: c],
+      {{fragment("date_trunc('day', ?)", r.date) |> type(:date) |> selected_as(:month), c.type},
+       sum(r.amount)}
+    )
+    |> group_by([record: r, category: c], [selected_as(:month), c.type])
+    |> order_by([record: r], selected_as(:month))
+    |> query_by_month(params)
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  defp query_by_month(query, %{month_date: month}) do
+    query
+    |> where(
+      [record: r],
+      fragment("date_trunc('month', ?) = date_trunc('month', ?)", type(^month, :date), r.date)
+    )
+  end
+
+  defp query_by_month(query, _), do: query
+
+  def with_total(%{} = records_map) do
+    total =
+      records_map
+      |> Enum.reduce(%{expense: 0, income: 0}, fn {key, value}, acc ->
+        case key do
+          {_, :expense} ->
+            Map.update(acc, :expense, value, &(&1 + value))
+
+          {_, :income} ->
+            Map.update(acc, :income, value, &(&1 + value))
+        end
+      end)
+
+    {records_map, total}
+  end
+
+  def get_nearest_date_record(%Date{} = date, timezone \\ "Etc/UTC") do
+    datetime = DateTime.new!(date, ~T[00:00:00], timezone)
+    end_of_month = Date.end_of_month(date) |> DateTime.new!(~T[23:59:59], timezone)
+
+    from(Record, as: :record)
+    |> where([r], r.date >= ^datetime)
+    |> where([r], r.date <= ^end_of_month)
+    |> order_by([r], asc: r.date)
+    |> limit(1)
+    |> Repo.one()
+  end
+
   @doc """
   Returns the list of records.
 
@@ -28,7 +82,7 @@ defmodule HousekeepingBook.Records do
 
   @spec list_records(map, map) :: {:ok, {[Record.t()], Flop.Meta.t()}} | {:error, Flop.Meta.t()}
   def list_records(params, opts \\ %{}) do
-    Record
+    from(Record, as: :record)
     |> maybe_with_category(opts)
     |> maybe_with_subject(opts)
     |> maybe_with_tags(opts)
@@ -74,7 +128,7 @@ defmodule HousekeepingBook.Records do
   #
   def maybe_with_category(record_or_records, %{with_category: true}) do
     record_or_records
-    |> join(:left, [r], c in assoc(r, :category), as: :category)
+    |> join(:left, [record: r], c in assoc(r, :category), as: :category)
     |> preload([category: c], category: c)
   end
 
@@ -82,7 +136,7 @@ defmodule HousekeepingBook.Records do
 
   def maybe_with_subject(record_or_records, %{with_subject: true}) do
     record_or_records
-    |> join(:left, [r], s in assoc(r, :subject), as: :subject)
+    |> join(:left, [record: r], s in assoc(r, :subject), as: :subject)
     |> preload([subject: s], subject: s)
   end
 
@@ -113,7 +167,7 @@ defmodule HousekeepingBook.Records do
 
   """
   def get_record!(id, opts \\ %{}) do
-    from(Record)
+    from(Record, as: :record)
     |> where([r], r.id == ^id)
     |> maybe_with_category(opts)
     |> maybe_with_subject(opts)

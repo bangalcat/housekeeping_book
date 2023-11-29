@@ -88,8 +88,12 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
     date |> DateTime.shift_zone!(timezone)
   end
 
-  def new_record do
-    Record.new()
+  def new_record(date \\ DateTime.utc_now())
+
+  def new_record(nil), do: new_record(DateTime.utc_now())
+
+  def new_record(%DateTime{} = datetime) do
+    Record.new(datetime)
   end
 
   def get_record!(id) do

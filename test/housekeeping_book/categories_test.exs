@@ -123,4 +123,14 @@ defmodule HousekeepingBook.CategoriesTest do
       assert msg =~ "should be set parent"
     end
   end
+
+  describe "leaf_category?" do
+    test "it should return true or false" do
+      %{id: cat_id} = cat = insert!(:category, %{type: :income})
+      cat2 = insert!(:category, %{type: :expense, parent_id: cat_id})
+
+      assert Categories.leaf_category?(cat2)
+      refute Categories.leaf_category?(cat)
+    end
+  end
 end

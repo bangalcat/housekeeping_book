@@ -21,5 +21,6 @@ defmodule HousekeepingBook.RecordsFixtures do
       |> HousekeepingBook.Records.create_record()
 
     record
+    |> HousekeepingBook.Repo.preload([:category, :subject])
   end
 end
