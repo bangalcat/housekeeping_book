@@ -11,7 +11,7 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="flex bg-gray-100">
+  <body class="flex">
     <.nav_layout>
       <:top_button>
         <.link
@@ -27,7 +27,7 @@
         </.link>
       </:menu_item>
       <:menu_item :if={@current_user}>
-        <.link href={~p"/monthly_records"}>
+        <.link href={~p"/monthly/records"}>
           Monthly
         </.link>
       </:menu_item>
@@ -93,7 +93,7 @@
           Register
         </.link>
       </:top_profile>
-      <div class="w-full overflow-x-hidden border-t flex flex-col">
+      <div id="main-container" class="w-full overflow-x-hidden border-t flex flex-col">
         <%= @inner_content %>
       </div>
     </.nav_layout>
