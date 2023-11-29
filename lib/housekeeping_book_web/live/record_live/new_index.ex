@@ -6,30 +6,63 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
   alias HousekeepingBook.Records
 
   @impl true
-  def mount(_params, session, socket) do
-    {timezone, _timezone_offset} = get_timezone_with_offset(socket)
-    now = DateTime.utc_now() |> DateTime.shift_zone!(timezone || "UTC")
+  def mount(params, session, socket) do
+    {timezone, timezone_offset} = get_timezone_with_offset(socket)
 
-    socket =
-      socket
-      |> assign_list_records(now.year, now.month)
-      |> assign_user_device(session)
-      |> assign(:year, now.year)
-      |> assign(:month, now.month)
-      |> assign(:selected_date, DateTime.to_date(now))
-      |> assign(:meta, nil)
+    unless params["year"] || params["month"] do
+      now = DateTime.utc_now() |> DateTime.shift_zone!(timezone || "UTC")
+      {:ok, redirect(socket, to: ~p"/monthly/records/#{now.year}/#{now.month}")}
+    else
+      socket =
+        socket
+        |> assign_user_device(session)
+        |> assign(:timezone, timezone)
+        |> assign(:timezone_offset, timezone_offset)
+        |> assign(:meta, nil)
 
-    {:ok, socket}
+      {:ok, socket}
+    end
   end
 
   @impl true
   def handle_params(params, _url, socket) do
+    year = params["year"] |> String.to_integer()
+    month = params["month"] |> String.to_integer()
+    now = DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "UTC")
+
+    socket =
+      socket
+      |> assign(:year, year)
+      |> assign(:month, month)
+      |> assign_list_records(year, month)
+      |> assign_new(:selected_date, fn -> Date.new!(year, month, now.day) end)
+      |> assign_daily_type_amount()
+
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:record, nil)
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    socket
+    |> assign(:page_title, "Edit Record")
+    |> assign(:record, get_record!(id))
+  end
+
+  defp apply_action(socket, :new, _params) do
+    datetime =
+      if selected_date = socket.assigns.selected_date do
+        DateTime.new!(selected_date, Time.utc_now())
+      else
+        DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "Etc/UTC")
+      end
+
+    socket
+    |> assign(:page_title, "New Record")
+    |> assign(:record, new_record(datetime))
   end
 
   @impl true
@@ -42,13 +75,22 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     handle_calendar_event(event, params, socket)
   end
 
-  defp select_date(date, date), do: nil
-  defp select_date(new_date, _selected_date), do: new_date
+  def handle_event("go-to-today", _, socket) do
+    date = Date.utc_today()
+
+    socket =
+      socket
+      |> push_patch(to: ~p"/monthly/records/#{date.year}/#{date.month}")
+      |> assign(:selected_date, select_date(date, socket.assigns.selected_date))
+      |> maybe_scroll_to_date(date)
+
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, record}}, socket) do
-    record = get_record!(record.id)
-    {:noreply, stream_insert(socket, :records, record)}
+    record = get_record!(record.id) |> dbg()
+    {:noreply, stream_insert(socket, :records, record, at: 0)}
   end
 
   def assign_timezone(socket) do
@@ -59,11 +101,9 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     |> assign(:timezone_offset, offset)
   end
 
-  def day_content(day, records_map) do
-    records = records_map[day] || []
-
-    income = get_amount_sum(records, :income)
-    expense = get_amount_sum(records, :expense)
+  def day_content(day, daily_amount_map) do
+    income = daily_amount_map[{day, :income}]
+    expense = daily_amount_map[{day, :expense}]
 
     my_day_content(%{income: income, expense: expense})
   end
@@ -84,12 +124,10 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
 
     socket =
       socket
-      |> assign(:year, updated_date.year)
-      |> assign(:month, updated_date.month)
-      |> assign_list_records(updated_date.year, updated_date.month)
-      |> assign(:selected_date, socket.assigns.selected_date && updated_date)
+      |> assign(:selected_date, updated_date)
 
-    {:noreply, socket}
+    {:noreply,
+     push_patch(socket, to: ~p"/monthly/records/#{updated_date.year}/#{updated_date.month}")}
   end
 
   def handle_calendar_event("select-day", %{"date" => date}, socket) do
@@ -103,8 +141,11 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     {:noreply, socket}
   end
 
+  defp select_date(date, date), do: nil
+  defp select_date(new_date, _selected_date), do: new_date
+
   def maybe_scroll_to_date(socket, %Date{} = date) do
-    nearest_record = find_nearest_record(socket.assigns.records_map, date)
+    nearest_record = Records.get_nearest_date_record(date, socket.assigns.timezone)
 
     if nearest_record do
       push_event(socket, "scroll_to", %{id: "records-#{nearest_record.id}"})
@@ -126,13 +167,29 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     Date.add(last_of_prev, -days_prev_month + min(day, days_prev_month))
   end
 
+  def assign_daily_type_amount(socket) do
+    year = socket.assigns.year
+    month = socket.assigns.month
+
+    month_date =
+      NaiveDateTime.from_erl!({{year, month, 1}, {0, 0, 0}})
+      |> DateTime.from_naive!(socket.assigns.timezone || "Etc/UTC")
+
+    {daily_amount_map, total} =
+      Records.get_amount_sum_group_by_date_and_type(%{month_date: month_date})
+      |> Records.with_total()
+
+    socket
+    |> assign(:daily_amount_map, daily_amount_map)
+    |> assign(:total_amount, total)
+  end
+
   def assign_list_records(socket, year, month) do
     case list_records(year, month) do
       {:ok, {records, meta}} ->
         socket
         |> assign(%{meta: meta})
-        |> stream(:records, records)
-        |> assign_records_map(records)
+        |> stream(:records, records, reset: true)
 
       {:error, meta} ->
         socket
@@ -161,14 +218,16 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     end
   end
 
-  def assign_records_map(socket, records) do
-    records_map =
-      Enum.reduce(records, %{}, fn record, acc ->
-        key = DateTime.to_date(record.date)
-        Map.update(acc, key, [record], &([record] ++ &1))
-      end)
-
-    socket
-    |> assign(:records_map, records_map)
+  def total_amount(assigns) do
+    ~H"""
+    <div class="">
+      <span class="text-sm dark:text-zinc-100"><%= gettext("Income") %></span>
+      <span class="text-green-500"><%= format_amount(@income) %></span>
+    </div>
+    <div class="">
+      <span class="text-sm dark:text-zinc-100"><%= gettext("Expense") %></span>
+      <span class="text-red-500"><%= format_amount(@expense) %></span>
+    </div>
+    """
   end
 end

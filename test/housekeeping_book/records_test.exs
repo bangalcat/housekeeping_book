@@ -93,6 +93,52 @@ defmodule HousekeepingBook.RecordsTest do
     end
   end
 
+  describe "get_records_group_by_date/1" do
+    test "it should returns records group by date" do
+      user = user_fixture()
+      category = category_fixture()
+      category2 = category_fixture(type: :expense)
+
+      records_map =
+        [
+          record_fixture(
+            %{date: ~U[2023-10-16 05:48:00Z], amount: 10},
+            user,
+            category
+          ),
+          record_fixture(
+            %{date: ~U[2023-11-15 05:48:00Z], amount: 30},
+            user,
+            category
+          ),
+          record_fixture(
+            %{date: ~U[2023-11-15 09:48:00Z], amount: 20},
+            user,
+            category2
+          ),
+          record_fixture(
+            %{date: ~U[2023-11-15 05:48:00Z], amount: 50},
+            user,
+            category2
+          ),
+          record_fixture(
+            %{date: ~U[2023-11-16 05:48:00Z], amount: 15},
+            user,
+            category2
+          )
+        ]
+        |> Enum.group_by(
+          &{DateTime.to_date(&1.date), &1.category.type},
+          & &1.amount
+        )
+        |> Map.new(fn {key, value} -> {key, Enum.sum(value)} end)
+
+      result = Records.get_amount_sum_group_by_date_and_type(%{})
+
+      assert records_map == result
+    end
+  end
+
   def setup_records(_) do
     user = user_fixture()
     category = category_fixture()

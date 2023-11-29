@@ -71,8 +71,8 @@ defmodule HousekeepingBook.Schema.Record do
     field :tags, {:array, :map}, virtual: true
   end
 
-  def new() do
-    %__MODULE__{date: DateTime.utc_now(), category: nil, subject: nil}
+  def new(date \\ DateTime.utc_now()) do
+    %__MODULE__{date: date, category: nil, subject: nil}
   end
 
   def payment_enum_name(nil), do: ""

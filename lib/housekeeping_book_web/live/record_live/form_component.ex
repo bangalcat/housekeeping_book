@@ -10,7 +10,6 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     <div>
       <.header>
         <%= @title %>
-        <:subtitle>Use this form to manage record records in your database.</:subtitle>
       </.header>
 
       <.simple_form
@@ -19,6 +18,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
+        phx-debounce={120}
       >
         <.input field={@form[:date]} type="datetime-local" label="Date" />
         <.input
@@ -37,7 +37,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
             type="button"
             phx-click="toggle-tree-modal"
             phx-target={@myself}
-            class="py-1 rounded-sm bg-primary hover:bg-second"
+            class="py-1 rounded-sm bg-primary-600 hover:bg-primary-400"
           >
             <%= if @last_select_category do %>
               <%= @last_select_category.name %>
@@ -146,7 +146,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     {:noreply, socket}
   end
 
-  def handle_event("tree-select-done", _, socket) do
+  def handle_event("tree-select-done", %{"id" => _id}, socket) do
     {:noreply, socket |> assign(:open_tree_modal, false)}
   end
 
