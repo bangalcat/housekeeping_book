@@ -11,7 +11,7 @@ defmodule HousekeepingBookWeb.Layouts do
 
   def nav_layout(assigns) do
     ~H"""
-    <aside class="relative bg-second w-64 h-screen hidden sm:block shadow-xl">
+    <aside class="relative bg-primary-300 w-64 h-screen hidden sm:block shadow-xl">
       <div class="p-6">
         <a href="/" class="text-white text-3xl font-semibold uppercase hover:text-gray-300">
           Home
@@ -22,7 +22,7 @@ defmodule HousekeepingBookWeb.Layouts do
         <ul class="">
           <li
             :for={item <- @menu_item}
-            class="items-center active-nav-link text-white py-4 pl-6 hover:bg-primary"
+            class="items-center active-nav-link text-white py-4 pl-6 hover:bg-primary-700"
           >
             <%= render_slot(item) %>
           </li>
@@ -30,7 +30,7 @@ defmodule HousekeepingBookWeb.Layouts do
       </nav>
     </aside>
 
-    <div class="relative w-full flex flex-col h-screen overflow-y-hidden">
+    <div class="relative w-full flex flex-col h-screen overflow-y-hidden dark:bg-gray-800">
       <!-- Desktop Header -->
       <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex flex-row-reverse">
         <div class="openable z-10">
@@ -38,7 +38,7 @@ defmodule HousekeepingBookWeb.Layouts do
         </div>
       </header>
       <!-- Mobile Header & Nav -->
-      <header class="w-full bg-second py-3 px-6 sm:hidden">
+      <header class="w-full bg-primary-300 dark:bg-primary-800 py-3 px-6 sm:hidden">
         <div class="flex items-center justify-between">
           <a href="/" class="text-white text-xl font-semibold uppercase hover:text-gray-300">
             Home
@@ -74,7 +74,7 @@ defmodule HousekeepingBookWeb.Layouts do
       <ul>
         <li
           :for={item <- @dropdown_item}
-          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 hover:bg-primary"
+          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 hover:bg-primary-70"
         >
           <%= render_slot(item) %>
         </li>
@@ -82,6 +82,18 @@ defmodule HousekeepingBookWeb.Layouts do
       <button class="w-full bg-white cta-btn font-semibold py-2 mt-3 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center">
         <i class="fas fa-arrow-circle-up mr-3"></i> Upgrade to Pro!
       </button>
+    </nav>
+    """
+  end
+
+  def mobile_footer_nav(assigns) do
+    ~H"""
+    <nav aria-label="alternative nav" class="sm:hidden">
+      <div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+        <div class="grid h-full max-w-lg mx-auto font-medium">
+          <%= render_slot(@menu_item) %>
+        </div>
+      </div>
     </nav>
     """
   end
