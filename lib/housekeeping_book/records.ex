@@ -55,14 +55,14 @@ defmodule HousekeepingBook.Records do
   end
 
   def get_nearest_date_record(%Date{} = date, timezone \\ "Etc/UTC") do
-    datetime = DateTime.new!(date, ~T[00:00:00], timezone)
+    datetime = DateTime.new!(date, ~T[23:59:00], timezone)
     end_of_month = Date.end_of_month(date) |> DateTime.new!(~T[23:59:59], timezone)
 
     from(Record, as: :record)
-    |> where([r], r.date >= ^datetime)
+    |> where([r], r.date > ^datetime)
     |> where([r], r.date <= ^end_of_month)
     |> order_by([r], asc: r.date)
-    |> limit(1)
+    |> first()
     |> Repo.one()
   end
 
