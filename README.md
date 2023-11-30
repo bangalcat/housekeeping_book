@@ -36,6 +36,8 @@ The record list should be paginated.
 
 Also, there should be a search bar to search records.
 
+I need one more feature, which is to import and export records as a CSV file.
+
 ### Record Detail Page
 
 - Date
