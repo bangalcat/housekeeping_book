@@ -50,12 +50,14 @@ defmodule HousekeepingBookWeb.CustomComponents do
       {@rest}
     >
       <.filter_fields :let={i} form={@form} fields={@fields}>
+        <.label for={i.field.id} class="flex-none w-1/4 text-gray-700 dark:text-gray-100">
+          <%= i.label %>
+        </.label>
         <.input
           field={i.field}
-          label={i.label}
           type={i.type}
           phx-debounce={120}
-          class="flex-auto"
+          class="flex-auto dark:text-white"
           {i.rest}
         />
       </.filter_fields>

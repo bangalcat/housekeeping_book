@@ -11,7 +11,7 @@ defmodule HousekeepingBookWeb.Layouts do
 
   def nav_layout(assigns) do
     ~H"""
-    <aside class="relative bg-primary-300 w-64 h-screen hidden sm:block shadow-xl">
+    <aside class="relative bg-primary-600 w-64 h-screen hidden sm:block shadow-xl">
       <div class="p-6">
         <a href="/" class="text-white text-3xl font-semibold uppercase hover:text-gray-300">
           Home
@@ -32,13 +32,13 @@ defmodule HousekeepingBookWeb.Layouts do
 
     <div class="relative w-full flex flex-col h-screen overflow-y-hidden dark:bg-gray-800">
       <!-- Desktop Header -->
-      <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex flex-row-reverse">
+      <header class="w-full items-center bg-primary-200 dark:bg-primary-900 py-2 px-6 hidden sm:flex flex-row-reverse">
         <div class="openable z-10">
           <%= render_slot(@top_profile) %>
         </div>
       </header>
       <!-- Mobile Header & Nav -->
-      <header class="w-full bg-primary-300 dark:bg-primary-800 py-3 px-6 sm:hidden">
+      <header class="w-full bg-primary-600 dark:bg-primary-800 py-3 px-6 sm:hidden">
         <div class="flex items-center justify-between">
           <a href="/" class="text-white text-xl font-semibold uppercase hover:text-gray-300">
             Home
@@ -74,7 +74,7 @@ defmodule HousekeepingBookWeb.Layouts do
       <ul>
         <li
           :for={item <- @dropdown_item}
-          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 hover:bg-primary-70"
+          class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 hover:bg-primary-700"
         >
           <%= render_slot(item) %>
         </li>
