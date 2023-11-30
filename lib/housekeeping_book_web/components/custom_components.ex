@@ -200,7 +200,7 @@ defmodule HousekeepingBookWeb.CustomComponents do
   defp focus_day_class,
     do: [
       "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 focus:bg-primary-400",
-      "hover:bg-primary-400 text-base p-2 leading-tight flex items-center justify-center",
+      "hover:bg-primary-400 text-base w-7 h-7 leading-tight flex items-center justify-center",
       "font-medium text-white bg-primary-500 rounded-full"
     ]
 
