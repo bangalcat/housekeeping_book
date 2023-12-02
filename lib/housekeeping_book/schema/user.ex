@@ -10,6 +10,8 @@ defmodule HousekeepingBook.Schema.User do
 
     field :type, Ecto.Enum, values: [:shared, :normal, :admin], default: :normal
 
+    field :timezone, :string, default: "Etc/UTC"
+
     timestamps(type: :utc_datetime)
   end
 end

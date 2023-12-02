@@ -69,6 +69,34 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+      <div>
+        <.simple_form
+          for={@info_form}
+          id="info_form"
+          phx-submit="update_info"
+          phx-change="validate_info"
+        >
+          <.input field={@info_form[:name]} type="text" label="Name" required />
+          <.input
+            field={@info_form[:timezone]}
+            type="text"
+            label="Timezone"
+            list="matches"
+            phx-debounce="600"
+            required
+          />
+
+          <datalist id="matches">
+            <option :for={{name, abbr, offset} <- @matches} value={name}>
+              <%= "#{name} (#{abbr}) #{div(offset, 3600)}" %>
+            </option>
+          </datalist>
+
+          <:actions>
+            <.button phx-disable-with="Saving...">Save</.button>
+          </:actions>
+        </.simple_form>
+      </div>
     </div>
     """
   end
@@ -90,12 +118,15 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
+    info_changeset = Accounts.change_user(user)
 
     socket =
       socket
       |> assign(:current_password, nil)
       |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
+      |> assign(:info_form, to_form(info_changeset))
+      |> assign(:matches, [])
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
@@ -163,5 +194,47 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
     end
+  end
+
+  def handle_event("validate_info", params, socket) do
+    %{"user" => user_params} = params
+
+    timezone_matches = user_params["timezone"] |> matched_timezone_list()
+
+    info_form =
+      socket.assigns.current_user
+      |> Accounts.change_user(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, info_form: info_form) |> assign(matches: timezone_matches)}
+  end
+
+  def handle_event("update_info", params, socket) do
+    %{"user" => user_params} = params
+    user = socket.assigns.current_user
+
+    case Accounts.update_user(user, user_params) do
+      {:ok, _user} ->
+        {:noreply, socket |> put_flash(:info, "User updated successfully")}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, info_form: to_form(changeset))}
+    end
+  end
+
+  def matched_timezone_list(""), do: []
+
+  def matched_timezone_list(str) do
+    now = DateTime.utc_now()
+
+    Tzdata.zone_list()
+    |> Enum.filter(&(&1 =~ ~r/^#{str}/i))
+    |> Enum.map(fn zone ->
+      shifted = DateTime.shift_zone!(now, zone)
+
+      {zone, shifted.zone_abbr, shifted.utc_offset}
+    end)
+    |> Enum.uniq()
   end
 end

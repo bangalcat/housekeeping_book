@@ -28,7 +28,8 @@ defmodule HousekeepingBook.AccountsTest do
 
       assert {:ok, %User{} = user} = Accounts.update_user(user, update_attrs)
       assert user.name == "some updated name"
-      assert user.email == "some@email.com"
+      # email will not change
+      refute user.email == "some@email.com"
     end
 
     test "update_user/2 with invalid data returns error changeset" do
