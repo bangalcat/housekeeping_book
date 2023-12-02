@@ -10,10 +10,13 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"id" => id} = params, _, socket) do
+    return_to = params["return_to"] || ~p"/records"
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
+     |> assign(:return_to, return_to)
      |> assign(
        :record,
        Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})

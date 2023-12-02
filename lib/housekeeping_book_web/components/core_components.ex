@@ -284,6 +284,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
   attr :prompt, :string, default: nil, doc: "the prompt for select inputs"
   attr :options, :list, doc: "the options to pass to Phoenix.HTML.Form.options_for_select/2"
   attr :multiple, :boolean, default: false, doc: "the multiple flag for select inputs"
+  attr :timezone, :string, default: "Etc/UTC"
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
@@ -367,6 +368,13 @@ defmodule HousekeepingBookWeb.CoreComponents do
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
+    assigns =
+      if assigns.type == "datetime-local" and match?(%DateTime{}, assigns.value) do
+        assign(assigns, :value, DateTime.shift_zone!(assigns.value, assigns.timezone))
+      else
+        assigns
+      end
+
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
@@ -401,7 +409,10 @@ defmodule HousekeepingBookWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class={["block text-sm font-semibold leading-6 text-zinc-800", @class]}>
+    <label
+      for={@for}
+      class={["block text-sm font-semibold leading-6 text-zinc-800 dark:text-white", @class]}
+    >
       <%= render_slot(@inner_block) %>
     </label>
     """
@@ -542,13 +553,15 @@ defmodule HousekeepingBookWeb.CoreComponents do
     attr :title, :string, required: true
   end
 
+  attr :class, :string, default: nil
+
   def list(assigns) do
     ~H"""
-    <div class="mt-14 w-full">
+    <div class={["mt-14 w-full", @class]}>
       <dl class="-my-4 divide-y divide-zinc-100">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500"><%= item.title %></dt>
-          <dd class="text-zinc-700"><%= render_slot(item) %></dd>
+          <dt class="w-1/4 flex-none text-zinc-500 dark:text-zinc-400"><%= item.title %></dt>
+          <dd class="text-zinc-700 dark:text-white"><%= render_slot(item) %></dd>
         </div>
       </dl>
     </div>

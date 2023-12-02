@@ -79,9 +79,10 @@ defmodule HousekeepingBookWeb.Layouts do
           <%= render_slot(item) %>
         </li>
       </ul>
+      <!--
       <button class="w-full bg-white cta-btn font-semibold py-2 mt-3 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-300 flex items-center justify-center">
-        <i class="fas fa-arrow-circle-up mr-3"></i> Upgrade to Pro!
       </button>
+      -->
     </nav>
     """
   end

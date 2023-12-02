@@ -100,6 +100,14 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
     Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
   end
 
+  def get_timezone_with_offset(%{assigns: %{current_user: %User{} = user}}) when user != nil do
+    {user.timezone,
+     DateTime.utc_now()
+     |> DateTime.shift_zone!(user.timezone)
+     |> Map.get(:utc_offset)
+     |> then(&div(&1, 3600))}
+  end
+
   def get_timezone_with_offset(socket) do
     {get_connect_params(socket)["timezone"], get_connect_params(socket)["timezone_offset"]}
   end
