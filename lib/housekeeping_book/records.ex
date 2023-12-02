@@ -268,7 +268,8 @@ defmodule HousekeepingBook.Records do
   @doc false
   defp record_changeset(record, attrs) do
     record
-    |> cast(attrs, [:amount, :description, :date, :payment, :tags, :category_id, :subject_id])
+    |> cast(attrs, [:amount, :description, :payment, :tags, :category_id, :subject_id])
+    |> cast_datetime_with_timezone(attrs)
     |> Utils.maybe_put_assoc(attrs, key: :subject)
     |> Utils.maybe_put_assoc(attrs, key: :category)
     |> validate_required([:amount, :description, :date, :category_id, :subject_id])
@@ -279,4 +280,20 @@ defmodule HousekeepingBook.Records do
     Ecto.Enum.values(Record, :payment)
     |> Enum.map(&{Record.payment_enum_name(&1), &1})
   end
+
+  def cast_datetime_with_timezone(changeset, %{"date" => date} = attrs) do
+    timezone = attrs["timezone"] || "Etc/UTC"
+
+    with {:ok, ndate} <- Ecto.Type.cast(:naive_datetime, date),
+         {:ok, datetime} <- DateTime.from_naive(ndate, timezone),
+         {:ok, datetime} <- DateTime.shift_zone(datetime, "Etc/UTC") do
+      changeset |> change(date: datetime)
+    else
+      error ->
+        Logger.error("date cast error: #{error}")
+        changeset |> add_error(:date, "invalid date: #{date}")
+    end
+  end
+
+  def cast_datetime_with_timezone(changeset, _), do: changeset
 end

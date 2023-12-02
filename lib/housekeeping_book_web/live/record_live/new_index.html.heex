@@ -1,106 +1,110 @@
 <div class="h-screen">
-<.header class="w-full">
-  <%= HousekeepingBook.Cldr.DateTime.to_string!(Date.new!(@year, @month, 1), format: :yMMM) %>
-  <:actions>
-    <button
-      type="button"
-      aria-label="calendar backward"
-      class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-400"
-      phx-click="calendar-click"
-      phx-value-event="prev-month"
-    >
-      <.icon name="hero-chevron-left" />
-    </button>
-    <button
-      type="button"
-      aria-label="calendar forward"
-      class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-400"
-      phx-click="calendar-click"
-      phx-value-event="next-month"
-    >
-      <.icon name="hero-chevron-right" />
-    </button>
-  </:actions>
-  <:subtitle>
-    <.total_amount income={@total_amount.income} expense={@total_amount.expense} />
-  </:subtitle>
-</.header>
-<div id="monthly-container" class="flex flex-col h-full">
-  <.calendar
-    current_year={@year}
-    current_month={@month}
-    selected_date={@selected_date}
-    day_content_fn={&day_content(&1, @daily_amount_map)}
-    calendar_click_event="calendar-click"
-    day_click_event="select-day"
-    class="shadow-black"
-  />
+  <.header class="w-full">
+    <%= HousekeepingBook.Cldr.DateTime.to_string!(Date.new!(@year, @month, 1), format: :yMMM) %>
+    <:actions>
+      <button
+        type="button"
+        aria-label="calendar backward"
+        class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-400"
+        phx-click="calendar-click"
+        phx-value-event="prev-month"
+      >
+        <.icon name="hero-chevron-left" />
+      </button>
+      <button
+        type="button"
+        aria-label="calendar forward"
+        class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-400"
+        phx-click="calendar-click"
+        phx-value-event="next-month"
+      >
+        <.icon name="hero-chevron-right" />
+      </button>
+    </:actions>
+    <:subtitle>
+      <.total_amount income={@total_amount.income} expense={@total_amount.expense} />
+    </:subtitle>
+  </.header>
+  <div id="monthly-container" class="flex flex-col h-full">
+    <.calendar
+      current_year={@year}
+      current_month={@month}
+      selected_date={@selected_date}
+      day_content_fn={&day_content(&1, @daily_amount_map)}
+      calendar_click_event="calendar-click"
+      day_click_event="select-day"
+      class="shadow-black"
+    />
 
-  <div
-    id="record-list"
-    phx-hook="Scrolling"
-    class="space-y-3 pt-4 w-full overflow-y-scroll shrink snap-y snap-mandatory relative"
-    phx-update="stream"
-  >
-    <.card
-      :for={{id, record} <- @streams.records}
-      id={id}
-      class="bg-orange-50 dark:bg-slate-700 snap-start scroll-m-2"
+    <div
+      id="record-list"
+      phx-hook="Scrolling"
+      class="space-y-3 pt-4 w-full overflow-y-scroll shrink snap-y snap-mandatory relative"
+      phx-update="stream"
     >
-      <:card_header>
-        <span>
-          <%= format_date(record) %>
-        </span>
-      </:card_header>
-      <:card_body>
-        <span class="grow text-ellipsis max-w-full">
-          <%= record.description %>
-        </span>
-        <span class="flex-none text-sm font-bold">
-          <%= format_amount(record) %>
-        </span>
-      </:card_body>
-      <:card_footer>
-        <span class="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-700 border text-sm">
-          <%= category_name(record) %>
-        </span>
-        <span class="ml-2 px-3 py-1 rounded-full bg-cyan-50 border text-zinc-800">
-          <%= subject_name(record) %>
-        </span>
-      </:card_footer>
-    </.card>
+      <.card
+        :for={{id, record} <- @streams.records}
+        id={id}
+        class="bg-orange-50 dark:bg-slate-700 snap-start scroll-m-2"
+        patch={JS.patch(~p"/records/#{record.id}/?#{%{return_to: @current_path}}")}
+      >
+        <:card_header>
+          <span>
+            <%= format_date(record) %>
+          </span>
+        </:card_header>
+        <:card_body>
+          <span class="grow text-ellipsis max-w-full">
+            <%= record.description %>
+          </span>
+          <span class="flex-none text-sm font-bold">
+            <%= format_amount(record) %>
+          </span>
+        </:card_body>
+        <:card_footer>
+          <span class="px-3 py-1 rounded-full bg-zinc-200 dark:bg-zinc-700 border text-sm">
+            <%= category_name(record) %>
+          </span>
+          <span class="ml-2 px-3 py-1 rounded-full bg-cyan-50 border text-zinc-800">
+            <%= subject_name(record) %>
+          </span>
+        </:card_footer>
+      </.card>
+    </div>
   </div>
-</div>
 
-<.floating_button_group>
-  <:main_button>
-    <button type="button" phx-click={JS.patch(~p"/monthly/records/#{@year}/#{@month}/new")}>
-      <.icon name="hero-plus-mini" class="text-white" />
-    </button>
-  </:main_button>
-  <:left_button>
-    <button type="button" phx-click="go-to-today">
-      <.icon name="hero-calendar-days" class="text-white" />
-    </button>
-  </:left_button>
-</.floating_button_group>
+  <.floating_button_group>
+    <:main_button>
+      <.icon name="hero-cog-6-tooth" class="text-white" />
+    </:main_button>
+    <:top_button>
+      <button type="button" phx-click={JS.patch(~p"/monthly/records/#{@year}/#{@month}/new")}>
+        <.icon name="hero-plus-mini" class="text-white" />
+      </button>
+    </:top_button>
+    <:left_button>
+      <button type="button" phx-click="go-to-today">
+        <.icon name="hero-calendar-days" class="text-white" />
+      </button>
+    </:left_button>
+  </.floating_button_group>
 
-<.modal
-  :if={@live_action in [:new, :edit]}
-  id="record-modal"
-  show
-  on_cancel={JS.patch(~p"/monthly/records/#{@year}/#{@month}")}
->
-  <.live_component
-    module={HousekeepingBookWeb.RecordLive.FormComponent}
-    id={@record.id || :new}
-    title={@page_title}
-    action={@live_action}
-    record={@record}
-    patch={~p"/monthly/records/#{@year}/#{@month}"}
-    options={record_options()}
-    timezone={@timezone}
-    timezone_offset={@timezone_offset}
-  />
-</.modal>
+  <.modal
+    :if={@live_action in [:new, :edit]}
+    id="record-modal"
+    show
+    on_cancel={JS.patch(~p"/monthly/records/#{@year}/#{@month}")}
+  >
+    <.live_component
+      module={HousekeepingBookWeb.RecordLive.FormComponent}
+      id={@record.id || :new}
+      title={@page_title}
+      action={@live_action}
+      record={@record}
+      patch={~p"/monthly/records/#{@year}/#{@month}"}
+      options={record_options()}
+      timezone={@timezone}
+      timezone_offset={@timezone_offset}
+    />
+  </.modal>
 </div>

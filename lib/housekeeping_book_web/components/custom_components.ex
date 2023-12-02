@@ -12,11 +12,12 @@ defmodule HousekeepingBookWeb.CustomComponents do
   attr :body_class, :string, default: ""
   attr :header_class, :string, default: ""
   attr :footer_class, :string, default: ""
+  attr :patch, JS, default: nil
   attr :rest, :global, include: ~w(id)
 
   def card(assigns) do
     ~H"""
-    <div class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]} {@rest}>
+    <div class={["bg-white space-y-3 p-4 rounded-lg shadow", @class]} phx-click={@patch} {@rest}>
       <div class={["flex items-center space-x-2 text-sm dark:text-slate-50", @header_class]}>
         <%= render_slot(@card_header) %>
       </div>

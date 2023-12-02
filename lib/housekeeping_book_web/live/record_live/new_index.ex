@@ -10,7 +10,7 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
     {timezone, timezone_offset} = get_timezone_with_offset(socket)
 
     unless params["year"] || params["month"] do
-      now = DateTime.utc_now() |> DateTime.shift_zone!(timezone || "UTC")
+      now = DateTime.utc_now() |> DateTime.shift_zone!(timezone || "Etc/UTC")
       {:ok, redirect(socket, to: ~p"/monthly/records/#{now.year}/#{now.month}")}
     else
       socket =
@@ -25,13 +25,15 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
     year = params["year"] |> String.to_integer()
     month = params["month"] |> String.to_integer()
-    now = DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "UTC")
+    now = DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "Etc/UTC")
+    curr_path = URI.parse(url).path
 
     socket =
       socket
+      |> assign(:current_path, curr_path)
       |> assign(:year, year)
       |> assign(:month, month)
       |> assign_list_records(year, month)
@@ -55,9 +57,10 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
   defp apply_action(socket, :new, _params) do
     datetime =
       if selected_date = socket.assigns.selected_date do
-        DateTime.new!(selected_date, Time.utc_now())
+        DateTime.new!(selected_date, ~T[00:00:00], socket.assigns.timezone || "UTC")
       else
-        DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "Etc/UTC")
+        DateTime.utc_now()
+        |> DateTime.shift_zone!(socket.assigns.timezone || "UTC")
       end
 
     socket
@@ -89,7 +92,7 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
 
   @impl true
   def handle_info({HousekeepingBookWeb.RecordLive.FormComponent, {:saved, record}}, socket) do
-    record = get_record!(record.id) |> dbg()
+    record = get_record!(record.id)
     {:noreply, stream_insert(socket, :records, record, at: 0)}
   end
 

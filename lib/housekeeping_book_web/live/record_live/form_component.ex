@@ -20,7 +20,8 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         phx-submit="save"
         phx-debounce={120}
       >
-        <.input field={@form[:date]} type="datetime-local" label="Date" />
+        <.input field={@form[:date]} type="datetime-local" label="Date" timezone={@timezone} />
+        <.input type="hidden" id="timezone" field={@form[:timezone]} value={@timezone} />
         <.input
           type="hidden"
           id="timezone-offset"
@@ -90,7 +91,6 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     # |> assign_new(:options, fn -> assign_options() end)
      |> assign(tree: Tree.new(), open_tree_modal: false, last_select_category: record.category)
      |> assign_form(changeset)}
   end
@@ -112,13 +112,6 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
         "category_id",
         socket.assigns.last_select_category && socket.assigns.last_select_category.id
       )
-      |> Map.update("date", nil, fn
-        nil ->
-          nil
-
-        date ->
-          date <> ":00" <> record_params["timezone_offset"]
-      end)
 
     save_record(socket, socket.assigns.action, record_params)
   end
