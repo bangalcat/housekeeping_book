@@ -1,4 +1,7 @@
 defmodule HousekeepingBook.Accounts.Users do
+  @moduledoc """
+  This module contains functions for working with users.
+  """
   import Ecto.Changeset
 
   alias HousekeepingBook.Schema.User
@@ -151,15 +154,27 @@ defmodule HousekeepingBook.Accounts.Users do
 
   def info_changeset(user, attrs, _opts \\ []) do
     user
-    |> cast(attrs, [:type])
+    |> cast(attrs, [:type, :timezone])
     |> validate_inclusion(:type, [:normal, :admin])
     |> name_changeset(attrs)
-    |> email_changeset(attrs)
+    |> validate_timezone()
   end
 
   def name_changeset(changeset, attrs) do
     changeset
     |> cast(attrs, [:name])
+    |> validate_required([:name])
     |> validate_length(:name, min: 2, max: 100)
+  end
+
+  def validate_timezone(changeset) do
+    changeset
+    |> validate_change(:timezone, fn :timezone, timezone ->
+      if Tzdata.zone_exists?(timezone) do
+        []
+      else
+        [timezone: "is not a valid timezone"]
+      end
+    end)
   end
 end
