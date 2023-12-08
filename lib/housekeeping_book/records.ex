@@ -281,14 +281,20 @@ defmodule HousekeepingBook.Records do
     |> Enum.map(&{Record.payment_enum_name(&1), &1})
   end
 
-  def cast_datetime_with_timezone(changeset, %{"date" => date} = attrs) do
-    timezone = attrs["timezone"] || "Etc/UTC"
+  def cast_datetime_with_timezone(changeset, attrs)
+      when is_map_key(attrs, :date) or is_map_key(attrs, "date") do
+    date = attrs[:date] || attrs["date"]
+    timezone = attrs[:timezone] || attrs["timezone"] || "Etc/UTC"
 
-    with {:ok, ndate} <- Ecto.Type.cast(:naive_datetime, date),
+    with date when date != nil <- date,
+         {:ok, ndate} <- Ecto.Type.cast(:naive_datetime, date),
          {:ok, datetime} <- DateTime.from_naive(ndate, timezone),
          {:ok, datetime} <- DateTime.shift_zone(datetime, "Etc/UTC") do
       changeset |> change(date: datetime)
     else
+      nil ->
+        changeset
+
       error ->
         Logger.error("date cast error: #{error}")
         changeset |> add_error(:date, "invalid date: #{date}")
