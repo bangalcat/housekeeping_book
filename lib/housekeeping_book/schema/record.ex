@@ -15,7 +15,7 @@ defmodule HousekeepingBook.Schema.Record do
       :category_id,
       :category_name,
       :category_type,
-      :subject_name,
+      :subject_id,
       :date_month
     ],
     sortable: [:date, :amount, :payment],
@@ -44,10 +44,10 @@ defmodule HousekeepingBook.Schema.Record do
           field: :type,
           ecto_type: :string
         ],
-        subject_name: [
+        subject_id: [
           binding: :subject,
-          field: :name,
-          ecto_type: :string
+          field: :id,
+          ecto_type: :id
         ]
       ]
     ]
