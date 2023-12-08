@@ -1,4 +1,4 @@
-defmodule HousekeepingBookWeb.RecordLive.NewIndex do
+defmodule HousekeepingBookWeb.RecordLive.Monthly do
   use HousekeepingBookWeb, :live_view
   import HousekeepingBookWeb.RecordLive.Helper
   require Logger
@@ -105,8 +105,8 @@ defmodule HousekeepingBookWeb.RecordLive.NewIndex do
   end
 
   def day_content(day, daily_amount_map) do
-    income = daily_amount_map[{day, :income}]
-    expense = daily_amount_map[{day, :expense}]
+    income = daily_amount_map[{day, :income}] |> format_amount()
+    expense = daily_amount_map[{day, :expense}] |> format_amount()
 
     my_day_content(%{income: income, expense: expense})
   end
