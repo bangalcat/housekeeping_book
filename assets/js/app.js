@@ -27,9 +27,22 @@ import topbar from "../vendor/topbar"
 const offset = new Date().getTimezoneOffset()
 const timezoneOffset = (offset > 0 ? '-' : '+') + Math.abs(offset / 60).toFixed(0).padStart(2, '0') + ':00';
 
+let Flash = {
+  mounted() {
+    let hide = () => liveSocket.execJS(this.el, this.el.getAttribute("phx-click"))
+    this.timer = setTimeout(() => hide(), 8000)
+    this.el.addEventListener("phx:hide-start", () => clearTimeout(this.timer))
+    this.el.addEventListener("mouseover", () => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => hide(), 8000)
+    })
+  },
+  destroyed() { clearTimeout(this.timer) }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: { LocalTime, Scrolling },
+  hooks: { LocalTime, Scrolling, Flash },
   params: {
     _csrf_token: csrfToken,
     locale: Intl.NumberFormat().resolvedOptions().locale,
