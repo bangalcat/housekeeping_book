@@ -17,11 +17,11 @@
       prompt: "All",
       options: @options[:payment_type]
     ],
-    subject_name: [
+    subject_id: [
       label: gettext("Subject"),
       type: "select",
       prompt: gettext("All"),
-      op: :=~,
+      op: :==,
       options: @options[:subject]
     ],
     category_id: [

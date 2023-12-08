@@ -46,7 +46,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
               Select Category
             <% end %>
           </.button>
-          <.error :for={error <- @form[:category_id].errors}><%= translate_error(error) %></.error>
+          <.error :if={!@last_select_category}><%= "Select a category" %></.error>
         </div>
         <.input
           field={@form[:subject_id]}
