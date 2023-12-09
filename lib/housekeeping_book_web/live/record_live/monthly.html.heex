@@ -1,4 +1,4 @@
-<div class="h-screen">
+<div class="h-screen w-full">
   <.header class="w-full">
     <%= HousekeepingBook.Cldr.DateTime.to_string!(Date.new!(@year, @month, 1), format: :yMMM) %>
     <:actions>
@@ -25,15 +25,32 @@
       <.total_amount income={@total_amount.income} expense={@total_amount.expense} />
     </:subtitle>
   </.header>
-  <div id="monthly-container" class="flex flex-col h-full">
+  <div id="monthly-container" class="flex flex-col h-full w-full">
+    <button
+      class="self-end w-fit"
+      phx-click={
+        JS.toggle(
+          to: "#monthly-calendar",
+          in: {"ease-out duration-700", "h-0", "h-80"},
+          out: {"ease-out duration-700", "h-80", "h-0"}
+        )
+        |> JS.toggle(to: ".hero-chevron-up-down")
+        |> JS.toggle(to: ".hero-arrows-pointing-in")
+      }
+    >
+      <span class="sr-only">Toggle Calendar</span>
+      <.icon name="hero-chevron-up-down" class="hidden" />
+      <.icon name="hero-arrows-pointing-in" />
+    </button>
     <.calendar
+      id="monthly-calendar"
       current_year={@year}
       current_month={@month}
       selected_date={@selected_date}
       day_content_fn={&day_content(&1, @daily_amount_map)}
       calendar_click_event="calendar-click"
       day_click_event="select-day"
-      class="shadow-black"
+      class="shadow-black -mt-2"
     />
 
     <div
@@ -78,12 +95,29 @@
       <.icon name="hero-cog-6-tooth" class="text-white" />
     </:main_button>
     <:top_button>
-      <button type="button" phx-click={JS.patch(~p"/monthly/records/#{@year}/#{@month}/new")}>
+      <button
+        type="button"
+        phx-click={
+          JS.patch(~p"/monthly/records/#{@year}/#{@month}/new")
+          |> JS.show(to: "#monthly-calendar")
+        }
+      >
+        <span class="sr-only">New Record</span>
         <.icon name="hero-plus-mini" class="text-white" />
       </button>
     </:top_button>
     <:left_button>
-      <button type="button" phx-click="go-to-today">
+      <button
+        type="button"
+        phx-click={
+          JS.push("go-to-today")
+          |> JS.show(
+            to: "#monthly-calendar",
+            transition: {"ease-out duration-300", "h-0", "h-80"}
+          )
+        }
+      >
+        <span class="sr-only">Go to Today</span>
         <.icon name="hero-calendar-days" class="text-white" />
       </button>
     </:left_button>

@@ -107,6 +107,7 @@ defmodule HousekeepingBookWeb.CustomComponents do
 
   @months ~w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
 
+  attr :id, :string, default: "calendar"
   attr :current_month, :integer, default: 1
   attr :current_year, :integer, default: 2000
   attr :selected_date, Date
@@ -131,7 +132,7 @@ defmodule HousekeepingBookWeb.CustomComponents do
     assigns = Map.put(assigns, :weeks, weeks) |> Map.put(:months, @months)
 
     ~H"""
-    <div class={["md:p-4 py-3 px-1 rounded-t w-full", @class]}>
+    <div id={@id} class={["md:p-4 py-3 px-1 rounded-t w-full flex", @class]}>
       <!-- Header -->
       <%= render_slot(@calendar_header) %>
       <!-- Calendar -->

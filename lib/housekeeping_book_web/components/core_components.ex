@@ -616,7 +616,7 @@ defmodule HousekeepingBookWeb.CoreComponents do
 
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
-    <span class={[@name, @class]} />
+    <span class={[@name, "dark:text-white", @class]} />
     """
   end
 
