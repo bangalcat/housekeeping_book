@@ -1,4 +1,4 @@
-<div class="h-screen w-full">
+<div class="w-full h-[90vh] overflow-y-hidden">
   <.header class="w-full">
     <%= HousekeepingBook.Cldr.DateTime.to_string!(Date.new!(@year, @month, 1), format: :yMMM) %>
     <:actions>
@@ -56,7 +56,7 @@
     <div
       id="record-list"
       phx-hook="Scrolling"
-      class="space-y-3 pt-4 w-full overflow-y-scroll shrink snap-y snap-mandatory relative"
+      class="space-y-3 pt-4 w-full overflow-y-scroll shrink snap-y snap-mandatory relative h-auto pb-32"
       phx-update="stream"
     >
       <.card
