@@ -21,7 +21,7 @@ defmodule HousekeepingBook.Records do
     |> select(
       [record: r, category: c],
       {{fragment(
-          "(date_trunc('day', ? AT TIME ZONE 'Z') AT TIME ZONE ?)",
+          "(date_trunc('day', ? AT TIME ZONE 'Z' AT TIME ZONE ?))",
           r.date,
           type(^timezone, :string)
         )
