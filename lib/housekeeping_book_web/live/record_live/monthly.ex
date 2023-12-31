@@ -184,8 +184,7 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
     timezone = socket.assigns.timezone || "Etc/UTC"
 
     month_first =
-      NaiveDateTime.from_erl!({{year, month, 1}, {0, 0, 0}})
-      |> DateTime.from_naive!(timezone)
+      DateTime.new!(Date.new!(year, month, 1), ~T[00:00:00], timezone)
 
     {daily_amount_map, total} =
       Records.get_amount_sum_group_by_date_and_type(%{
