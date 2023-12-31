@@ -36,10 +36,12 @@ defmodule HousekeepingBook.Records do
   end
 
   defp query_by_month(query, %{month_first: %DateTime{} = month_first}) do
+    end_date = DateTime.new!(Date.end_of_month(month_first), ~T[23:59:59], month_first.time_zone)
+
     query
     |> where(
       [record: r],
-      r.date >= ^month_first and r.date < datetime_add(^month_first, 1, "month")
+      r.date >= ^month_first and r.date <= ^end_date
     )
   end
 
