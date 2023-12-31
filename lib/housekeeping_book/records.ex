@@ -14,25 +14,32 @@ defmodule HousekeepingBook.Records do
 
   @spec get_amount_sum_group_by_date_and_type(map) :: [Record.t()]
   def get_amount_sum_group_by_date_and_type(params \\ %{}) do
+    timezone = params[:timezone] || "Etc/UTC"
+
     from(Record, as: :record)
     |> join(:inner, [record: r], c in assoc(r, :category), as: :category)
     |> select(
       [record: r, category: c],
-      {{fragment("date_trunc('day', ?)", r.date) |> type(:date) |> selected_as(:month), c.type},
-       sum(r.amount)}
+      {{fragment(
+          "(date_trunc('day', ? AT TIME ZONE 'Z') AT TIME ZONE ?)",
+          r.date,
+          type(^timezone, :string)
+        )
+        |> type(:date)
+        |> selected_as(:day), c.type}, sum(r.amount)}
     )
-    |> group_by([record: r, category: c], [selected_as(:month), c.type])
-    |> order_by([record: r], selected_as(:month))
+    |> group_by([record: r, category: c], [selected_as(:day), c.type])
+    |> order_by([record: r], selected_as(:day))
     |> query_by_month(params)
     |> Repo.all()
     |> Map.new()
   end
 
-  defp query_by_month(query, %{month_date: month}) do
+  defp query_by_month(query, %{month_first: %DateTime{} = month_first}) do
     query
     |> where(
       [record: r],
-      fragment("date_trunc('month', ?) = date_trunc('month', ?)", type(^month, :date), r.date)
+      r.date >= ^month_first and r.date < datetime_add(^month_first, 1, "month")
     )
   end
 

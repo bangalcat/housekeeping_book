@@ -9,7 +9,7 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   def mount(params, session, socket) do
     {timezone, timezone_offset} = get_timezone_with_offset(socket)
 
-    unless params["year"] || params["month"] do
+    if !params["year"] && !params["month"] do
       now = DateTime.utc_now() |> DateTime.shift_zone!(timezone || "Etc/UTC")
       {:ok, redirect(socket, to: ~p"/monthly/records/#{now.year}/#{now.month}")}
     else
@@ -28,16 +28,25 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   def handle_params(params, url, socket) do
     year = params["year"] |> String.to_integer()
     month = params["month"] |> String.to_integer()
-    now = DateTime.utc_now() |> DateTime.shift_zone!(socket.assigns.timezone || "Etc/UTC")
+    timezone = socket.assigns.timezone || "Etc/UTC"
+    now = DateTime.utc_now() |> DateTime.shift_zone!(timezone)
     curr_path = URI.parse(url).path
+
+    Logger.debug("#{inspect(now)}, year, month")
 
     socket =
       socket
       |> assign(:current_path, curr_path)
       |> assign(:year, year)
       |> assign(:month, month)
-      |> assign_list_records(year, month)
-      |> assign_new(:selected_date, fn -> Date.new!(year, month, now.day) end)
+      |> assign_list_records(year, month, timezone)
+      |> assign_new(:selected_date, fn ->
+        if year == now.year and month == now.month do
+          Date.new!(year, month, now.day)
+        else
+          Date.new!(year, month, 1)
+        end
+      end)
       |> assign_daily_type_amount()
 
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
@@ -144,7 +153,6 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
     {:noreply, socket}
   end
 
-  defp select_date(date, date), do: nil
   defp select_date(new_date, _selected_date), do: new_date
 
   def maybe_scroll_to_date(socket, %Date{} = date) do
@@ -173,13 +181,17 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   def assign_daily_type_amount(socket) do
     year = socket.assigns.year
     month = socket.assigns.month
+    timezone = socket.assigns.timezone || "Etc/UTC"
 
-    month_date =
+    month_first =
       NaiveDateTime.from_erl!({{year, month, 1}, {0, 0, 0}})
-      |> DateTime.from_naive!(socket.assigns.timezone || "Etc/UTC")
+      |> DateTime.from_naive!(timezone)
 
     {daily_amount_map, total} =
-      Records.get_amount_sum_group_by_date_and_type(%{month_date: month_date})
+      Records.get_amount_sum_group_by_date_and_type(%{
+        month_first: month_first,
+        timezone: month_first.zone_abbr
+      })
       |> Records.with_total()
 
     socket
@@ -187,8 +199,8 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
     |> assign(:total_amount, total)
   end
 
-  def assign_list_records(socket, year, month) do
-    case list_records(year, month) do
+  def assign_list_records(socket, year, month, timezone) do
+    case list_records(year, month, timezone) do
       {:ok, {records, meta}} ->
         socket
         |> assign(%{meta: meta})
@@ -200,10 +212,10 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
     end
   end
 
-  def list_records(year, month) do
+  def list_records(year, month, timezone) do
     params = %{
       filters: [
-        %{field: :date_month, value: {year, month}}
+        %{field: :date_month, value: {year, month, timezone}}
       ],
       limit: 1000
     }
