@@ -25,7 +25,7 @@ defmodule HousekeepingBook.Schema.Record do
       custom_fields: [
         date_month: [
           filter: {CustomFilters, :date_month_filter, [source: :date]},
-          operators: [:<=, :>=, :==]
+          operators: [:==]
         ]
       ],
       join_fields: [

@@ -1,4 +1,5 @@
 defmodule HousekeepingBookWeb.CustomComponents do
+  @moduledoc false
   use Phoenix.Component
 
   import Flop.Phoenix
