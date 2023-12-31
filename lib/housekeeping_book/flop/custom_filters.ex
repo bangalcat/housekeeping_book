@@ -5,8 +5,9 @@ defmodule HousekeepingBook.Flop.CustomFilters do
   def date_month_filter(query, %Flop.Filter{value: value, op: :==}, _opts) do
     {year, month, timezone} = cast_value(value)
     start_date = DateTime.new!(Date.new!(year, month, 1), ~T[00:00:00], timezone)
+    end_date = DateTime.new!(Date.end_of_month(start_date), ~T[23:59:59], timezone)
 
-    where(query, [r], r.date >= ^start_date and r.date < datetime_add(^start_date, 1, "month"))
+    where(query, [r], r.date >= ^start_date and r.date < ^end_date)
   end
 
   defp cast_value(value) do
