@@ -1,7 +1,7 @@
 defmodule HousekeepingBook.Repo do
   use Boundary, deps: []
 
-  use Ecto.Repo,
+  use AshPostgres.Repo,
     otp_app: :housekeeping_book,
     adapter: Ecto.Adapters.Postgres
 
@@ -22,5 +22,9 @@ defmodule HousekeepingBook.Repo do
       end,
       opts
     )
+  end
+
+  def installed_extensions() do
+    ["citext"]
   end
 end

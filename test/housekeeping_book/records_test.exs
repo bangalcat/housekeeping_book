@@ -11,14 +11,6 @@ defmodule HousekeepingBook.RecordsTest do
   describe "list_records" do
     setup [:setup_records]
 
-    test "list_records/0 returns all records", %{records: records} do
-      result_records = Records.list_records() |> Enum.sort_by(& &1.id)
-
-      for {expect, result} <- Enum.zip(records, result_records) do
-        assert_same_schema(expect, result)
-      end
-    end
-
     test "list_records/1 with pagination options returns paginated records ", %{
       records: expect_records
     } do
@@ -102,7 +94,7 @@ defmodule HousekeepingBook.RecordsTest do
       records_map =
         [
           record_fixture(
-            %{date: ~U[2023-10-16 05:48:00Z], amount: 10},
+            %{date: ~U[2023-11-06 05:48:00Z], amount: 10},
             user,
             category
           ),
@@ -133,7 +125,11 @@ defmodule HousekeepingBook.RecordsTest do
         )
         |> Map.new(fn {key, value} -> {key, Enum.sum(value)} end)
 
-      result = Records.get_amount_sum_group_by_date_and_type(%{})
+      result =
+        HousekeepingBook.Households.get_records_amount_sum_group_by_date_and_type(
+          {2023, 11},
+          "UTC"
+        )
 
       assert records_map == result
     end

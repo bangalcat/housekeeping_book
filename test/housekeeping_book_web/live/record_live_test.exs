@@ -48,7 +48,7 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
 
       assert index_live
              |> form("#record-form", record: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#record-form", record: @create_attrs)
@@ -71,7 +71,7 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
 
       assert index_live
              |> form("#record-form", record: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#record-form", record: @update_attrs)
@@ -113,7 +113,7 @@ defmodule HousekeepingBookWeb.RecordLiveTest do
 
       assert show_live
              |> form("#record-form", record: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert show_live
              |> form("#record-form", record: @update_attrs)

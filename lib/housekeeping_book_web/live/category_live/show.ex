@@ -2,7 +2,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Show do
   use HousekeepingBookWeb, :live_view
   import HousekeepingBookWeb.CategoryLive.Helper
 
-  alias HousekeepingBook.Categories
+  alias HousekeepingBook.Households
 
   @impl true
   def mount(_params, _session, socket) do
@@ -14,7 +14,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:category, Categories.get_category!(id))}
+     |> assign(:category, Households.Category.get_by_id!(id, load: [:parent]))}
   end
 
   defp page_title(:show), do: "Show Category"

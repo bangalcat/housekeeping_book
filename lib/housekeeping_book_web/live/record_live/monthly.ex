@@ -3,7 +3,7 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   import HousekeepingBookWeb.RecordLive.Helper
   require Logger
 
-  alias HousekeepingBook.Records
+  alias HousekeepingBook.Households
 
   @impl true
   def mount(params, session, socket) do
@@ -156,12 +156,12 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   defp select_date(new_date, _selected_date), do: new_date
 
   def maybe_scroll_to_date(socket, %Date{} = date) do
-    nearest_record = Records.get_nearest_date_record(date, socket.assigns.timezone)
+    case Households.Record.get_nearest_date_record(date, socket.assigns.timezone) do
+      {:ok, nearest_record} ->
+        push_event(socket, "scroll_to", %{id: "records-#{nearest_record.id}"})
 
-    if nearest_record do
-      push_event(socket, "scroll_to", %{id: "records-#{nearest_record.id}"})
-    else
-      socket
+      {:error, _} ->
+        socket
     end
   end
 
@@ -183,15 +183,9 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
     month = socket.assigns.month
     timezone = socket.assigns.timezone || "Etc/UTC"
 
-    month_first =
-      DateTime.new!(Date.new!(year, month, 1), ~T[00:00:00], timezone)
-
     {daily_amount_map, total} =
-      Records.get_amount_sum_group_by_date_and_type(%{
-        month_first: month_first,
-        timezone: month_first.zone_abbr
-      })
-      |> Records.with_total()
+      Households.get_records_amount_sum_group_by_date_and_type({year, month}, timezone)
+      |> Households.with_total()
 
     socket
     |> assign(:daily_amount_map, daily_amount_map)
@@ -199,36 +193,14 @@ defmodule HousekeepingBookWeb.RecordLive.Monthly do
   end
 
   def assign_list_records(socket, year, month, timezone) do
-    case list_records(year, month, timezone) do
-      {:ok, {records, meta}} ->
+    case Households.Record.monthly_records({year, month}, timezone) do
+      {:ok, records} ->
         socket
-        |> assign(%{meta: meta})
         |> stream(:records, records, reset: true)
 
-      {:error, meta} ->
+      error ->
+        Logger.error("#{inspect(error)}")
         socket
-        |> assign(:meta, meta)
-    end
-  end
-
-  def list_records(year, month, timezone) do
-    params = %{
-      filters: [
-        %{field: :date_month, value: {year, month, timezone}}
-      ],
-      limit: 1000
-    }
-
-    case Records.list_records(params, %{
-           with_category: true,
-           with_subject: true,
-           with_tags: true
-         }) do
-      {:ok, {records, meta}} ->
-        {:ok, {records, meta}}
-
-      {:error, meta} ->
-        {:error, meta}
     end
   end
 
