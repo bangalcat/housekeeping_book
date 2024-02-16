@@ -33,7 +33,7 @@ defmodule HousekeepingBookWeb.TagLiveTest do
 
       assert index_live
              |> form("#tag-form", tag: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#tag-form", tag: @create_attrs)
@@ -56,7 +56,7 @@ defmodule HousekeepingBookWeb.TagLiveTest do
 
       assert index_live
              |> form("#tag-form", tag: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#tag-form", tag: @update_attrs)
@@ -97,7 +97,7 @@ defmodule HousekeepingBookWeb.TagLiveTest do
 
       assert show_live
              |> form("#tag-form", tag: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert show_live
              |> form("#tag-form", tag: @update_attrs)

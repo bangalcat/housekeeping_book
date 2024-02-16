@@ -1,12 +1,11 @@
 defmodule HousekeepingBookWeb.TagLive.Index do
   use HousekeepingBookWeb, :live_view
 
-  alias HousekeepingBook.Tags
-  alias HousekeepingBook.Schema.Tag
+  alias HousekeepingBook.Households
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :tags, Tags.list_tags())}
+    {:ok, stream(socket, :tags, Households.Tag.read!())}
   end
 
   @impl true
@@ -17,13 +16,13 @@ defmodule HousekeepingBookWeb.TagLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Tag")
-    |> assign(:tag, Tags.get_tag!(id))
+    |> assign(:tag, Households.Tag.get_by_id!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Tag")
-    |> assign(:tag, %Tag{})
+    |> assign(:tag, %Households.Tag{})
   end
 
   defp apply_action(socket, :index, _params) do
@@ -39,8 +38,8 @@ defmodule HousekeepingBookWeb.TagLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    tag = Tags.get_tag!(id)
-    {:ok, _} = Tags.delete_tag(tag)
+    tag = Households.Tag.get_by_id!(id)
+    Households.Tag.destroy!(tag)
 
     {:noreply, stream_delete(socket, :tags, tag)}
   end

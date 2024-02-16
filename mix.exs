@@ -72,7 +72,10 @@ defmodule HousekeepingBook.MixProject do
       {:ua_parser, "~> 1.0"},
       {:phoenix_storybook, "~> 0.5.0"},
       {:tzdata, ">= 0.0.0"},
-      {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"}
+      {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"},
+      {:ash, "~> 2.0"},
+      {:ash_postgres, "~> 1.0"},
+      {:ash_phoenix, "~> 1.0"}
     ]
   end
 

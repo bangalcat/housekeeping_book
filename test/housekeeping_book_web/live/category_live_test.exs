@@ -32,7 +32,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert index_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#category-form", category: @create_attrs)
@@ -55,7 +55,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert index_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#category-form", category: @update_attrs)
@@ -96,7 +96,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert show_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert show_live
              |> form("#category-form", category: @update_attrs)

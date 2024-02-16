@@ -85,6 +85,10 @@ config :housekeeping_book, :site_encrypt,
   domains: ["localhost", "www.localhost"],
   emails: ["test@test.com"]
 
+config :housekeeping_book, :ash_apis, [HousekeepingBook.Accounts, HousekeepingBook.Households]
+
+config :ash, :default_belongs_to_type, :integer
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
