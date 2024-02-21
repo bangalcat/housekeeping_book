@@ -89,6 +89,23 @@ config :housekeeping_book, :ash_apis, [HousekeepingBook.Accounts, HousekeepingBo
 
 config :ash, :default_belongs_to_type, :integer
 
+config :spark, :formatter,
+  remove_parens?: true,
+  "Ash.Resource": [
+    type: Ash.Resource,
+    section_order: [
+      :code_interface,
+      :actions,
+      :calculations,
+      :authentication,
+      :token,
+      :attributes,
+      :relationships,
+      :policies,
+      :postgres
+    ]
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
