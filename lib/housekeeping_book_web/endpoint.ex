@@ -12,7 +12,7 @@ defmodule HousekeepingBookWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  @impl Phoenix.Endpoint
+  # TODO: should move this
   def init(_key, config) do
     {:ok, SiteEncrypt.Phoenix.configure_https(config)}
   end
