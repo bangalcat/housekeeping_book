@@ -1,6 +1,10 @@
-defmodule HousekeepingBook.Accounts.UserTokens do
+defmodule HousekeepingBook.Accounts.UserToken do
+  use Ash.Resource,
+    data_layer: AshPostgres.DataLayer
+
   import Ecto.Query
-  alias HousekeepingBook.Schema.UserToken
+  require Ash.Query
+  alias __MODULE__
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -11,6 +15,74 @@ defmodule HousekeepingBook.Accounts.UserTokens do
   @confirm_validity_in_days 7
   @change_email_validity_in_days 7
   @session_validity_in_days 60
+
+  code_interface do
+    define_for HousekeepingBook.Accounts
+    define :by_token_and_context, args: [:token, {:optional, :context}]
+  end
+
+  actions do
+    defaults [:read, :create, :update, :destroy]
+
+    create :generate_user_session_token do
+      argument :user, :struct do
+        constraints instance_of: HousekeepingBook.Accounts.User
+      end
+
+      change set_attribute(:context, "session")
+
+      change before_action(fn changeset ->
+               user = Ash.Changeset.get_argument(changeset, :user)
+               token = :crypto.strong_rand_bytes(@rand_size)
+               Ash.Changeset.change_attribute(changeset, :user_id, user.id)
+               Ash.Changeset.change_attribute(changeset, :token, token)
+             end)
+    end
+
+    read :by_token_and_context do
+      argument :token, :string, allow_nil?: false
+      argument :context, :string, default: "all"
+
+      filter expr(
+               token == ^arg(:token) &&
+                 (^arg(:context) == "all" || context == ^arg(:context))
+             )
+
+      prepare fn query, ctx ->
+        if ctx[:verify?] do
+          Ash.Query.filter(query, inserted_at > ago(@session_validity_in_days, :day))
+        else
+          query
+        end
+      end
+    end
+  end
+
+  attributes do
+    integer_primary_key :id
+    attribute :token, :binary, allow_nil?: false
+    attribute :context, :string, allow_nil?: false
+    attribute :sent_to, :string
+
+    create_timestamp :inserted_at
+  end
+
+  relationships do
+    belongs_to :user, HousekeepingBook.Accounts.User
+  end
+
+  postgres do
+    table "users_tokens"
+    repo HousekeepingBook.Repo
+
+    references do
+    end
+
+    custom_indexes do
+      index [:user_id]
+      index [:context, :token], unique: true
+    end
+  end
 
   @doc """
   Generates a token that will be stored in a signed place,
@@ -33,7 +105,7 @@ defmodule HousekeepingBook.Accounts.UserTokens do
   """
   def build_session_token(user) do
     token = :crypto.strong_rand_bytes(@rand_size)
-    {token, %UserToken{token: token, context: "session", user_id: user.id}}
+    {token, %{token: token, context: "session", user_id: user.id}}
   end
 
   @doc """
@@ -76,7 +148,7 @@ defmodule HousekeepingBook.Accounts.UserTokens do
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
     {Base.url_encode64(token, padding: false),
-     %UserToken{
+     %{
        token: hashed_token,
        context: context,
        sent_to: sent_to,

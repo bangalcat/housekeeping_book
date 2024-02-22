@@ -75,7 +75,8 @@ defmodule HousekeepingBook.MixProject do
       {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"},
       {:ash, "~> 2.0"},
       {:ash_postgres, "~> 1.0"},
-      {:ash_phoenix, "~> 1.0"}
+      {:ash_phoenix, "~> 1.0"},
+      {:ash_authentication, "~> 3.12"}
     ]
   end
 

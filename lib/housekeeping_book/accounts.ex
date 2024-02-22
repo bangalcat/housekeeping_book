@@ -2,6 +2,18 @@ defmodule HousekeepingBook.Accounts do
   @moduledoc """
   The Accounts context.
   """
+  use Ash.Api
+
+  use Boundary,
+    deps: [HousekeepingBook.Repo, HousekeepingBook.Schema, HousekeepingBook.Mailer],
+    exports: [User, UserToken]
+
+  resources do
+    resource HousekeepingBook.Accounts.User
+    resource HousekeepingBook.Accounts.UserToken
+  end
+
+  ######################################
 
   import Ecto.Query, warn: false
   alias HousekeepingBook.Repo

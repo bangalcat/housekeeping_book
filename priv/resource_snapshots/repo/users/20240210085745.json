@@ -1,0 +1,119 @@
+{
+  "attributes": [
+    {
+      "default": "nil",
+      "size": null,
+      "type": "bigint",
+      "source": "id",
+      "references": null,
+      "generated?": true,
+      "allow_nil?": false,
+      "primary_key?": true
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "name",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "citext",
+      "source": "email",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "password",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "text",
+      "source": "hashed_password",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "nil",
+      "size": null,
+      "type": "utc_datetime",
+      "source": "confirmed_at",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "\"normal\"",
+      "size": null,
+      "type": "text",
+      "source": "type",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "\"Etc/UTC\"",
+      "size": null,
+      "type": "text",
+      "source": "timezone",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": true,
+      "primary_key?": false
+    },
+    {
+      "default": "fragment(\"now()\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "inserted_at",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": false,
+      "primary_key?": false
+    },
+    {
+      "default": "fragment(\"now()\")",
+      "size": null,
+      "type": "utc_datetime_usec",
+      "source": "updated_at",
+      "references": null,
+      "generated?": false,
+      "allow_nil?": false,
+      "primary_key?": false
+    }
+  ],
+  "table": "users",
+  "hash": "73158BF97D12DB4A20B47A05322548BA17C9EA37B22D8B19475C6B2E862A971A",
+  "repo": "Elixir.HousekeepingBook.Repo",
+  "schema": null,
+  "check_constraints": [],
+  "identities": [],
+  "custom_indexes": [],
+  "multitenancy": {
+    "global": null,
+    "attribute": null,
+    "strategy": null
+  },
+  "base_filter": null,
+  "custom_statements": [],
+  "has_create_action": false
+}
