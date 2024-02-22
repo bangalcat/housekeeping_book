@@ -18,12 +18,15 @@ config :housekeeping_book, HousekeepingBook.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
+secret_key_base = "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/"
+
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   https: [port: 4001],
-  secret_key_base: "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/",
+  secret_key_base: secret_key_base,
   server: false
 
+config :housekeeping_book, :accounts, signing_secret: secret_key_base
 # In test we don't send emails.
 config :housekeeping_book, HousekeepingBook.Mailer, adapter: Swoosh.Adapters.Test
 
