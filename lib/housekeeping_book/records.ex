@@ -21,9 +21,9 @@ defmodule HousekeepingBook.Records do
     |> select(
       [record: r, category: c],
       {{fragment(
-          "(date_trunc('day', ? AT TIME ZONE 'Z' AT TIME ZONE ?))",
+          "(date_trunc('day', ? AT TIME ZONE 'Z' AT TIME ZONE ?::varchar))",
           r.date,
-          type(^timezone, :string)
+          ^timezone
         )
         |> type(:date)
         |> selected_as(:day), c.type}, type(sum(r.amount), :integer)}
@@ -73,20 +73,6 @@ defmodule HousekeepingBook.Records do
     |> order_by([r], asc: r.date)
     |> first()
     |> Repo.one()
-  end
-
-  @doc """
-  Returns the list of records.
-
-  ## Examples
-
-      iex> list_records()
-      [%Record{}, ...]
-
-  """
-  @spec list_records() :: [Record.t()]
-  def list_records do
-    Repo.all(Record)
   end
 
   @spec list_records(map, map) :: {:ok, {[Record.t()], Flop.Meta.t()}} | {:error, Flop.Meta.t()}
