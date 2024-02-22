@@ -42,11 +42,6 @@ defmodule HousekeepingBook.Households.Category do
     end
   end
 
-  postgres do
-    table "categories"
-    repo HousekeepingBook.Repo
-  end
-
   attributes do
     integer_primary_key :id
 
@@ -68,5 +63,10 @@ defmodule HousekeepingBook.Households.Category do
     end
 
     has_many :children, __MODULE__, destination_attribute: :parent_id
+  end
+
+  postgres do
+    table "categories"
+    repo HousekeepingBook.Repo
   end
 end

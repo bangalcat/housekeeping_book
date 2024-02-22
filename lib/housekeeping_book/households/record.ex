@@ -53,15 +53,6 @@ defmodule HousekeepingBook.Households.Record do
       end
     end
 
-    action :sum_amount_by_day_and_type, :map do
-      argument :date_month, :term
-      argument :timezone, :string, allow_nil?: true, default: "UTC"
-
-      run fn input, context ->
-        nil
-      end
-    end
-
     read :amount_by_day_and_type do
       argument :date_month, :term
       argument :timezone, :string, allow_nil?: true, default: "UTC"
@@ -127,11 +118,6 @@ defmodule HousekeepingBook.Households.Record do
     calculate :category_type, HousekeepingBook.Households.CategoryType, expr(category.type)
   end
 
-  postgres do
-    table "records"
-    repo HousekeepingBook.Repo
-  end
-
   attributes do
     integer_primary_key :id
     attribute :date, :utc_datetime
@@ -160,5 +146,10 @@ defmodule HousekeepingBook.Households.Record do
       source_attribute_on_join_resource :tag_id
       destination_attribute_on_join_resource :record_id
     end
+  end
+
+  postgres do
+    table "records"
+    repo HousekeepingBook.Repo
   end
 end
