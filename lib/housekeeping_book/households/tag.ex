@@ -18,16 +18,16 @@ defmodule HousekeepingBook.Households.Tag do
     end
   end
 
-  postgres do
-    table "tags"
-    repo HousekeepingBook.Repo
-  end
-
   attributes do
     integer_primary_key :id
     attribute :name, :string, allow_nil?: false
 
     create_timestamp :inserted_at
     update_timestamp :updated_at
+  end
+
+  postgres do
+    table "tags"
+    repo HousekeepingBook.Repo
   end
 end

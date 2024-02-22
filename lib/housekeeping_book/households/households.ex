@@ -35,7 +35,7 @@ defmodule HousekeepingBook.Households do
           ^timezone
         )
         |> type(:date)
-        |> selected_as(:day), c.type}, sum(r.amount)}
+        |> selected_as(:day), c.type}, type(sum(r.amount), :integer)}
     )
     |> group_by([r, c], [selected_as(:day), c.type])
     |> exclude(:order_by)
