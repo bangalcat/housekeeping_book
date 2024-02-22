@@ -43,11 +43,11 @@ defmodule HousekeepingBookWeb.UserLiveTest do
 
       assert index_live
              |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#user-form", user: @create_attrs)
-             |> render_submit()
+             |> render_submit() =~ "Saving"
 
       assert_patch(index_live, ~p"/admin/users")
 
@@ -66,7 +66,7 @@ defmodule HousekeepingBookWeb.UserLiveTest do
 
       assert index_live
              |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#user-form", user: @update_attrs)
@@ -107,7 +107,7 @@ defmodule HousekeepingBookWeb.UserLiveTest do
 
       assert show_live
              |> form("#user-form", user: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert show_live
              |> form("#user-form", user: @update_attrs)

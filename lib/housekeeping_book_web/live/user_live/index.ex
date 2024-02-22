@@ -2,11 +2,10 @@ defmodule HousekeepingBookWeb.UserLive.Index do
   use HousekeepingBookWeb, :live_view
 
   alias HousekeepingBook.Accounts
-  alias HousekeepingBook.Schema.User
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :users, Accounts.list_users())}
+    {:ok, stream(socket, :users, Accounts.User.list_users!())}
   end
 
   @impl true
@@ -17,13 +16,13 @@ defmodule HousekeepingBookWeb.UserLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit User")
-    |> assign(:user, Accounts.get_user!(id))
+    |> assign(:user, Accounts.User.get_by_id!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New User")
-    |> assign(:user, %User{})
+    |> assign(:user, %Accounts.User{})
   end
 
   defp apply_action(socket, :index, _params) do
@@ -39,8 +38,8 @@ defmodule HousekeepingBookWeb.UserLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    user = Accounts.get_user!(id)
-    {:ok, _} = Accounts.delete_user(user)
+    user = Accounts.User.get_by_id!(id)
+    Accounts.User.delete!(user)
 
     {:noreply, stream_delete(socket, :users, user)}
   end

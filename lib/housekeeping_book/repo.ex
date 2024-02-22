@@ -25,6 +25,6 @@ defmodule HousekeepingBook.Repo do
   end
 
   def installed_extensions() do
-    ["citext"]
+    ["citext", "ash-functions"]
   end
 end

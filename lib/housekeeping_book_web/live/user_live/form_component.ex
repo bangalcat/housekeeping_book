@@ -34,22 +34,21 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
 
   @impl true
   def update(%{user: user} = assigns, socket) do
-    changeset = Accounts.change_user(user)
+    form = for_create_or_update(user, %{}, assigns.action)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign_form(changeset)}
+     |> assign_form(form)}
   end
 
   @impl true
   def handle_event("validate", %{"user" => user_params}, socket) do
-    changeset =
+    form =
       socket.assigns.user
-      |> Accounts.change_user(user_params)
-      |> Map.put(:action, :validate)
+      |> for_create_or_update(user_params, socket.assigns.action)
 
-    {:noreply, assign_form(socket, changeset)}
+    {:noreply, assign_form(socket, form)}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
@@ -57,7 +56,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
   end
 
   defp save_user(socket, :edit, user_params) do
-    case Accounts.update_user(socket.assigns.user, user_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: user_params) do
       {:ok, user} ->
         notify_parent({:saved, user})
 
@@ -66,13 +65,13 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
          |> put_flash(:info, "User updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, form} ->
+        {:noreply, assign(socket, form: form)}
     end
   end
 
   defp save_user(socket, :new, user_params) do
-    case Accounts.register_user(user_params, secret_code: user_params["secret_code"]) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: user_params) do
       {:ok, user} ->
         notify_parent({:saved, user})
 
@@ -81,8 +80,8 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
          |> put_flash(:info, "User created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, form} ->
+        {:noreply, assign(socket, form: form)}
     end
   end
 
@@ -90,5 +89,31 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
     assign(socket, :form, to_form(changeset))
   end
 
+  defp assign_form(socket, %AshPhoenix.Form{} = form) do
+    assign(socket, :form, to_form(form))
+  end
+
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  defp for_create_or_update(tag, params, live_action) do
+    case live_action do
+      :edit ->
+        tag
+        |> AshPhoenix.Form.for_update(:update,
+          as: "user",
+          api: Accounts,
+          forms: [auto?: true]
+        )
+        |> AshPhoenix.Form.validate(params)
+
+      :new ->
+        Accounts.User
+        |> AshPhoenix.Form.for_create(:register,
+          as: "user",
+          api: Accounts,
+          forms: [auto?: true]
+        )
+        |> AshPhoenix.Form.validate(params)
+    end
+  end
 end
