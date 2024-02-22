@@ -490,9 +490,9 @@ defmodule HousekeepingBookWeb.CoreComponents do
       end
 
     ~H"""
-    <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0 w-full">
-      <table class="w-[40rem] mt-11 sm:w-full table-auto">
-        <thead class="text-sm text-left leading-6 text-zinc-500 dark:text-white">
+    <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0 w-full table-container">
+      <table class="w-[40rem] mt-11 sm:w-full table-auto my-table">
+        <thead class="text-sm text-left leading-6 text-zinc-500 dark:text-white my-thead">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
             <th :if={@action != []} class="relative p-0 pb-4">
@@ -503,13 +503,17 @@ defmodule HousekeepingBookWeb.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700 dark:text-white"
+          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700 dark:text-white my-table-body"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-white">
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="group hover:bg-white my-tbody-tr"
+          >
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
-              class={["relative p-0", @row_click && "hover:cursor-pointer"]}
+              class={["relative p-0", @row_click && "hover:cursor-pointer", "my-tbody-td"]}
             >
               <div class="block py-4 pr-6 group-hover:dark:text-zinc-800">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
