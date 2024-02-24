@@ -8,6 +8,7 @@ defmodule HousekeepingBookWeb.UserLiveTest do
     name: "some name",
     type: :normal,
     password: "some valid password",
+    password_confirmation: "some valid password",
     email: "test@abc.com"
   }
   @update_attrs %{
@@ -70,7 +71,7 @@ defmodule HousekeepingBookWeb.UserLiveTest do
 
       assert index_live
              |> form("#user-form", user: @update_attrs)
-             |> render_submit()
+             |> render_submit() =~ "Saving"
 
       assert_patch(index_live, ~p"/admin/users")
 

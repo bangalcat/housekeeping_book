@@ -26,7 +26,8 @@ defmodule HousekeepingBook.Accounts.User do
       accept [:name, :type, :email]
 
       require_attributes [:name, :type, :email]
-      upsert_identity :email
+      upsert_identity :unique_email
+      upsert? true
 
       argument :password, :string do
         allow_nil? false
