@@ -1,5 +1,4 @@
 alias HousekeepingBook.Households
-alias HousekeepingBook.Categories
 
 middle_categories = [
   "수입",
@@ -61,7 +60,6 @@ categories = [
   "기타"
 ]
 
-# Categories.delete_all_categories()
 Households.bulk_destroy!(Households.Category, :destroy, %{})
 
 [
