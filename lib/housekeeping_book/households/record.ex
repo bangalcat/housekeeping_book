@@ -151,5 +151,10 @@ defmodule HousekeepingBook.Households.Record do
   postgres do
     table "records"
     repo HousekeepingBook.Repo
+
+    references do
+      reference :subject, on_delete: :nothing
+      reference :category, on_delete: :nilify
+    end
   end
 end

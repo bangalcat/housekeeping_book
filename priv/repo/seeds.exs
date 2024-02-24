@@ -12,8 +12,15 @@
 alias HousekeepingBook.Records.Importer.CsvImporter
 
 Code.eval_file("priv/repo/categories_seeds.exs")
+Code.eval_file("priv/repo/accounts_seeds.exs")
+Code.eval_file("priv/repo/sample_records.exs")
 
-Application.app_dir(:housekeeping_book, "priv")
-|> Path.join("account-book-records.csv")
-|> File.stream!()
-|> CsvImporter.import_records(mapper: &CsvImporter.my_mapper/1)
+path =
+  Application.app_dir(:housekeeping_book, "priv")
+  |> Path.join("account-book-records.csv")
+
+if File.exists?(path) do
+  path
+  |> File.stream!()
+  |> CsvImporter.import_records(mapper: &CsvImporter.my_mapper/1)
+end
