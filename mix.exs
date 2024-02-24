@@ -64,6 +64,7 @@ defmodule HousekeepingBook.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:boundary, "~> 0.10", runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 1.2"},
       {:flop_phoenix, "~> 0.22.4"},
       {:ex_cldr, "~> 2.37"},
