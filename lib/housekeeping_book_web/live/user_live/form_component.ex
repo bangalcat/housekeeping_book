@@ -1,6 +1,7 @@
 defmodule HousekeepingBookWeb.UserLive.FormComponent do
   use HousekeepingBookWeb, :live_component
 
+  require Logger
   alias HousekeepingBook.Accounts
 
   @impl true
@@ -19,11 +20,17 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:email]} type="text" label="Email" />
-        <.input field={@form[:password]} type="text" label="Password" />
-        <.input field={@form[:type]} type="text" label="Type" />
-        <.input field={@form[:secret_code]} type="text" label="Secret Code" />
+        <.input field={@form[:name]} type="text" label="Name" phx-debounce />
+        <.input field={@form[:email]} type="text" label="Email" phx-debounce />
+        <.input field={@form[:password]} type="text" label="Password" phx-debounce />
+        <.input
+          field={@form[:password_confirmation]}
+          type="text"
+          label="Password Confirmation"
+          phx-debounce
+        />
+        <.input field={@form[:type]} type="text" label="Type" phx-debounce />
+        <.input field={@form[:secret_code]} type="text" label="Secret Code" phx-debounce />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>
@@ -81,6 +88,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, form} ->
+        Logger.error("#{inspect(form.errors)}")
         {:noreply, assign(socket, form: form)}
     end
   end
