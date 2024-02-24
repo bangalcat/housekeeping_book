@@ -5,6 +5,7 @@ defmodule HousekeepingBook.Households.Category do
     define_for HousekeepingBook.Households
     define :read
     define :get_by_id, action: :by_id, args: [:id]
+    define :get_by_name_and_type, action: :by_name_and_type, args: [:name, :type]
 
     define :top_categories
     define :child_categories, args: [:id]
@@ -29,6 +30,10 @@ defmodule HousekeepingBook.Households.Category do
 
     read :by_id do
       get_by [:id]
+    end
+
+    read :by_name_and_type do
+      get_by [:name, :type]
     end
 
     read :top_categories do

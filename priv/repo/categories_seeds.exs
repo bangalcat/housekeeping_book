@@ -1,3 +1,4 @@
+alias HousekeepingBook.Households
 alias HousekeepingBook.Categories
 
 middle_categories = [
@@ -60,7 +61,8 @@ categories = [
   "기타"
 ]
 
-Categories.delete_all_categories()
+# Categories.delete_all_categories()
+Households.bulk_destroy!(Households.Category, :destroy, %{})
 
 [
   "고정비",
@@ -69,7 +71,7 @@ Categories.delete_all_categories()
 |> Enum.map(fn
   name ->
     %{name: name, type: :expense}
-    |> Categories.create_category()
+    |> Households.Category.create!()
 end)
 
 middle_categories
@@ -81,22 +83,22 @@ middle_categories
     %{name: name, type: :saving}
 
   name when name in ["대출이자", "보험", "주거비"] ->
-    parent = Categories.get_category_by_name_and_type!("고정비", :expense)
+    parent = Households.Category.get_by_name_and_type!("고정비", :expense)
     %{name: name, type: :expense, parent_id: parent.id}
 
   name ->
-    parent = Categories.get_category_by_name_and_type!("상비비", :expense)
+    parent = Households.Category.get_by_name_and_type!("상비비", :expense)
     %{name: name, type: :expense, parent_id: parent.id}
 end)
-|> Enum.map(fn attrs -> Categories.create_category(attrs) end)
+|> Enum.map(fn attrs -> Households.Category.create!(attrs) end)
 
 categories
 |> Enum.map(fn
   name when name in ["월급", "부수입"] ->
-    parent = Categories.get_category_by_name_and_type!("수입", :income)
+    parent = Households.Category.get_by_name_and_type!("수입", :income)
 
-    %{name: name, type: :income, parent_id: parent.id}
-    |> Categories.create_category()
+    %{name: name, type: :income, parent: parent}
+    |> Households.Category.create!()
 
   name ->
     parent_name =
@@ -106,8 +108,8 @@ categories
         _ -> "기타"
       end
 
-    parent = Categories.get_category_by_name_and_type!(parent_name, :expense)
+    parent = Households.Category.get_by_name_and_type!(parent_name, :expense)
 
-    %{name: name, type: :expense, parent_id: parent.id}
-    |> Categories.create_category()
+    %{name: name, type: :expense, parent: parent}
+    |> Households.Category.create!()
 end)
