@@ -47,7 +47,8 @@ defmodule HousekeepingBook.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 3.3"},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20.1"},
       {:floki, ">= 0.30.0", only: :test},
@@ -66,18 +67,16 @@ defmodule HousekeepingBook.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 1.2"},
-      {:flop_phoenix, "~> 0.22.4"},
       {:ex_cldr, "~> 2.37"},
       {:ex_cldr_numbers, ">= 0.0.0"},
       {:ex_cldr_dates_times, ">= 0.0.0"},
       {:ua_parser, "~> 1.0"},
-      {:phoenix_storybook, "~> 0.5.0"},
+      {:phoenix_storybook, "~> 0.6.0"},
       {:tzdata, ">= 0.0.0"},
       {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"},
-      {:ash, "~> 2.0"},
-      {:ash_postgres, "~> 1.0"},
-      {:ash_phoenix, "~> 1.0"},
-      {:ash_authentication, "~> 3.12"}
+      {:ash, "~> 2.19"},
+      {:ash_postgres, "~> 1.5"},
+      {:ash_phoenix, "~> 1.3"}
     ]
   end
 

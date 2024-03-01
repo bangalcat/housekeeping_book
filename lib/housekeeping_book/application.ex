@@ -15,7 +15,6 @@ defmodule HousekeepingBook.Application do
       {Phoenix.PubSub, name: HousekeepingBook.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: HousekeepingBook.Finch},
-      {AshAuthentication.Supervisor, otp_app: :housekeeping_book},
       # Start a worker by calling: HousekeepingBook.Worker.start_link(arg)
       # {HousekeepingBook.Worker, arg},
       # Start to serve requests, typically the last entry
