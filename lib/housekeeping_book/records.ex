@@ -75,14 +75,14 @@ defmodule HousekeepingBook.Records do
     |> Repo.one()
   end
 
-  @spec list_records(map, map) :: {:ok, {[Record.t()], Flop.Meta.t()}} | {:error, Flop.Meta.t()}
-  def list_records(params, opts \\ %{}) do
-    from(Record, as: :record)
-    |> maybe_with_category(opts)
-    |> maybe_with_subject(opts)
-    |> maybe_with_tags(opts)
-    |> Flop.validate_and_run(params, for: Record)
-  end
+  # @spec list_records(map, map) :: {:ok, {[Record.t()], Flop.Meta.t()}} | {:error, Flop.Meta.t()}
+  # def list_records(params, opts \\ %{}) do
+  #   from(Record, as: :record)
+  #   |> maybe_with_category(opts)
+  #   |> maybe_with_subject(opts)
+  #   |> maybe_with_tags(opts)
+  #   |> Flop.validate_and_run(params, for: Record)
+  # end
 
   # @type list_options :: %{
   #         page: integer(),

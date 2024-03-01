@@ -3,55 +3,6 @@ defmodule HousekeepingBook.Schema.Record do
 
   alias HousekeepingBook.Schema.User
   alias HousekeepingBook.Schema.Category
-  alias HousekeepingBook.Flop.CustomFilters
-
-  @derive {
-    Flop.Schema,
-    filterable: [
-      :date,
-      :amount,
-      :payment,
-      :tags,
-      :category_id,
-      :category_name,
-      :category_type,
-      :subject_id,
-      :date_month
-    ],
-    sortable: [:date, :amount, :payment],
-    default_limit: 20,
-    default_order: %{order_by: [:date], order_directions: [:desc, :asc]},
-    adapter_opts: [
-      custom_fields: [
-        date_month: [
-          filter: {CustomFilters, :date_month_filter, [source: :date]},
-          operators: [:==]
-        ]
-      ],
-      join_fields: [
-        category_name: [
-          binding: :category,
-          field: :name,
-          ecto_type: :string
-        ],
-        category_id: [
-          binding: :category,
-          field: :id,
-          ecto_type: :id
-        ],
-        category_type: [
-          binding: :category,
-          field: :type,
-          ecto_type: :string
-        ],
-        subject_id: [
-          binding: :subject,
-          field: :id,
-          ecto_type: :id
-        ]
-      ]
-    ]
-  }
 
   schema "records" do
     field :date, :utc_datetime
