@@ -26,7 +26,7 @@ defmodule HousekeepingBook.Records do
           type(^timezone, :string)
         )
         |> type(:date)
-        |> selected_as(:day), c.type}, sum(r.amount)}
+        |> selected_as(:day), c.type}, type(sum(r.amount), :integer)}
     )
     |> group_by([record: r, category: c], [selected_as(:day), c.type])
     |> order_by([record: r], selected_as(:day))
