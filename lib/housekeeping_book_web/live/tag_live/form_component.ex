@@ -93,7 +93,7 @@ defmodule HousekeepingBookWeb.TagLive.FormComponent do
         tag
         |> AshPhoenix.Form.for_update(:update,
           as: "tag",
-          api: Households,
+          domain: Households,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)
@@ -102,7 +102,7 @@ defmodule HousekeepingBookWeb.TagLive.FormComponent do
         Households.Tag
         |> AshPhoenix.Form.for_create(:create,
           as: "tag",
-          api: Households,
+          domain: Households,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)

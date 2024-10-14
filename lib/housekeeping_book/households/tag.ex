@@ -1,8 +1,9 @@
 defmodule HousekeepingBook.Households.Tag do
-  use Ash.Resource, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: HousekeepingBook.Households,
+    data_layer: AshPostgres.DataLayer
 
   code_interface do
-    define_for HousekeepingBook.Households
     define :read
     define :create
     define :update

@@ -176,7 +176,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
         category
         |> AshPhoenix.Form.for_update(:update,
           as: "category",
-          api: Households,
+          domain: Households,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)
@@ -185,7 +185,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
         Households.Category
         |> AshPhoenix.Form.for_create(:create,
           as: "category",
-          api: Households,
+          domain: Households,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)

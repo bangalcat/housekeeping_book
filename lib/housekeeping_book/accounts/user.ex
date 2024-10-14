@@ -1,8 +1,9 @@
 defmodule HousekeepingBook.Accounts.User do
-  use Ash.Resource, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: HousekeepingBook.Accounts,
+    data_layer: AshPostgres.DataLayer
 
   code_interface do
-    define_for HousekeepingBook.Accounts
     define :get_by_id, action: :by_id, args: [:id]
 
     define :list_users
@@ -40,7 +41,7 @@ defmodule HousekeepingBook.Accounts.User do
       validate confirm(:password, :password_confirmation)
 
       # temporarily validate secret code
-      validate fn changeset ->
+      validate fn changeset, _ ->
         secret_code = Ash.Changeset.get_argument(changeset, :secret_code) || ""
 
         if secret_code == Application.get_env(:housekeeping_book, :secret_code) do
@@ -51,7 +52,7 @@ defmodule HousekeepingBook.Accounts.User do
       end
 
       # hash password
-      change before_action(fn changeset ->
+      change before_action(fn changeset, _ ->
                password = Ash.Changeset.get_argument(changeset, :password)
 
                Ash.Changeset.change_attribute(
@@ -65,13 +66,14 @@ defmodule HousekeepingBook.Accounts.User do
     # TODO: update user_token first
     update :update_user_email do
       accept [:email]
+      require_atomic? false
 
       argument :token, :struct do
         constraints instance_of: HousekeepingBook.Accounts.UserToken
         allow_nil? false
       end
 
-      change before_action(fn changeset ->
+      change before_action(fn changeset, _ ->
                token = Ash.Changeset.get_argument(changeset, :token)
              end)
     end

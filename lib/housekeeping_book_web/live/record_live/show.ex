@@ -17,9 +17,7 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
      |> assign(:return_to, return_to)
      |> assign(
        :record,
-       HousekeepingBook.Households.get!(HousekeepingBook.Households.Record, id,
-         load: [:category, :subject, :tags]
-       )
+       Ash.get!(HousekeepingBook.Households.Record, id, load: [:category, :subject, :tags])
      )}
   end
 

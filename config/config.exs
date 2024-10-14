@@ -69,7 +69,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-
 config :housekeeping_book, :mailer, mailer_sender: "contact@example.com"
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
@@ -80,7 +79,7 @@ config :housekeeping_book, :site_encrypt,
   domains: ["localhost", "www.localhost"],
   emails: ["test@test.com"]
 
-config :housekeeping_book, :ash_apis, [HousekeepingBook.Accounts, HousekeepingBook.Households]
+config :housekeeping_book, :ash_domains, [HousekeepingBook.Accounts, HousekeepingBook.Households]
 
 config :ash, :default_belongs_to_type, :integer
 

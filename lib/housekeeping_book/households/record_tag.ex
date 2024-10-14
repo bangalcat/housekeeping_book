@@ -1,5 +1,7 @@
 defmodule HousekeepingBook.Households.RecordTag do
-  use Ash.Resource, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: HousekeepingBook.Households,
+    data_layer: AshPostgres.DataLayer
 
   actions do
     defaults [:read, :create, :update, :destroy]

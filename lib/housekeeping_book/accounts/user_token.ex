@@ -1,5 +1,6 @@
 defmodule HousekeepingBook.Accounts.UserToken do
   use Ash.Resource,
+    domain: HousekeepingBook.Accounts,
     data_layer: AshPostgres.DataLayer
 
   import Ecto.Query
@@ -17,7 +18,7 @@ defmodule HousekeepingBook.Accounts.UserToken do
   @session_validity_in_days 60
 
   code_interface do
-    define_for HousekeepingBook.Accounts
+    domain HousekeepingBook.Accounts
     define :by_token_and_context, args: [:token, {:optional, :context}]
   end
 

@@ -1,10 +1,11 @@
 defmodule HousekeepingBook.Households.Record do
-  use Ash.Resource, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: HousekeepingBook.Households,
+    data_layer: AshPostgres.DataLayer
 
   require Ash.Query
 
   code_interface do
-    define_for HousekeepingBook.Households
     define :monthly_records, args: [:date_month, {:optional, :timezone}]
 
     define :create
@@ -32,7 +33,7 @@ defmodule HousekeepingBook.Households.Record do
     end
 
     update :update do
-      accept [:id, :date, :amount, :description, :payment, :subject_id, :category_id]
+      accept [:date, :amount, :description, :payment, :subject_id, :category_id]
 
       require_attributes [:date, :category_id, :subject_id]
     end

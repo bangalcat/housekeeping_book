@@ -109,7 +109,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         tag
         |> AshPhoenix.Form.for_update(:update,
           as: "user",
-          api: Accounts,
+          domain: Accounts,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)
@@ -118,7 +118,7 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         Accounts.User
         |> AshPhoenix.Form.for_create(:register,
           as: "user",
-          api: Accounts,
+          domain: Accounts,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)

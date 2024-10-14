@@ -1,8 +1,9 @@
 defmodule HousekeepingBook.Households.Category do
-  use Ash.Resource, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    domain: HousekeepingBook.Households,
+    data_layer: AshPostgres.DataLayer
 
   code_interface do
-    define_for HousekeepingBook.Households
     define :read
     define :get_by_id, action: :by_id, args: [:id]
     define :get_by_name_and_type, action: :by_name_and_type, args: [:name, :type]
@@ -24,8 +25,7 @@ defmodule HousekeepingBook.Households.Category do
     end
 
     update :update do
-      argument :parent_id, :integer
-      change manage_relationship(:parent_id, :parent, type: :append)
+      accept [:parent_id]
     end
 
     read :by_id do
