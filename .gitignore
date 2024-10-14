@@ -35,3 +35,4 @@ housekeeping_book-*.tar
 npm-debug.log
 /assets/node_modules/
 
+priv/cldr/locales/ko.json
