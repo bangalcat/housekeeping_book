@@ -35,7 +35,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
 
   @impl true
   def handle_info({HousekeepingBookWeb.CategoryLive.FormComponent, {:saved, category}}, socket) do
-    category = Households.load!(category, [:parent])
+    category = Ash.load!(category, [:parent])
     {:noreply, stream_insert(socket, :categories, category)}
   end
 

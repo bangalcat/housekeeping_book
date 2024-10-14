@@ -2,7 +2,7 @@ defmodule HousekeepingBook.Accounts do
   @moduledoc """
   The Accounts context.
   """
-  use Ash.Api
+  use Ash.Domain
 
   use Boundary,
     deps: [HousekeepingBook.Repo, HousekeepingBook.Schema, HousekeepingBook.Mailer],

@@ -1,11 +1,10 @@
 defmodule HousekeepingBook.Households do
-  use Ash.Api
+  use Ash.Domain
   use Boundary, deps: [HousekeepingBook.Repo], exports: [Record, Subject, Category, Tag]
 
   require Logger
-  import Ecto.Query
-
   require Ash.Query
+  import Ecto.Query
 
   alias HousekeepingBook.Households.Record
   alias HousekeepingBook.Households.Subject

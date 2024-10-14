@@ -96,7 +96,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   end
 
   def get_record!(id) do
-    Households.get!(Households.Record, id, load: [:category, :subject, :tags])
+    Ash.get!(Households.Record, id, load: [:category, :subject, :tags])
   end
 
   def get_timezone_with_offset(%{assigns: %{current_user: %User{} = user}}) when user != nil do
@@ -153,7 +153,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
         |> AshPhoenix.Form.for_update(:update,
           as: "record",
           prepare_params: &prepare_params/2,
-          api: Households
+          domain: Households
         )
         |> AshPhoenix.Form.validate(params)
 
@@ -162,7 +162,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
         |> AshPhoenix.Form.for_create(:create,
           as: "record",
           prepare_params: &prepare_params/2,
-          api: Households
+          domain: Households
         )
         |> AshPhoenix.Form.validate(params)
     end
