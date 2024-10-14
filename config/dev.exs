@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :housekeeping_book, HousekeepingBook.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "rootpassword",
   hostname: "localhost",
   database: "housekeeping_book_dev",
   stacktrace: true,
