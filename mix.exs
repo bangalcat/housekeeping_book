@@ -62,7 +62,6 @@ defmodule HousekeepingBook.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:plug_cowboy, "~> 2.5"},
       {:boundary, "~> 0.10", runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
@@ -74,9 +73,9 @@ defmodule HousekeepingBook.MixProject do
       {:phoenix_storybook, "~> 0.6.0"},
       {:tzdata, ">= 0.0.0"},
       {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"},
-      {:ash, "~> 2.19"},
-      {:ash_postgres, "~> 1.5"},
-      {:ash_phoenix, "~> 1.3"}
+      {:ash, "~> 3.0"},
+      {:ash_postgres, "~> 2.0"},
+      {:ash_phoenix, "~> 2.0"}
     ]
   end
 
