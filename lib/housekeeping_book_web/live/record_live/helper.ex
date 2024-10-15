@@ -1,5 +1,5 @@
 defmodule HousekeepingBookWeb.RecordLive.Helper do
-  import HousekeepingBook.Gettext
+  use Gettext, backend: HousekeepingBook.Gettext
   import Phoenix.LiveView, only: [get_connect_params: 1]
 
   require Logger

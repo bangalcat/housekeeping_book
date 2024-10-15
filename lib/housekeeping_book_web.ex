@@ -47,7 +47,7 @@ defmodule HousekeepingBookWeb do
         layouts: [html: HousekeepingBookWeb.Layouts]
 
       import Plug.Conn
-      import HousekeepingBook.Gettext
+      use Gettext, backend: HousekeepingBook.Gettext
 
       unquote(verified_routes())
     end
@@ -58,6 +58,7 @@ defmodule HousekeepingBookWeb do
       use Phoenix.LiveView,
         layout: {HousekeepingBookWeb.Layouts, :app}
 
+      use Gettext, backend: HousekeepingBook.Gettext
       import HousekeepingBookWeb.UserAgent, only: [assign_user_device: 2]
       unquote(html_helpers())
     end
