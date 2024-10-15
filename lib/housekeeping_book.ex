@@ -1,6 +1,6 @@
 defmodule HousekeepingBook do
   use Boundary,
-    deps: [Ecto, Ecto.Changeset, Ecto.Repo, Ecto.Schema],
+    deps: [Ecto, Ecto.Query, Ecto.Changeset, Ecto.Repo, Ecto.Schema],
     exports: [
       {Accounts, []},
       Records,
