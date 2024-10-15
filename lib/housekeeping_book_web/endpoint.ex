@@ -1,6 +1,5 @@
 defmodule HousekeepingBookWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :housekeeping_book
-  use SiteEncrypt.Phoenix
+  use SiteEncrypt.Phoenix.Endpoint, otp_app: :housekeeping_book
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -11,11 +10,6 @@ defmodule HousekeepingBookWeb.Endpoint do
     signing_salt: "+wvRJ9Ll",
     same_site: "Lax"
   ]
-
-  # TODO: should move this
-  def init(_key, config) do
-    {:ok, SiteEncrypt.Phoenix.configure_https(config)}
-  end
 
   @impl SiteEncrypt
   def certification do
