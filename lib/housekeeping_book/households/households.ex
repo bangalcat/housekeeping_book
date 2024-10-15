@@ -6,11 +6,12 @@ defmodule HousekeepingBook.Households do
   require Ash.Query
   import Ecto.Query
 
-  alias HousekeepingBook.Households.Record
-  alias HousekeepingBook.Households.Subject
   alias HousekeepingBook.Households.Category
-  alias HousekeepingBook.Households.Tag
+  alias HousekeepingBook.Households.CategoryType
+  alias HousekeepingBook.Households.Record
   alias HousekeepingBook.Households.RecordTag
+  alias HousekeepingBook.Households.Subject
+  alias HousekeepingBook.Households.Tag
 
   resources do
     resource Record
@@ -76,7 +77,7 @@ defmodule HousekeepingBook.Households do
 
   @spec category_type_options() :: [{String.t(), atom()}]
   def category_type_options() do
-    __MODULE__.CategoryType.values()
-    |> Enum.map(&{__MODULE__.CategoryType.category_type_name(&1), &1})
+    CategoryType.values()
+    |> Enum.map(&{CategoryType.category_type_name(&1), &1})
   end
 end
