@@ -18,14 +18,12 @@ defmodule HousekeepingBook.Households.Category do
 
   actions do
     defaults [:read, :destroy]
+    default_accept [:name, :type, :parent_id]
 
     create :create do
-      argument :parent_id, :integer
-      change manage_relationship(:parent_id, :parent, type: :append)
     end
 
     update :update do
-      accept [:parent_id]
     end
 
     read :by_id do
