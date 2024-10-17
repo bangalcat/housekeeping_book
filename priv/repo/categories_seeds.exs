@@ -60,7 +60,7 @@ categories = [
   "기타"
 ]
 
-Households.bulk_destroy!(Households.Category, :destroy, %{})
+Ash.bulk_destroy!(Households.Category, :destroy, %{})
 
 [
   "고정비",
@@ -95,7 +95,7 @@ categories
   name when name in ["월급", "부수입"] ->
     parent = Households.Category.get_by_name_and_type!("수입", :income)
 
-    %{name: name, type: :income, parent: parent}
+    %{name: name, type: :income, parent_id: parent.id}
     |> Households.Category.create!()
 
   name ->
@@ -108,6 +108,6 @@ categories
 
     parent = Households.Category.get_by_name_and_type!(parent_name, :expense)
 
-    %{name: name, type: :expense, parent: parent}
+    %{name: name, type: :expense, parent_id: parent.id}
     |> Households.Category.create!()
 end)

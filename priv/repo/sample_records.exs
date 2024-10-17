@@ -12,5 +12,5 @@ r1 =
     payment: :check_card
   }
 
-Households.bulk_destroy!(Households.Record, :destroy, %{})
+Ash.bulk_destroy!(Households.Record, :destroy, %{})
 Households.Record.create!(r1)
