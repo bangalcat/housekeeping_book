@@ -152,8 +152,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
         record
         |> AshPhoenix.Form.for_update(:update,
           as: "record",
-          prepare_params: &prepare_params/2,
-          domain: Households
+          prepare_params: &prepare_params/2
         )
         |> AshPhoenix.Form.validate(params)
 
@@ -161,8 +160,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
         Households.Record
         |> AshPhoenix.Form.for_create(:create,
           as: "record",
-          prepare_params: &prepare_params/2,
-          domain: Households
+          prepare_params: &prepare_params/2
         )
         |> AshPhoenix.Form.validate(params)
     end
