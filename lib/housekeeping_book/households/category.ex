@@ -3,6 +3,8 @@ defmodule HousekeepingBook.Households.Category do
     domain: HousekeepingBook.Households,
     data_layer: AshPostgres.DataLayer
 
+  require Ash.Query
+
   code_interface do
     define :read
     define :get_by_id, action: :by_id, args: [:id]
@@ -24,6 +26,7 @@ defmodule HousekeepingBook.Households.Category do
     end
 
     update :update do
+      validate attribute_does_not_equal(:parent_id, ref(:id))
     end
 
     read :by_id do
@@ -43,6 +46,10 @@ defmodule HousekeepingBook.Households.Category do
       filter expr(parent_id == ^arg(:id))
       prepare build(load: [:children])
     end
+
+    read :bottom_categories do
+      filter expr(is_nil(children))
+    end
   end
 
   attributes do
@@ -53,6 +60,7 @@ defmodule HousekeepingBook.Households.Category do
     end
 
     attribute :type, HousekeepingBook.Households.CategoryType do
+      default :expense
       allow_nil? false
     end
 

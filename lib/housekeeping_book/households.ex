@@ -14,11 +14,46 @@ defmodule HousekeepingBook.Households do
   alias HousekeepingBook.Households.Tag
 
   resources do
-    resource Record
+    resource Record do
+      define :monthly_records, args: [:date_month, {:optional, :timezone}]
+
+      define :get_nearest_date_record,
+        args: [:date, {:optional, :timezone}],
+        get?: true
+
+      define :get_record_amount_by_day_and_type,
+        action: :amount_by_day_and_type,
+        args: [:date_month, {:optional, :timezone}]
+    end
+
     resource Subject
-    resource Category
+
+    resource Category do
+      define :get_category_by_name_and_type, action: :by_name_and_type, args: [:name, :type]
+
+      define :top_categories
+      define :child_categories, args: [:id]
+      define :list_categories, action: :read
+
+      define :delete_category, action: :destroy
+      define :bottom_categories
+      define :create_category, action: :create
+      define :update_category, action: :update
+    end
+
     resource Tag
     resource RecordTag
+  end
+
+  def get_category!(id) do
+    Ash.get!(Category, id)
+  end
+
+  def leaf_category?(category) do
+    Category
+    |> Ash.Query.filter(parent_id == ^category.id)
+    |> Ash.exists?()
+    |> Kernel.not()
   end
 
   def get_records_amount_sum_group_by_date_and_type(date_month, timezone \\ "UTC") do
