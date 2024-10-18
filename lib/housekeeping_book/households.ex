@@ -41,7 +41,14 @@ defmodule HousekeepingBook.Households do
       define :update_category, action: :update
     end
 
-    resource Tag
+    resource Tag do
+      define :list_tags, action: :read
+      define :get_by_id, action: :read, get_by: :id
+      define :create_tag, action: :create
+      define :update_tag, action: :update
+      define :delete_tag, action: :destroy
+    end
+
     resource RecordTag
   end
 
