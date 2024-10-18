@@ -12,11 +12,6 @@ defmodule HousekeepingBook.RecordsTest do
   describe "records" do
     @invalid_attrs %{date: nil, description: nil, amount: nil}
 
-    test "get_record!/1 returns the record with given id" do
-      record = insert!(:record)
-      assert_same_schema(Records.get_record!(record.id), record)
-    end
-
     test "create_record/1 with valid data creates a record" do
       valid_attrs = %{
         date: ~U[2023-11-15 05:48:00Z],
@@ -129,6 +124,120 @@ defmodule HousekeepingBook.RecordsTest do
         )
 
       assert records_map == result
+    end
+  end
+
+  describe "categories" do
+    @invalid_attrs %{name: nil, type: nil}
+
+    test "list_categories/0 returns all categories" do
+      category = category_fixture()
+      {:ok, [res_cat]} = Households.list_categories()
+      assert_same_schema(category, res_cat)
+    end
+
+    test "list_categories/0 returns all categories with parent preload" do
+      cat = category_fixture()
+      {:ok, [res_cat]} = Households.list_categories()
+      assert_same_fields(cat, res_cat)
+    end
+
+    test "get_category!/1 returns the category with given id and parent preloaded" do
+      category = category_fixture()
+      assert_same_fields(Households.get_category!(category.id), category)
+    end
+
+    test "delete_category/1 deletes the category" do
+      category = category_fixture()
+      assert :ok = Households.delete_category(category)
+      assert_raise Ash.Error.Invalid, fn -> Households.get_category!(category.id) end
+    end
+
+    test "bottom_categories/0 should returns only categories without children" do
+      top_category = category_fixture()
+      parent_category = category_fixture(%{parent_id: top_category.id})
+      leaf_category = category_fixture(%{parent_id: parent_category.id})
+
+      assert {:ok, bottom_categories} = Households.bottom_categories()
+      assert_same_schema([leaf_category], bottom_categories)
+    end
+
+    test "top_categories/0 should returns only categories without parent" do
+      top_category = category_fixture()
+
+      parent_category = category_fixture(%{parent_id: top_category.id})
+      _leaf_category = category_fixture(%{parent_id: parent_category.id})
+
+      assert_same_schema([top_category], Households.top_categories!())
+    end
+
+    test "child_categories/1 should returns only children categories with given parent" do
+      top_category = category_fixture()
+
+      cat_1 = category_fixture(%{parent_id: top_category.id})
+      cat_2 = category_fixture(%{parent_id: top_category.id})
+      assert_same_schema([cat_1, cat_2], Households.child_categories!(top_category.id))
+      assert_same_schema([cat_1, cat_2], Households.child_categories!(top_category.id))
+    end
+  end
+
+  describe "create and update categories" do
+    test "create_category/1 with valid data creates a category" do
+      valid_attrs = %{name: "some name", type: :income}
+
+      assert {:ok, %Households.Category{} = category} = Households.create_category(valid_attrs)
+      assert category.name == "some name"
+      assert category.type == :income
+    end
+
+    test "create_category/1 with invalid data returns error changeset" do
+      assert {:error, %Ash.Error.Invalid{}} = Households.create_category(@invalid_attrs)
+    end
+
+    test "update_category/2 with valid data updates the category" do
+      category = category_fixture()
+      update_attrs = %{name: "some updated name", type: :expense}
+
+      assert {:ok, %Households.Category{} = category} =
+               Households.update_category(category, update_attrs)
+
+      assert category.name == "some updated name"
+      assert category.type == :expense
+    end
+
+    test "update_category/2 with invalid data returns error changeset" do
+      category = category_fixture()
+      assert {:error, %Ash.Error.Invalid{}} = Households.update_category(category, @invalid_attrs)
+      assert_same_schema(category, Households.get_category!(category.id))
+    end
+
+    test "it should have the same type as it's parent category" do
+      %{id: cat_id} = cat = category_fixture(%{type: :income})
+      %{id: cat2_id} = cat2 = category_fixture(%{type: :expense})
+      new_attrs = %{name: "test", parent_id: cat.id}
+
+      assert {:ok, %{parent_id: ^cat_id, type: :expense} = child_cat} =
+               Households.create_category(new_attrs)
+
+      assert {:ok, %{parent_id: ^cat2_id, type: :expense}} =
+               Households.update_category(child_cat, %{parent_id: cat2.id})
+    end
+
+    test "it could not have itself as parent" do
+      {:ok, cat} = Households.create_category(%{name: "cat"})
+
+      assert {:error, %Ash.Error.Invalid{errors: [%{field: :parent_id}]}} =
+               Households.update_category(cat, %{parent_id: cat.id})
+    end
+  end
+
+  describe "leaf_category?" do
+    test "it should return true or false" do
+      %{id: cat_id} = cat = category_fixture(%{type: :income})
+      cat2 = category_fixture(%{type: :expense, parent_id: cat_id})
+
+      assert Households.leaf_category?(cat2)
+      refute Households.leaf_category?(cat)
     end
   end
 

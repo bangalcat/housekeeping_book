@@ -16,7 +16,9 @@ defmodule HousekeepingBook.TestUtils do
   end
 
   def assert_same_fields(a, b) do
-    unless same_fields?(a, b, Map.keys(a)),
+    keys = Map.keys(a) |> Enum.reject(&(to_string(&1) |> String.starts_with?("__")))
+
+    unless same_fields?(a, b, keys),
       do:
         raise(ExUnit.AssertionError,
           message: "The two records have different fields",

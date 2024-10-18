@@ -16,7 +16,7 @@ defmodule HousekeepingBook.CategoriesFixtures do
         name: unique_name(),
         type: :income
       })
-      |> HousekeepingBook.Categories.create_category()
+      |> HousekeepingBook.Households.create_category()
 
     category
   end
