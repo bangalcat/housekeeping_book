@@ -22,10 +22,10 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
       >
         <.input field={@form[:name]} type="text" label="Name" phx-debounce />
         <.input field={@form[:email]} type="text" label="Email" phx-debounce />
-        <.input field={@form[:password]} type="text" label="Password" phx-debounce />
+        <.input field={@form[:password]} type="password" label="Password" phx-debounce />
         <.input
           field={@form[:password_confirmation]}
-          type="text"
+          type="password"
           label="Password Confirmation"
           phx-debounce
         />
@@ -109,7 +109,6 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         tag
         |> AshPhoenix.Form.for_update(:update,
           as: "user",
-          domain: Accounts,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)
@@ -118,7 +117,6 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
         Accounts.User
         |> AshPhoenix.Form.for_create(:register,
           as: "user",
-          domain: Accounts,
           forms: [auto?: true]
         )
         |> AshPhoenix.Form.validate(params)
