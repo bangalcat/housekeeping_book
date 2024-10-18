@@ -1,4 +1,4 @@
-defmodule HousekeepingBook.RecordsTest do
+defmodule HousekeepingBook.HouseholdsTest do
   use HousekeepingBook.DataCase
 
   import HousekeepingBook.AccountsFixtures
