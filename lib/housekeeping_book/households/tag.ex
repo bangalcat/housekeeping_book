@@ -13,6 +13,7 @@ defmodule HousekeepingBook.Households.Tag do
 
   actions do
     defaults [:read, :create, :update, :destroy]
+    default_accept [:name]
 
     read :by_id do
       get_by :id
