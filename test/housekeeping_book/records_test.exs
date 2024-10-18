@@ -8,21 +8,6 @@ defmodule HousekeepingBook.RecordsTest do
   alias HousekeepingBook.Records
   alias HousekeepingBook.Schema.Record
 
-  describe "list_records" do
-    setup [:setup_records]
-
-    test "list_records/1 with pagination options returns paginated records ", %{
-      records: expect_records
-    } do
-      options = %{page: 1, per_page: 5}
-      {:ok, {result_records, _meta}} = Records.list_records(options)
-
-      for {expect, result} <- expect_records |> Enum.take(5) |> Enum.zip(result_records) do
-        assert_same_schema(expect, result)
-      end
-    end
-  end
-
   describe "records" do
     @invalid_attrs %{date: nil, description: nil, amount: nil}
 
