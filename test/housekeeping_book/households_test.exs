@@ -4,6 +4,7 @@ defmodule HousekeepingBook.HouseholdsTest do
   import HousekeepingBook.AccountsFixtures
   import HousekeepingBook.RecordsFixtures
   import HousekeepingBook.CategoriesFixtures
+  import HousekeepingBook.TagsFixtures
 
   alias HousekeepingBook.Records
   alias HousekeepingBook.Schema.Record
@@ -238,6 +239,29 @@ defmodule HousekeepingBook.HouseholdsTest do
 
       assert Households.leaf_category?(cat2)
       refute Households.leaf_category?(cat)
+    end
+  end
+
+  describe "tags" do
+    test "list_tags" do
+      assert {:ok, []} = Households.list_tags()
+      tag = tag_fixture()
+      assert {:ok, [res_tag]} = Households.list_tags()
+      assert_same_schema(tag, res_tag)
+    end
+
+    test "create_tag" do
+      assert {:ok, %Households.Tag{}} = Households.create_tag(%{name: "Test"})
+    end
+
+    test "update_tag" do
+      assert {:ok, tag} = Households.create_tag(%{name: "Test"})
+      assert {:ok, %Households.Tag{name: "Tests"}} = Households.update_tag(tag, %{name: "Tests"})
+    end
+
+    test "delete_tag" do
+      assert {:ok, tag} = Households.create_tag(%{name: "Test"})
+      assert :ok = Households.delete_tag(tag)
     end
   end
 

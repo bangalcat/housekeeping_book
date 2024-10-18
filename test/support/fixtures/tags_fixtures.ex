@@ -13,7 +13,7 @@ defmodule HousekeepingBook.TagsFixtures do
       |> Enum.into(%{
         name: "some name"
       })
-      |> HousekeepingBook.Tags.create_tag()
+      |> HousekeepingBook.Households.create_tag()
 
     tag
   end
