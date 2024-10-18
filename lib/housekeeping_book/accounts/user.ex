@@ -14,7 +14,8 @@ defmodule HousekeepingBook.Accounts.User do
   end
 
   actions do
-    defaults [:read, :destroy, :create, :update]
+    defaults [:read, :destroy, :create]
+    default_accept [:name, :type, :email]
 
     read :by_id do
       get_by :id
@@ -23,12 +24,16 @@ defmodule HousekeepingBook.Accounts.User do
     read :list_users do
     end
 
+    update :update do
+      require_attributes [:name, :type, :email]
+    end
+
     create :register do
       accept [:name, :type, :email]
 
       require_attributes [:name, :type, :email]
-      upsert_identity :unique_email
-      upsert? true
+      # upsert_identity :unique_email
+      # upsert? true
 
       argument :password, :string do
         allow_nil? false
@@ -96,7 +101,7 @@ defmodule HousekeepingBook.Accounts.User do
   attributes do
     integer_primary_key :id
 
-    attribute :name, :string
+    attribute :name, :string, allow_nil?: false
 
     attribute :email, :ci_string do
       allow_nil? false
