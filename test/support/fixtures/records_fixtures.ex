@@ -18,9 +18,9 @@ defmodule HousekeepingBook.RecordsFixtures do
         subject_id: user.id,
         category_id: category.id
       })
-      |> HousekeepingBook.Records.create_record()
+      |> HousekeepingBook.Households.Record.create()
 
     record
-    |> HousekeepingBook.Repo.preload([:category, :subject])
+    |> Ash.load!([:category, :subject])
   end
 end

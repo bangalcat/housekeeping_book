@@ -80,4 +80,8 @@ defmodule HousekeepingBook.Households do
     CategoryType.values()
     |> Enum.map(&{CategoryType.category_type_name(&1), &1})
   end
+
+  def update_record(record, params, opts \\ []) do
+    Record.update(record, params, opts)
+  end
 end
