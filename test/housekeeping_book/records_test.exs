@@ -7,6 +7,7 @@ defmodule HousekeepingBook.RecordsTest do
 
   alias HousekeepingBook.Records
   alias HousekeepingBook.Schema.Record
+  alias HousekeepingBook.Households
 
   describe "records" do
     @invalid_attrs %{date: nil, description: nil, amount: nil}
@@ -46,16 +47,27 @@ defmodule HousekeepingBook.RecordsTest do
         amount: 43
       }
 
-      assert {:ok, %Record{} = record} = Records.update_record(record, update_attrs)
+      assert {:ok, %Households.Record{} = record} = Households.update_record(record, update_attrs)
       assert record.date == ~U[2023-11-16 05:48:00Z]
       assert record.description == "some updated description"
       assert record.amount == 43
     end
 
     test "update_record/2 with invalid data returns error changeset" do
-      record = insert!(:record)
-      assert {:error, %Ecto.Changeset{}} = Records.update_record(record, @invalid_attrs)
-      assert record == Records.get_record!(record.id)
+      user = user_fixture()
+      category = category_fixture()
+      record = record_fixture(user, category)
+
+      assert {:error,
+              %Ash.Error.Invalid{
+                changeset: %Ash.Changeset{},
+                errors: [%_{field: :date, type: :attribute}]
+              }} =
+               Households.update_record(record, @invalid_attrs)
+
+      assert Map.take(record, Map.keys(@invalid_attrs)) ==
+               Ash.get!(Households.Record, record.id, load: [:category, :subject])
+               |> Map.take(Map.keys(@invalid_attrs))
     end
 
     test "delete_record/1 deletes the record" do
@@ -111,7 +123,7 @@ defmodule HousekeepingBook.RecordsTest do
         |> Map.new(fn {key, value} -> {key, Enum.sum(value)} end)
 
       result =
-        HousekeepingBook.Households.get_records_amount_sum_group_by_date_and_type(
+        Households.get_records_amount_sum_group_by_date_and_type(
           {2023, 11},
           "UTC"
         )
