@@ -147,7 +147,7 @@ defmodule HousekeepingBook.HouseholdsTest do
     test "delete_category/1 deletes the category" do
       category = category_fixture()
       assert :ok = Households.delete_category(category)
-      assert_raise Ash.Error.Invalid, fn -> Households.get_category!(category.id) end
+      assert_raise Ash.Error.Query.NotFound, fn -> Households.get_category!(category.id) end
     end
 
     test "bottom_categories/0 should returns only categories without children" do

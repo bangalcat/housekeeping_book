@@ -7,8 +7,6 @@ defmodule HousekeepingBook.Households.Category do
 
   code_interface do
     define :read
-    define :get_by_id, action: :by_id, args: [:id]
-    define :get_by_name_and_type, action: :by_name_and_type, args: [:name, :type]
 
     define :top_categories
     define :child_categories, args: [:id]

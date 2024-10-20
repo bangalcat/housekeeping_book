@@ -8,7 +8,6 @@ defmodule HousekeepingBook.Households.Tag do
     define :create
     define :update
     define :destroy
-    define :get_by_id, action: :by_id, args: [:id]
   end
 
   actions do

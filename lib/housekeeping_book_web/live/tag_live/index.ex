@@ -16,7 +16,7 @@ defmodule HousekeepingBookWeb.TagLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Tag")
-    |> assign(:tag, Households.Tag.get_by_id!(id))
+    |> assign(:tag, Households.get_tag_by_id!(id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -38,7 +38,7 @@ defmodule HousekeepingBookWeb.TagLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    tag = Households.Tag.get_by_id!(id)
+    tag = Households.get_tag_by_id!(id)
     Households.Tag.destroy!(tag)
 
     {:noreply, stream_delete(socket, :tags, tag)}

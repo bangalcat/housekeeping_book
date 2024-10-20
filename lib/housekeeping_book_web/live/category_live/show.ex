@@ -14,7 +14,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:category, Households.Category.get_by_id!(id, load: [:parent]))}
+     |> assign(:category, Households.get_category!(id, load: [:parent]))}
   end
 
   defp page_title(:show), do: "Show Category"

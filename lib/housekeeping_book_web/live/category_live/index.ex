@@ -18,7 +18,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Category")
-    |> assign(:category, Households.Category.get_by_id!(id, load: [:parent]))
+    |> assign(:category, Households.get_category!(id, load: [:parent]))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -41,7 +41,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    category = Households.Category.get_by_id!(id)
+    category = Households.get_category!(id)
     Households.Category.delete!(category)
 
     {:noreply, stream_delete(socket, :categories, category)}
