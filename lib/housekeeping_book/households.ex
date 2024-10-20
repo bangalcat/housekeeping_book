@@ -17,6 +17,8 @@ defmodule HousekeepingBook.Households do
     resource Record do
       define :monthly_records, args: [:date_month, {:optional, :timezone}]
 
+      define :get_record, action: :read, get_by: :id
+
       define :get_nearest_date_record,
         args: [:date, {:optional, :timezone}],
         get?: true
@@ -24,6 +26,10 @@ defmodule HousekeepingBook.Households do
       define :get_record_amount_by_day_and_type,
         action: :amount_by_day_and_type,
         args: [:date_month, {:optional, :timezone}]
+
+      define :create_record, action: :create
+      define :update_record, action: :update
+      define :delete_record, action: :destroy
     end
 
     resource Subject
@@ -123,7 +129,13 @@ defmodule HousekeepingBook.Households do
     |> Enum.map(&{CategoryType.category_type_name(&1), &1})
   end
 
-  def update_record(record, params, opts \\ []) do
-    Record.update(record, params, opts)
+  @spec record_payment_options() :: [{String.t(), atom()}]
+  def record_payment_options do
+    __MODULE__.PaymentType.values()
+    |> Enum.map(&{__MODULE__.PaymentType.description(&1), &1})
+  end
+
+  def record_payment_name(value) do
+    __MODULE__.PaymentType.description(value)
   end
 end

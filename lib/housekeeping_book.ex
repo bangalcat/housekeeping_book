@@ -3,7 +3,6 @@ defmodule HousekeepingBook do
     deps: [Ecto, Ecto.Query, Ecto.Changeset, Ecto.Repo, Ecto.Schema],
     exports: [
       {Accounts, []},
-      Records,
       Categories,
       Tags,
       {Schema, []},

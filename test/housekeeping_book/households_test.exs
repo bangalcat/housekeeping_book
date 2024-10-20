@@ -6,8 +6,6 @@ defmodule HousekeepingBook.HouseholdsTest do
   import HousekeepingBook.CategoriesFixtures
   import HousekeepingBook.TagsFixtures
 
-  alias HousekeepingBook.Records
-  alias HousekeepingBook.Schema.Record
   alias HousekeepingBook.Households
 
   describe "records" do
@@ -22,14 +20,15 @@ defmodule HousekeepingBook.HouseholdsTest do
         category_id: category_fixture().id
       }
 
-      assert {:ok, %Record{} = record} = Records.create_record(valid_attrs)
+      assert {:ok, %Households.Record{} = record} = Households.create_record(valid_attrs)
       assert record.date == ~U[2023-11-15 05:48:00Z]
       assert record.description == "some description"
       assert record.amount == 42
     end
 
     test "create_record/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Records.create_record(@invalid_attrs)
+      assert {:error, %Ash.Error.Invalid{errors: [%Ash.Error.Changes.Required{}, %{}, %{}]}} =
+               Households.create_record(@invalid_attrs)
     end
 
     test "update_record/2 with valid data updates the record" do
@@ -67,14 +66,11 @@ defmodule HousekeepingBook.HouseholdsTest do
     end
 
     test "delete_record/1 deletes the record" do
-      record = insert!(:record)
-      assert {:ok, %Record{}} = Records.delete_record(record)
-      assert_raise Ecto.NoResultsError, fn -> Records.get_record!(record.id) end
-    end
-
-    test "change_record/1 returns a record changeset" do
-      record = insert!(:record)
-      assert %Ecto.Changeset{} = Records.change_record(record)
+      user = user_fixture()
+      category = category_fixture()
+      record = record_fixture(user, category)
+      assert :ok = Households.delete_record(record)
+      assert_raise Ash.Error.Query.NotFound, fn -> Households.get_record!(record.id) end
     end
   end
 
