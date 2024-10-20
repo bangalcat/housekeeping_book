@@ -5,7 +5,7 @@ defmodule HousekeepingBookWeb.UserLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :users, Accounts.User.list_users!())}
+    {:ok, stream(socket, :users, Accounts.list_users!())}
   end
 
   @impl true
@@ -16,7 +16,7 @@ defmodule HousekeepingBookWeb.UserLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit User")
-    |> assign(:user, Accounts.User.get_by_id!(id))
+    |> assign(:user, Accounts.get_user_by_id!(id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -38,8 +38,8 @@ defmodule HousekeepingBookWeb.UserLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    user = Accounts.User.get_by_id!(id)
-    Accounts.User.delete!(user)
+    user = Accounts.get_user_by_id!(id)
+    Accounts.delete_user!(user)
 
     {:noreply, stream_delete(socket, :users, user)}
   end

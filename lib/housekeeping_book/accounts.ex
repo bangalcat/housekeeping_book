@@ -9,7 +9,12 @@ defmodule HousekeepingBook.Accounts do
     exports: [User, UserToken]
 
   resources do
-    resource HousekeepingBook.Accounts.User
+    resource HousekeepingBook.Accounts.User do
+      define :get_user_by_id, action: :read, get_by: :id
+      define :delete_user, action: :destroy
+      define :list_users
+    end
+
     resource HousekeepingBook.Accounts.UserToken
   end
 
