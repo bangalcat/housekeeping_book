@@ -2,13 +2,14 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
   use HousekeepingBookWeb.ConnCase
 
   import Phoenix.LiveViewTest
+  import HousekeepingBook.CategoriesFixtures
 
   @create_attrs %{name: "some name", type: "income"}
   @update_attrs %{name: "some updated name", type: "expense"}
   @invalid_attrs %{name: nil}
 
   defp create_category(_) do
-    category = insert!(:category)
+    category = category_fixture()
     %{category: category}
   end
 
