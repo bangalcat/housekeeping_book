@@ -6,16 +6,13 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
 
   alias HousekeepingBook.Households
 
-  alias HousekeepingBook.Records
-  alias HousekeepingBook.Categories
   alias HousekeepingBook.Accounts
-  alias HousekeepingBook.Schema.Record
   alias HousekeepingBook.Schema.User
 
   def record_options() do
     subjects = Accounts.list_users() |> Enum.map(&subject_option/1)
-    category_types = Categories.category_type_options()
-    payment_types = Records.record_payment_options()
+    category_types = Households.category_type_options()
+    payment_types = Households.record_payment_options()
 
     %{
       subject: subjects,
@@ -42,7 +39,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   end
 
   def payment_name(payment) do
-    Record.payment_enum_name(payment)
+    Households.record_payment_name(payment)
   end
 
   def subject_name(%{subject: nil}), do: nil
@@ -99,7 +96,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
     Ash.get!(Households.Record, id, load: [:category, :subject, :tags])
   end
 
-  def get_timezone_with_offset(%{assigns: %{current_user: %User{} = user}}) when user != nil do
+  def get_timezone_with_offset(%{assigns: %{current_user: %{} = user}}) do
     {user.timezone,
      DateTime.utc_now()
      |> DateTime.shift_zone!(user.timezone)
@@ -136,10 +133,6 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   end
 
   def change_record(record, params \\ %{}, opts \\ [])
-
-  def change_record(%HousekeepingBook.Schema.Record{} = record, params, _opts) do
-    Records.change_record(record, params)
-  end
 
   def change_record(%Households.Record{} = record, params, opts) do
     record

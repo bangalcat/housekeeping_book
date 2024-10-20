@@ -1,6 +1,6 @@
 defmodule HousekeepingBook.Records.Importer.CsvImporter do
-  alias HousekeepingBook.Records
   alias HousekeepingBook.Accounts
+  alias HousekeepingBook.Households
 
   @behaviour HousekeepingBook.Records.Importer
 
@@ -11,7 +11,7 @@ defmodule HousekeepingBook.Records.Importer.CsvImporter do
     source
     |> NimbleCSV.RFC4180.parse_stream()
     |> Stream.map(mapper)
-    |> Records.create_records()
+    |> Ash.bulk_create(Households.Record, :create)
   end
 
   def my_mapper([
@@ -70,7 +70,7 @@ defmodule HousekeepingBook.Records.Importer.CsvImporter do
   end
 
   defp get_category(_category_1, _category_2, category_3, type) do
-    HousekeepingBook.Categories.get_category_by_name_and_type!(category_3, type)
+    HousekeepingBook.Households.get_category_by_name_and_type!(category_3, type)
   end
 
   defp payment("현금"), do: :cash
