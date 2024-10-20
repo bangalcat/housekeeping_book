@@ -93,20 +93,16 @@ defmodule HousekeepingBookWeb.UserLive.FormComponent do
     end
   end
 
-  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    assign(socket, :form, to_form(changeset))
-  end
-
   defp assign_form(socket, %AshPhoenix.Form{} = form) do
     assign(socket, :form, to_form(form))
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
-  defp for_create_or_update(tag, params, live_action) do
+  defp for_create_or_update(user, params, live_action) do
     case live_action do
       :edit ->
-        tag
+        user
         |> AshPhoenix.Form.for_update(:update,
           as: "user",
           forms: [auto?: true]

@@ -4,8 +4,6 @@ defmodule HousekeepingBook.Accounts.User do
     data_layer: AshPostgres.DataLayer
 
   code_interface do
-    define :get_by_id, action: :by_id, args: [:id]
-
     define :list_users
     define :delete, action: :destroy
     define :register
