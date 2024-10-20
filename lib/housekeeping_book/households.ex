@@ -36,6 +36,7 @@ defmodule HousekeepingBook.Households do
 
     resource Category do
       define :get_category_by_name_and_type, action: :by_name_and_type, args: [:name, :type]
+      define :get_category, action: :read, get_by: :id
 
       define :top_categories
       define :child_categories, args: [:id]
@@ -49,17 +50,13 @@ defmodule HousekeepingBook.Households do
 
     resource Tag do
       define :list_tags, action: :read
-      define :get_by_id, action: :read, get_by: :id
+      define :get_tag_by_id, action: :read, get_by: :id
       define :create_tag, action: :create
       define :update_tag, action: :update
       define :delete_tag, action: :destroy
     end
 
     resource RecordTag
-  end
-
-  def get_category!(id) do
-    Ash.get!(Category, id)
   end
 
   def leaf_category?(category) do
