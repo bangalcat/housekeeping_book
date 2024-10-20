@@ -1,8 +1,8 @@
-defmodule HousekeepingBook.Records.Importer.CsvImporter do
+defmodule HousekeepingBook.RecordsImporter.CsvImporter do
   alias HousekeepingBook.Accounts
   alias HousekeepingBook.Households
 
-  @behaviour HousekeepingBook.Records.Importer
+  @behaviour HousekeepingBook.RecordsImporter
 
   @impl true
   def import_records(source, opts \\ []) do
@@ -70,7 +70,7 @@ defmodule HousekeepingBook.Records.Importer.CsvImporter do
   end
 
   defp get_category(_category_1, _category_2, category_3, type) do
-    HousekeepingBook.Households.get_category_by_name_and_type!(category_3, type)
+    Households.get_category_by_name_and_type!(category_3, type)
   end
 
   defp payment("현금"), do: :cash

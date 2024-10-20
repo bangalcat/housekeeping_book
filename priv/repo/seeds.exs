@@ -9,7 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-alias HousekeepingBook.Records.Importer.CsvImporter
+alias HousekeepingBook.RecordsImporter.CsvImporter
 
 Code.eval_file("priv/repo/categories_seeds.exs")
 Code.eval_file("priv/repo/accounts_seeds.exs")
