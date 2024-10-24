@@ -88,6 +88,7 @@ config :spark, :formatter,
   "Ash.Resource": [
     type: Ash.Resource,
     section_order: [
+      :tokens,
       :code_interface,
       :actions,
       :calculations,
@@ -104,6 +105,8 @@ config :housekeeping_book, HousekeepingBook.Cldr,
   locales: ["en"],
   default_locale: "en",
   force_locale_download: false
+
+config :housekeeping_book, token_signing_secret: "test_salt"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
