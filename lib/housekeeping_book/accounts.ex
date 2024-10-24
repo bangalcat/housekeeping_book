@@ -16,6 +16,7 @@ defmodule HousekeepingBook.Accounts do
     end
 
     resource HousekeepingBook.Accounts.UserToken
+    resource HousekeepingBook.Accounts.Token
   end
 
   ######################################

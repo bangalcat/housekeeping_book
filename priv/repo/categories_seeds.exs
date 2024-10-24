@@ -81,11 +81,11 @@ middle_categories
     %{name: name, type: :saving}
 
   name when name in ["대출이자", "보험", "주거비"] ->
-    parent = Households.Category.get_by_name_and_type!("고정비", :expense)
+    parent = Households.get_category_by_name_and_type!("고정비", :expense)
     %{name: name, type: :expense, parent_id: parent.id}
 
   name ->
-    parent = Households.Category.get_by_name_and_type!("상비비", :expense)
+    parent = Households.get_category_by_name_and_type!("상비비", :expense)
     %{name: name, type: :expense, parent_id: parent.id}
 end)
 |> Enum.map(fn attrs -> Households.Category.create!(attrs) end)
@@ -93,7 +93,7 @@ end)
 categories
 |> Enum.map(fn
   name when name in ["월급", "부수입"] ->
-    parent = Households.Category.get_by_name_and_type!("수입", :income)
+    parent = Households.get_category_by_name_and_type!("수입", :income)
 
     %{name: name, type: :income, parent_id: parent.id}
     |> Households.Category.create!()
@@ -106,7 +106,7 @@ categories
         _ -> "기타"
       end
 
-    parent = Households.Category.get_by_name_and_type!(parent_name, :expense)
+    parent = Households.get_category_by_name_and_type!(parent_name, :expense)
 
     %{name: name, type: :expense, parent_id: parent.id}
     |> Households.Category.create!()

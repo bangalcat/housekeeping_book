@@ -18,6 +18,7 @@ defmodule HousekeepingBook.Application do
       # Start a worker by calling: HousekeepingBook.Worker.start_link(arg)
       # {HousekeepingBook.Worker, arg},
       # Start to serve requests, typically the last entry
+      {AshAuthentication.Supervisor, [otp_app: :housekeeping_book]},
       HousekeepingBookWeb.Endpoint
     ]
 
