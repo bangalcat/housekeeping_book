@@ -6,16 +6,11 @@ defmodule HousekeepingBook.Accounts.User do
     data_layer: AshPostgres.DataLayer
 
   code_interface do
-    define :list_users
-    define :delete, action: :destroy
-    define :register
-    define :update_user_email
     define :update
   end
 
   actions do
-    defaults [:read, :destroy, :create]
-    default_accept [:name, :type, :email]
+    defaults [:read, :destroy, create: :*]
 
     read :by_id do
       get_by :id
@@ -25,66 +20,48 @@ defmodule HousekeepingBook.Accounts.User do
     end
 
     update :update do
-      require_attributes [:name, :type, :email]
+      accept [:name, :type, :timezone]
+      require_atomic? false
+      require_attributes [:name, :type]
+      action_select [:name, :type, :timezone]
     end
 
-    create :register do
-      accept [:name, :type, :email]
-
-      require_attributes [:name, :type, :email]
-      # upsert_identity :unique_email
-      # upsert? true
-
-      argument :password, :string do
-        allow_nil? false
-        constraints min_length: 12, max_length: 72
-      end
-
-      argument :password_confirmation, :string, allow_nil?: false
-      argument :secret_code, :string
-
-      validate confirm(:password, :password_confirmation)
-
-      # temporarily validate secret code
-      validate fn changeset, _ ->
-        secret_code = Ash.Changeset.get_argument(changeset, :secret_code) || ""
-
-        if secret_code == Application.get_env(:housekeeping_book, :secret_code) do
-          :ok
-        else
-          {:error, field: :secret_code, message: "invalid secret code"}
-        end
-      end
-
-      # hash password
-      change before_action(fn changeset, _ ->
-               password = Ash.Changeset.get_argument(changeset, :password)
-
-               Ash.Changeset.change_attribute(
-                 changeset,
-                 :hashed_password,
-                 Bcrypt.hash_pwd_salt(password)
-               )
-             end)
-    end
-
-    # TODO: update user_token first
-    update :update_user_email do
+    update :update_email do
       accept [:email]
       require_atomic? false
 
-      argument :token, :struct do
-        constraints instance_of: HousekeepingBook.Accounts.UserToken
-        allow_nil? false
-      end
-
-      change before_action(fn changeset, _ ->
-               token = Ash.Changeset.get_argument(changeset, :token)
-             end)
+      validate changing(:email)
     end
 
-    # TODO: remove user_tokens first
-    update :update_user_password do
+    update :update_password do
+      require_atomic? false
+      argument :current_password, :string, sensitive?: true, allow_nil?: false
+
+      argument :password, :string do
+        description "The proposed password for the user, in plain text."
+        allow_nil? false
+        constraints min_length: 8
+        sensitive? true
+      end
+
+      argument :password_confirmation, :string do
+        description "The proposed password for the user (again), in plain text."
+        allow_nil? false
+        sensitive? true
+      end
+
+      change set_context(%{strategy_name: :password})
+
+      # Hashes the provided password
+      change AshAuthentication.Strategy.Password.HashPasswordChange
+
+      # validates that the password matches the confirmation
+      validate AshAuthentication.Strategy.Password.PasswordConfirmationValidation,
+        only_when_valid?: true
+
+      validate {AshAuthentication.Strategy.Password.PasswordValidation,
+                password_argument: :current_password},
+               only_when_valid?: true
     end
 
     read :by_session_token do
@@ -203,6 +180,8 @@ defmodule HousekeepingBook.Accounts.User do
     end
 
     update :reset_password do
+      require_atomic? false
+
       argument :reset_token, :string do
         allow_nil? false
         sensitive? true
@@ -280,7 +259,7 @@ defmodule HousekeepingBook.Accounts.User do
 
     attribute :email, :ci_string do
       allow_nil? false
-      constraints match: ~r/^[^\s]+@[^\s]+$/, max_length: 160
+      constraints match: ~r/^[^\s]+@[^\s]+$/, max_length: 80
       public? true
     end
 

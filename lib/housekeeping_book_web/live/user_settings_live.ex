@@ -19,17 +19,10 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
           phx-change="validate_email"
         >
           <.input field={@email_form[:email]} type="email" label="Email" required />
-          <.input
-            field={@email_form[:current_password]}
-            name="current_password"
-            id="current_password_for_email"
-            type="password"
-            label="Current password"
-            value={@email_form_current_password}
-            required
-          />
           <:actions>
-            <.button phx-disable-with="Changing...">Change Email</.button>
+            <.button phx-disable-with="Changing..." disabled={@email_form.errors != []}>
+              Change Email
+            </.button>
           </:actions>
         </.simple_form>
       </div>
@@ -37,7 +30,7 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
         <.simple_form
           for={@password_form}
           id="password_form"
-          action={~p"/users/log_in?_action=password_updated"}
+          action={~p"/sign-in?action=password-update"}
           method="post"
           phx-change="validate_password"
           phx-submit="update_password"
@@ -116,14 +109,13 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
 
   def mount(_params, _session, socket) do
     user = socket.assigns.current_user
-    email_changeset = Accounts.change_user_email(user)
-    password_changeset = Accounts.change_user_password(user)
-    info_changeset = Accounts.change_user(user)
+    email_changeset = AshPhoenix.Form.for_update(user, :update_email, as: "user")
+    password_changeset = AshPhoenix.Form.for_update(user, :update_password, as: "user")
+    info_changeset = AshPhoenix.Form.for_update(user, :update, as: "user")
 
     socket =
       socket
       |> assign(:current_password, nil)
-      |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
       |> assign(:info_form, to_form(info_changeset))
       |> assign(:matches, [])
@@ -135,34 +127,27 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
   end
 
   def handle_event("validate_email", params, socket) do
-    %{"current_password" => password, "user" => user_params} = params
+    %{"user" => user_params} = params
 
     email_form =
-      socket.assigns.current_user
-      |> Accounts.change_user_email(user_params)
-      |> Map.put(:action, :validate)
-      |> to_form()
+      socket.assigns.email_form
+      |> AshPhoenix.Form.validate(user_params)
 
-    {:noreply, assign(socket, email_form: email_form, email_form_current_password: password)}
+    {:noreply, assign(socket, email_form: email_form)}
   end
 
   def handle_event("update_email", params, socket) do
-    %{"current_password" => password, "user" => user_params} = params
-    user = socket.assigns.current_user
+    %{"user" => user_params} = params
 
-    case Accounts.apply_user_email(user, password, user_params) do
-      {:ok, applied_user} ->
-        Accounts.deliver_user_update_email_instructions(
-          applied_user,
-          user.email,
-          &url(~p"/users/settings/confirm_email/#{&1}")
-        )
+    case AshPhoenix.Form.submit(socket.assigns.email_form, params: user_params) do
+      {:ok, user} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Confirm email has been sent. Please check your email.")
+         |> assign(:current_user, user)}
 
-        info = "A link to confirm your email change has been sent to the new address."
-        {:noreply, socket |> put_flash(:info, info) |> assign(email_form_current_password: nil)}
-
-      {:error, changeset} ->
-        {:noreply, assign(socket, :email_form, to_form(Map.put(changeset, :action, :insert)))}
+      {:error, form} ->
+        {:noreply, assign(socket, :email_form, form)}
     end
   end
 
@@ -170,29 +155,29 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
     %{"current_password" => password, "user" => user_params} = params
 
     password_form =
-      socket.assigns.current_user
-      |> Accounts.change_user_password(user_params)
-      |> Map.put(:action, :validate)
-      |> to_form()
+      socket.assigns.password_form
+      |> AshPhoenix.Form.validate(Map.put(user_params, "current_password", password || "-"),
+        target: ["password", "password_confirmation"]
+      )
 
     {:noreply, assign(socket, password_form: password_form, current_password: password)}
   end
 
   def handle_event("update_password", params, socket) do
     %{"current_password" => password, "user" => user_params} = params
-    user = socket.assigns.current_user
 
-    case Accounts.update_user_password(user, password, user_params) do
+    case AshPhoenix.Form.submit(
+           socket.assigns.password_form,
+           Map.put(user_params, "current_password", password)
+         ) do
       {:ok, user} ->
-        password_form =
-          user
-          |> Accounts.change_user_password(user_params)
-          |> to_form()
+        {:noreply,
+         socket
+         |> put_flash(:info, "Password has been changed")
+         |> assign(:current_user, user)}
 
-        {:noreply, assign(socket, trigger_submit: true, password_form: password_form)}
-
-      {:error, changeset} ->
-        {:noreply, assign(socket, password_form: to_form(changeset))}
+      {:error, form} ->
+        {:noreply, assign(socket, password_form: form)}
     end
   end
 
@@ -202,24 +187,24 @@ defmodule HousekeepingBookWeb.UserSettingsLive do
     timezone_matches = user_params["timezone"] |> matched_timezone_list()
 
     info_form =
-      socket.assigns.current_user
-      |> Accounts.change_user(user_params)
-      |> Map.put(:action, :validate)
-      |> to_form()
+      socket.assigns.info_form
+      |> AshPhoenix.Form.validate(user_params)
 
-    {:noreply, assign(socket, info_form: info_form) |> assign(matches: timezone_matches)}
+    {:noreply, assign(socket, info_form: info_form, matches: timezone_matches)}
   end
 
   def handle_event("update_info", params, socket) do
     %{"user" => user_params} = params
-    user = socket.assigns.current_user
 
-    case Accounts.update_user(user, user_params) do
-      {:ok, _user} ->
-        {:noreply, socket |> put_flash(:info, "User updated successfully")}
+    case AshPhoenix.Form.submit(socket.assigns.info_form, params: user_params) do
+      {:ok, user} ->
+        {:noreply,
+         socket
+         |> assign(:current_user, user)
+         |> put_flash(:info, "User updated successfully")}
 
-      {:error, changeset} ->
-        {:noreply, assign(socket, info_form: to_form(changeset))}
+      {:error, form} ->
+        {:noreply, assign(socket, info_form: form)}
     end
   end
 
