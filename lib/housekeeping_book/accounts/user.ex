@@ -243,6 +243,23 @@ defmodule HousekeepingBook.Accounts.User do
       signing_secret fn _, _ ->
         Application.fetch_env(:housekeeping_book, :token_signing_secret)
       end
+
+      add_ons do
+        confirmation :confirm_new_user do
+          monitor_fields [:email]
+          confirm_on_create? true
+          confirm_on_update? false
+          sender HousekeepingBook.Accounts.User.Senders.SendNewUserConfirmationEmail
+        end
+
+        confirmation :confirm_change do
+          monitor_fields [:email]
+          confirm_on_create? false
+          confirm_on_update? true
+          confirm_action_name :confirm_change
+          sender HousekeepingBook.Accounts.User.Senders.SendEmailChangeConfirmationEmail
+        end
+      end
     end
 
     strategies do
@@ -272,7 +289,6 @@ defmodule HousekeepingBook.Accounts.User do
       allow_nil? false
     end
 
-    attribute :confirmed_at, :utc_datetime
     attribute :type, :atom, constraints: [one_of: [:shared, :normal, :admin]], default: :normal
     attribute :timezone, :string, default: "Etc/UTC"
 
@@ -292,7 +308,7 @@ defmodule HousekeepingBook.Accounts.User do
   end
 
   identities do
-    identity :unique_email, [:email]
+    identity :unique_email, [:email], eager_check_with: HousekeepingBook.Accounts
   end
 
   postgres do
