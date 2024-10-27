@@ -13,6 +13,7 @@ defmodule HousekeepingBook.Accounts do
       define :get_user_by_id, action: :read, get_by: :id
       define :delete_user, action: :destroy
       define :list_users
+      define :update_user, action: :update
     end
 
     resource HousekeepingBook.Accounts.UserToken
@@ -460,6 +461,6 @@ defmodule HousekeepingBook.Accounts do
   end
 
   def web_paths do
-    Application.get_env(:housekeeping_book, HousekeepingBook.Accounts.WebPaths)
+    Application.fetch_env!(:housekeeping_book, HousekeepingBook.Accounts.WebPaths)
   end
 end
