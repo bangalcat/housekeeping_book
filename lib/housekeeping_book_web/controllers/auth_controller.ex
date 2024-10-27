@@ -2,6 +2,12 @@ defmodule HousekeepingBookWeb.AuthController do
   use HousekeepingBookWeb, :controller
   use AshAuthentication.Phoenix.Controller
 
+  def success(conn, {:confirm_change, :confirm}, user, token) do
+    conn
+    |> put_flash(:info, "Email chagne Confirmed ")
+    |> success(nil, user, token)
+  end
+
   def success(conn, _activity, user, _token) do
     return_to = get_session(conn, :return_to) || ~p"/"
 

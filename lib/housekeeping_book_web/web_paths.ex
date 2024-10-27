@@ -12,4 +12,9 @@ defmodule HousekeepingBookWeb.WebPaths do
   def new_user_confirmation_path(token) do
     url(~p"/auth/user/confirm_new_user?#{[confirm: token]}")
   end
+
+  @impl true
+  def user_confirmation_path(token) do
+    url(~p"/auth/user/confirm_change?#{[confirm: token]}")
+  end
 end
