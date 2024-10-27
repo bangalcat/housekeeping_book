@@ -6,7 +6,7 @@ defmodule HousekeepingBook.Accounts do
 
   use Boundary,
     deps: [HousekeepingBook.Repo, HousekeepingBook.Schema, HousekeepingBook.Mailer],
-    exports: [User, UserToken]
+    exports: [User, UserToken, WebPaths]
 
   resources do
     resource HousekeepingBook.Accounts.User do
@@ -457,5 +457,9 @@ defmodule HousekeepingBook.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def web_paths do
+    Application.get_env(:housekeeping_book, HousekeepingBook.Accounts.WebPaths)
   end
 end
