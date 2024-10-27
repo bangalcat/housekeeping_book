@@ -3,7 +3,6 @@ defmodule HousekeepingBookWeb.Router do
 
   use AshAuthentication.Phoenix.Router
 
-  import HousekeepingBookWeb.UserAuth
   import HousekeepingBookWeb.UserAgent
   import PhoenixStorybook.Router
 
@@ -14,7 +13,6 @@ defmodule HousekeepingBookWeb.Router do
     plug :put_root_layout, html: {HousekeepingBookWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :fetch_current_user
     plug :fetch_user_device
     plug :load_from_session
   end
@@ -90,24 +88,8 @@ defmodule HousekeepingBookWeb.Router do
     end
   end
 
-  ## Authentication routes
-
   scope "/", HousekeepingBookWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
-
-    live_session :redirect_if_user_is_authenticated,
-      on_mount: [{HousekeepingBookWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
-    end
-
-    post "/users/log_in", UserSessionController, :create
-  end
-
-  scope "/", HousekeepingBookWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser]
 
     ash_authentication_live_session :require_authenticated_user,
       on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_user_required}] do
@@ -141,20 +123,8 @@ defmodule HousekeepingBookWeb.Router do
     end
   end
 
-  scope "/", HousekeepingBookWeb do
-    pipe_through [:browser]
-
-    delete "/users/log_out", UserSessionController, :delete
-
-    ash_authentication_live_session :current_user,
-      on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_user_optional}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
-    end
-  end
-
   scope "/admin", HousekeepingBookWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser]
 
     ash_authentication_live_session :admin_require_authenticated_user,
       on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_user_required}] do
