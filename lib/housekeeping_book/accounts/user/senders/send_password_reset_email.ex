@@ -4,20 +4,14 @@ defmodule HousekeepingBook.Accounts.User.Senders.SendPasswordResetEmail do
   """
 
   use AshAuthentication.Sender
-  use HousekeepingBookWeb, :verified_routes
 
   @impl true
-  def send(_user, token, _) do
-    # Example of how you might send this email
-    # HousekeepingBook.Accounts.Emails.send_password_reset_email(
-    #   user,
-    #   token
-    # )
+  def send(user, token, _opts) do
+    url = HousekeepingBook.Accounts.web_paths().user_reset_password_path(token)
 
-    IO.puts("""
-    Click this link to reset your password:
-
-    #{url(~p"/auth-reset/#{token}")}
-    """)
+    HousekeepingBook.Accounts.UserNotifier.deliver_reset_password_instructions(
+      user,
+      url
+    )
   end
 end

@@ -108,6 +108,10 @@ config :housekeeping_book, HousekeepingBook.Cldr,
 
 config :housekeeping_book, token_signing_secret: "test_salt"
 
+config :housekeeping_book,
+       HousekeepingBook.Accounts.WebPaths,
+       HousekeepingBookWeb.WebPaths
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
