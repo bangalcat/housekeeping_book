@@ -259,7 +259,7 @@ defmodule HousekeepingBook.Accounts.User do
   attributes do
     integer_primary_key :id
 
-    attribute :name, :string, allow_nil?: false
+    attribute :name, :string, allow_nil?: false, default: "noname"
 
     attribute :email, :ci_string do
       allow_nil? false
