@@ -40,3 +40,6 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :housekeeping_book, :secret_code, ""
+
+config :ash, :disable_async?, true
+config :ash, :missed_notifications, :ignore
