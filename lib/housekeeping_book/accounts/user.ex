@@ -10,13 +10,29 @@ defmodule HousekeepingBook.Accounts.User do
   end
 
   actions do
-    defaults [:read, :destroy, create: :*]
+    defaults [:read, :destroy]
 
     read :by_id do
       get_by :id
     end
 
     read :list_users do
+    end
+
+    create :create do
+      accept [:name, :email, :type]
+      upsert? true
+      upsert_identity :unique_email
+    end
+
+    create :create_shared do
+      accept [:email]
+      upsert? true
+      upsert_identity :unique_email
+
+      change set_attribute(:name, "share")
+      change set_attribute(:type, :share)
+      change set_new_attribute(:email, "shared@example.com")
     end
 
     update :update do
@@ -40,7 +56,7 @@ defmodule HousekeepingBook.Accounts.User do
       argument :password, :string do
         description "The proposed password for the user, in plain text."
         allow_nil? false
-        constraints min_length: 8
+        constraints min_length: 8, max_length: 72
         sensitive? true
       end
 

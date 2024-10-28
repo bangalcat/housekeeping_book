@@ -13,11 +13,12 @@ defmodule HousekeepingBook.AccountsFixtures do
   def valid_user_password, do: "hello world there#{System.unique_integer()}"
 
   def valid_user_attributes(attrs \\ %{}) do
+    password = attrs[:password] || valid_user_password()
+
     Enum.into(attrs, %{
-      name: unique_name(),
       email: unique_user_email(),
-      password: valid_user_password(),
-      type: :normal
+      password: password,
+      password_confirmation: password
     })
   end
 
@@ -25,9 +26,7 @@ defmodule HousekeepingBook.AccountsFixtures do
     {:ok, user} =
       attrs
       |> valid_user_attributes()
-      |> HousekeepingBook.Accounts.register_user(
-        secret_code: Application.get_env(:housekeeping_book, :secret_code)
-      )
+      |> HousekeepingBook.Accounts.register_user_with_password()
 
     user
   end
