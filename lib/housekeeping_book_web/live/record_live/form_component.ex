@@ -120,7 +120,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     socket =
       case socket.assigns.open_tree_modal do
         false ->
-          top_categories = HousekeepingBook.Households.top_categories()
+          top_categories = HousekeepingBook.Households.top_categories!()
 
           socket
           |> assign(:tree, Tree.add_column(Tree.new(), top_categories, nil))
@@ -144,7 +144,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   end
 
   defp handle_select_item(socket, id, level) do
-    items = HousekeepingBook.Households.child_categories(id)
+    items = HousekeepingBook.Households.child_categories!(id)
 
     tree =
       socket.assigns.tree
