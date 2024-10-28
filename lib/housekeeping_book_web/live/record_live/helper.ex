@@ -7,10 +7,9 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   alias HousekeepingBook.Households
 
   alias HousekeepingBook.Accounts
-  alias HousekeepingBook.Schema.User
 
   def record_options() do
-    subjects = Accounts.list_users() |> Enum.map(&subject_option/1)
+    subjects = Accounts.list_users!() |> Enum.map(&subject_option/1)
     category_types = Households.category_type_options()
     payment_types = Households.record_payment_options()
 
@@ -22,7 +21,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
     }
   end
 
-  defp subject_option(%User{} = subject) do
+  defp subject_option(%Accounts.User{} = subject) do
     {subject.name, subject.id}
   end
 

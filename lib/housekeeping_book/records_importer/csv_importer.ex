@@ -50,13 +50,13 @@ defmodule HousekeepingBook.RecordsImporter.CsvImporter do
   end
 
   defp get_subject("공용") do
-    with {:ok, user} <- Accounts.get_or_create_user_by_type(:shared) do
+    with {:ok, user} <- Accounts.create_shared_user() do
       {:ok, user}
     end
   end
 
   defp get_subject(name) do
-    with {:ok, user} <- Accounts.get_or_create_user_by_name(name) do
+    with {:ok, user} <- Accounts.create_user(%{name: name, email: "#{name}@test.com"}) do
       {:ok, user}
     end
   end
