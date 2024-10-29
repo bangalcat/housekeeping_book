@@ -3,8 +3,10 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
 
   import HousekeepingBookWeb.CategoryLive.Helper
   import HousekeepingBookWeb.CategoryLive.Component
+  require Logger
   alias HousekeepingBookWeb.CategoryLive.Component.Tree
-  alias HousekeepingBook.Categories
+
+  alias HousekeepingBook.Households
 
   @impl true
   def render(assigns) do
@@ -63,13 +65,13 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
 
   @impl true
   def update(%{category: category} = assigns, socket) do
-    changeset = Categories.change_category(category)
+    form = for_create_or_update(category, %{}, assigns.action)
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(tree: Tree.new(), open_tree_modal: false, last_select: category.parent)
-     |> assign_form(changeset)}
+     |> assign_form(form)}
   end
 
   @impl true
@@ -78,14 +80,16 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
 
     changeset =
       socket.assigns.category
-      |> Categories.change_category(category_params)
-      |> Map.put(:action, :validate)
+      |> for_create_or_update(category_params, socket.assigns.action)
 
     {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("save", %{"category" => category_params}, socket) do
-    category_params = category_params |> Map.put("parent", socket.assigns.last_select)
+    category_params =
+      category_params
+      |> Map.put("parent_id", socket.assigns.last_select && socket.assigns.last_select.id)
+
     save_category(socket, socket.assigns.action, category_params)
   end
 
@@ -93,7 +97,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
     socket =
       case socket.assigns.open_tree_modal do
         false ->
-          top_categories = Categories.top_categories()
+          top_categories = Households.Category.top_categories!()
 
           socket
           |> assign(:tree, Tree.add_column(Tree.new(), top_categories, nil))
@@ -117,7 +121,7 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
   end
 
   defp save_category(socket, :edit, category_params) do
-    case Categories.update_category(socket.assigns.category, category_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: category_params) do
       {:ok, category} ->
         notify_parent({:saved, category})
 
@@ -126,13 +130,13 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
          |> put_flash(:info, "Category updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, %Phoenix.HTML.Form{} = form} ->
+        {:noreply, assign(socket, :form, form)}
     end
   end
 
   defp save_category(socket, :new, category_params) do
-    case Categories.create_category(category_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: category_params) do
       {:ok, category} ->
         notify_parent({:saved, category})
 
@@ -141,19 +145,20 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
          |> put_flash(:info, "Category created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, %Phoenix.HTML.Form{} = form} ->
+        Logger.error("Error: #{inspect(form)}")
+        {:noreply, assign(socket, :form, form)}
     end
   end
 
-  defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    assign(socket, :form, to_form(changeset))
+  defp assign_form(socket, %AshPhoenix.Form{} = form) do
+    assign(socket, :form, to_form(form))
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 
   defp handle_select_item(socket, id, level) do
-    items = Categories.child_categories(id)
+    items = Households.Category.child_categories!(id)
 
     tree =
       socket.assigns.tree
@@ -163,5 +168,27 @@ defmodule HousekeepingBookWeb.CategoryLive.FormComponent do
     socket
     |> assign(:tree, tree)
     |> assign(:last_select, Tree.last_select_item(tree))
+  end
+
+  defp for_create_or_update(category, params, live_action) do
+    case live_action do
+      :edit ->
+        category
+        |> AshPhoenix.Form.for_update(:update,
+          as: "category",
+          domain: Households,
+          forms: [auto?: true]
+        )
+        |> AshPhoenix.Form.validate(params)
+
+      :new ->
+        Households.Category
+        |> AshPhoenix.Form.for_create(:create,
+          as: "category",
+          domain: Households,
+          forms: [auto?: true]
+        )
+        |> AshPhoenix.Form.validate(params)
+    end
   end
 end

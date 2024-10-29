@@ -1,7 +1,8 @@
 defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   use HousekeepingBookWeb, :live_component
 
-  alias HousekeepingBook.Records
+  import HousekeepingBookWeb.RecordLive.Helper
+
   alias HousekeepingBookWeb.CategoryLive.Component.Tree
 
   @impl true
@@ -86,7 +87,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
 
   @impl true
   def update(%{record: record} = assigns, socket) do
-    changeset = Records.change_record(record)
+    changeset = change_record(record, %{}, live_action: assigns.action)
 
     {:ok,
      socket
@@ -99,8 +100,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   def handle_event("validate", %{"record" => record_params}, socket) do
     changeset =
       socket.assigns.record
-      |> Records.change_record(record_params)
-      |> Map.put(:action, :validate)
+      |> change_record(record_params, live_action: socket.assigns.action)
 
     {:noreply, assign_form(socket, changeset)}
   end
@@ -120,7 +120,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
     socket =
       case socket.assigns.open_tree_modal do
         false ->
-          top_categories = HousekeepingBook.Categories.top_categories()
+          top_categories = HousekeepingBook.Households.top_categories!()
 
           socket
           |> assign(:tree, Tree.add_column(Tree.new(), top_categories, nil))
@@ -144,7 +144,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   end
 
   defp handle_select_item(socket, id, level) do
-    items = HousekeepingBook.Categories.child_categories(id)
+    items = HousekeepingBook.Households.child_categories!(id)
 
     tree =
       socket.assigns.tree
@@ -157,7 +157,7 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
   end
 
   defp save_record(socket, :edit, record_params) do
-    case Records.update_record(socket.assigns.record, record_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: record_params) do
       {:ok, record} ->
         notify_parent({:saved, record})
 
@@ -166,13 +166,13 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
          |> put_flash(:info, "Record updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, form} ->
+        {:noreply, assign_form(socket, form)}
     end
   end
 
   defp save_record(socket, :new, record_params) do
-    case Records.create_record(record_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form, params: record_params) do
       {:ok, record} ->
         notify_parent({:saved, record})
 
@@ -181,14 +181,20 @@ defmodule HousekeepingBookWeb.RecordLive.FormComponent do
          |> put_flash(:info, "Record created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, form} ->
+        {:noreply, assign_form(socket, form)}
     end
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end
+
+  defp assign_form(socket, %AshPhoenix.Form{} = form) do
+    assign(socket, :form, to_form(form))
+  end
+
+  defp assign_form(socket, %Phoenix.HTML.Form{} = form), do: assign(socket, :form, form)
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 end

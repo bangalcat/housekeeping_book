@@ -1,7 +1,8 @@
 defmodule HousekeepingBookWeb.Router do
   use HousekeepingBookWeb, :router
 
-  import HousekeepingBookWeb.UserAuth
+  use AshAuthentication.Phoenix.Router
+
   import HousekeepingBookWeb.UserAgent
   import PhoenixStorybook.Router
 
@@ -12,18 +13,47 @@ defmodule HousekeepingBookWeb.Router do
     plug :put_root_layout, html: {HousekeepingBookWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug :fetch_current_user
     plug :fetch_user_device
+    plug :load_from_session
   end
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :load_from_bearer
   end
 
   scope "/", HousekeepingBookWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+    auth_routes AuthController, HousekeepingBook.Accounts.User, path: "/auth"
+    sign_out_route AuthController
+
+    # Remove these if you'd like to use your own authentication views
+    sign_in_route register_path: "/register",
+                  reset_path: "/reset",
+                  auth_routes_prefix: "/auth",
+                  on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_no_user}],
+                  overrides: [
+                    HousekeepingBookWeb.AuthOverrides,
+                    AshAuthentication.Phoenix.Overrides.Default
+                  ],
+                  layout: {HousekeepingBookWeb.Layouts, :app}
+  end
+
+  scope "/", HousekeepingBookWeb do
+    ash_authentication_live_session :authenticated_routes do
+      # in each liveview, add one of the following at the top of the module:
+      #
+      # If an authenticated user must be present:
+      # on_mount {HousekeepingBookWeb.LiveUserAuth, :live_user_required}
+      #
+      # If an authenticated user *may* be present:
+      # on_mount {HousekeepingBookWeb.LiveUserAuth, :live_user_optional}
+      #
+      # If an authenticated user must *not* be present:
+      # on_mount {HousekeepingBookWeb.LiveUserAuth, :live_no_user}
+    end
   end
 
   scope "/" do
@@ -58,27 +88,11 @@ defmodule HousekeepingBookWeb.Router do
     end
   end
 
-  ## Authentication routes
-
   scope "/", HousekeepingBookWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through [:browser]
 
-    live_session :redirect_if_user_is_authenticated,
-      on_mount: [{HousekeepingBookWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
-    end
-
-    post "/users/log_in", UserSessionController, :create
-  end
-
-  scope "/", HousekeepingBookWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :require_authenticated_user,
-      on_mount: [{HousekeepingBookWeb.UserAuth, :ensure_authenticated}] do
+    ash_authentication_live_session :require_authenticated_user,
+      on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_user_required}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/records", RecordLive.Index, :index
@@ -109,23 +123,11 @@ defmodule HousekeepingBookWeb.Router do
     end
   end
 
-  scope "/", HousekeepingBookWeb do
+  scope "/admin", HousekeepingBookWeb do
     pipe_through [:browser]
 
-    delete "/users/log_out", UserSessionController, :delete
-
-    live_session :current_user,
-      on_mount: [{HousekeepingBookWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
-    end
-  end
-
-  scope "/admin", HousekeepingBookWeb do
-    pipe_through [:browser, :require_authenticated_user]
-
-    live_session :admin_require_authenticated_user,
-      on_mount: [{HousekeepingBookWeb.UserAuth, :ensure_authenticated}] do
+    ash_authentication_live_session :admin_require_authenticated_user,
+      on_mount: [{HousekeepingBookWeb.LiveUserAuth, :live_user_required}] do
       live "/users", UserLive.Index, :index
       live "/users/new", UserLive.Index, :new
       live "/users/:id/edit", UserLive.Index, :edit

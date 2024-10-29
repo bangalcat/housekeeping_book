@@ -2,11 +2,11 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
   use HousekeepingBookWeb, :live_view
   import HousekeepingBookWeb.CategoryLive.Helper
 
-  alias HousekeepingBook.Categories
+  alias HousekeepingBook.Households
 
   @impl true
   def mount(_params, _session, socket) do
-    categories = Categories.list_categories()
+    categories = Households.Category.read!(load: [:parent])
     {:ok, stream(socket, :categories, categories)}
   end
 
@@ -18,7 +18,7 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Category")
-    |> assign(:category, Categories.get_category!(id))
+    |> assign(:category, Households.get_category!(id, load: [:parent]))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -35,14 +35,14 @@ defmodule HousekeepingBookWeb.CategoryLive.Index do
 
   @impl true
   def handle_info({HousekeepingBookWeb.CategoryLive.FormComponent, {:saved, category}}, socket) do
-    category = Categories.ensure_with_parent(category)
+    category = Ash.load!(category, [:parent])
     {:noreply, stream_insert(socket, :categories, category)}
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    category = Categories.get_category!(id)
-    {:ok, _} = Categories.delete_category(category)
+    category = Households.get_category!(id)
+    Households.Category.delete!(category)
 
     {:noreply, stream_delete(socket, :categories, category)}
   end

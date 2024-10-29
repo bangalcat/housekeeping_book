@@ -2,35 +2,8 @@ defmodule HousekeepingBook.Factory do
   alias HousekeepingBook.Repo
 
   alias HousekeepingBook.Schema.{
-    Record,
-    Category,
-    Tag,
     User
   }
-
-  def build(:record) do
-    %Record{
-      id: unique_id(),
-      date: ~U[2023-11-15 05:48:00Z],
-      description: "some description",
-      amount: 4200,
-      payment: :other
-    }
-  end
-
-  def build(:category) do
-    %Category{
-      id: unique_id(),
-      name: "some category"
-    }
-  end
-
-  def build(:tag) do
-    %Tag{
-      id: unique_id(),
-      name: "some tag"
-    }
-  end
 
   def build(:user) do
     %User{

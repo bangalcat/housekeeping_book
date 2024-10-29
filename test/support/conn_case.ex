@@ -58,10 +58,10 @@ defmodule HousekeepingBookWeb.ConnCase do
   It returns an updated `conn`.
   """
   def log_in_user(conn, user) do
-    token = HousekeepingBook.Accounts.generate_user_session_token(user)
+    subject = AshAuthentication.user_to_subject(user)
 
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
-    |> Plug.Conn.put_session(:user_token, token)
+    |> Plug.Conn.put_session(:user, subject)
   end
 end

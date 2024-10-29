@@ -69,12 +69,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :flop, :repo, HousekeepingBook.Repo
-
-config :flop_phoenix,
-  pagination: [opts: {HousekeepingBookWeb.CustomComponents, :pagination_opts}],
-  table: [opts: {HousekeepingBookWeb.CustomComponents, :table_opts}]
-
 config :housekeeping_book, :mailer, mailer_sender: "contact@example.com"
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
@@ -84,6 +78,39 @@ config :housekeeping_book, :secret_code, "BANGALDOE_LOVE"
 config :housekeeping_book, :site_encrypt,
   domains: ["localhost", "www.localhost"],
   emails: ["test@test.com"]
+
+config :housekeeping_book, :ash_domains, [HousekeepingBook.Accounts, HousekeepingBook.Households]
+
+config :ash, :default_belongs_to_type, :integer
+
+config :spark, :formatter,
+  remove_parens?: true,
+  "Ash.Resource": [
+    type: Ash.Resource,
+    section_order: [
+      :tokens,
+      :code_interface,
+      :actions,
+      :calculations,
+      :authentication,
+      :token,
+      :attributes,
+      :relationships,
+      :policies,
+      :postgres
+    ]
+  ]
+
+config :housekeeping_book, HousekeepingBook.Cldr,
+  locales: ["en"],
+  default_locale: "en",
+  force_locale_download: false
+
+config :housekeeping_book, token_signing_secret: "test_salt"
+
+config :housekeeping_book,
+       HousekeepingBook.Accounts.WebPaths,
+       HousekeepingBookWeb.WebPaths
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

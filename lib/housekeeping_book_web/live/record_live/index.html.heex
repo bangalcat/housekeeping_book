@@ -7,65 +7,34 @@
   </:actions>
 </.header>
 
-<.filter_form
-  :if={@meta}
-  fields={[
-    date: [label: gettext("After"), op: :>=],
-    date: [label: gettext("Before"), op: :<=],
-    payment: [
-      type: "select",
-      prompt: "All",
-      options: @options[:payment_type]
-    ],
-    subject_id: [
-      label: gettext("Subject"),
-      type: "select",
-      prompt: gettext("All"),
-      op: :==,
-      options: @options[:subject]
-    ],
-    category_id: [
-      label: gettext("Category"),
-      type: "select",
-      prompt: gettext("All"),
-      options: @options[:category]
-    ],
-    category_type: [
-      label: gettext("Income/Expense"),
-      type: "select",
-      prompt: gettext("All"),
-      options: @options[:category_type]
-    ]
-  ]}
-  meta={@meta}
-  id="records-filter-form"
-  class="w-full"
-/>
-
-<div class="w-full mt-6">
-  <Flop.Phoenix.table
-    :if={@meta}
-    items={@streams.records}
-    meta={@meta}
-    path={~p"/records"}
-    row_click={fn {_, record} -> JS.navigate(~p"/records/#{record}") end}
-  >
-    <:col :let={{_, record}} label="Date" field={:date}>
+<.simple_form
+  :let={filter_form}
+  for={@filter_form}
+  phx-change="filter-validate"
+  phx-submit="filter-submit"
+  class="h-fit overflow-auto"
+>
+  <.filter_form_component component={filter_form} />
+  <:actions>
+    <.button type="submit">Submit</.button>
+  </:actions>
+  <.table id="records" rows={@streams.records}>
+    <:col :let={{_, record}} label="Date">
       <%= record |> format_datetime(@timezone) %>
     </:col>
-    <:col :let={{_, record}} label="Description" field={:desciption}>
+    <:col :let={{_, record}} label="Description">
       <%= record.description %>
     </:col>
-    <:col :let={{_, record}} label="Amount" field={:amount}><%= format_amount(record) %></:col>
-    <:col :let={{_, record}} label="Category" field={:category}>
+    <:col :let={{_, record}} label="Amount"><%= format_amount(record) %></:col>
+    <:col :let={{_, record}} label="Category">
       <%= category_name(record) %>
     </:col>
-    <:col :let={{_, record}} label="Type" field={:type}><%= category_type(record) %></:col>
-    <:col :let={{_, record}} label="Subject" field={:subject}><%= subject_name(record) %></:col>
-    <:col :let={{_, record}} label="Payment Type" field={:payment}>
+    <:col :let={{_, record}} label="Type"><%= category_type(record) %></:col>
+    <:col :let={{_, record}} label="Subject"><%= subject_name(record) %></:col>
+    <:col :let={{_, record}} label="Payment Type">
       <%= payment_name(record.payment) %>
     </:col>
-    <:col :let={{_, record}} label="Tags" field={:payment}><%= tags(record) %></:col>
+    <:col :let={{_, record}} label="Tags"><%= tags(record) %></:col>
 
     <:action :let={{_, record}}>
       <div class="sr-only">
@@ -83,10 +52,8 @@
         <.icon name="hero-trash" />
       </.link>
     </:action>
-  </Flop.Phoenix.table>
-
-  <Flop.Phoenix.pagination :if={@meta} meta={@meta} path={~p"/records"} />
-</div>
+  </.table>
+</.simple_form>
 
 <.modal
   :if={@live_action in [:new, :edit]}

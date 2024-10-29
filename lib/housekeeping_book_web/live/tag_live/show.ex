@@ -1,7 +1,7 @@
 defmodule HousekeepingBookWeb.TagLive.Show do
   use HousekeepingBookWeb, :live_view
 
-  alias HousekeepingBook.Tags
+  alias HousekeepingBook.Households
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,7 +13,7 @@ defmodule HousekeepingBookWeb.TagLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:tag, Tags.get_tag!(id))}
+     |> assign(:tag, Households.get_tag_by_id!(id))}
   end
 
   defp page_title(:show), do: "Show Tag"

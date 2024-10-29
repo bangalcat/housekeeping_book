@@ -1,22 +1,19 @@
 defmodule HousekeepingBookWeb.RecordLive.Helper do
-  import HousekeepingBook.Gettext
+  use Gettext, backend: HousekeepingBook.Gettext
   import Phoenix.LiveView, only: [get_connect_params: 1]
 
-  alias HousekeepingBook.Records
-  alias HousekeepingBook.Categories
+  require Logger
+
+  alias HousekeepingBook.Households
+
   alias HousekeepingBook.Accounts
-  alias HousekeepingBook.Schema.Record
-  alias HousekeepingBook.Schema.Category
-  alias HousekeepingBook.Schema.User
 
   def record_options() do
-    categories = Categories.bottom_categories() |> Enum.map(&category_option/1)
-    subjects = Accounts.list_users() |> Enum.map(&subject_option/1)
-    category_types = Categories.category_type_options()
-    payment_types = Records.record_payment_options()
+    subjects = Accounts.list_users!() |> Enum.map(&subject_option/1)
+    category_types = Households.category_type_options()
+    payment_types = Households.record_payment_options()
 
     %{
-      category: categories,
       subject: subjects,
       payment: payment_types,
       category_type: category_types,
@@ -24,11 +21,7 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
     }
   end
 
-  defp category_option(%Category{} = category) do
-    {"#{category.name} (#{category.type})", category.id}
-  end
-
-  defp subject_option(%User{} = subject) do
+  defp subject_option(%Accounts.User{} = subject) do
     {subject.name, subject.id}
   end
 
@@ -45,14 +38,15 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   end
 
   def payment_name(payment) do
-    Record.payment_enum_name(payment)
+    Households.record_payment_name(payment)
   end
 
   def subject_name(%{subject: nil}), do: nil
   def subject_name(%{subject: %{name: name}}), do: name
 
   def tags(%{tags: nil}), do: nil
-  def tags(%{tags: tags}), do: Enum.join(tags, ", ")
+  def tags(%{tags: tags}) when is_list(tags), do: Enum.join(tags, ", ")
+  def tags(%{}), do: nil
 
   def format_amount(%{amount: amount}) do
     format_amount(amount)
@@ -93,14 +87,15 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
   def new_record(nil), do: new_record(DateTime.utc_now())
 
   def new_record(%DateTime{} = datetime) do
-    Record.new(datetime)
+    # Record.new(datetime)
+    %Households.Record{date: datetime, category: nil, subject: nil}
   end
 
   def get_record!(id) do
-    Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
+    Ash.get!(Households.Record, id, load: [:category, :subject, :tags])
   end
 
-  def get_timezone_with_offset(%{assigns: %{current_user: %User{} = user}}) when user != nil do
+  def get_timezone_with_offset(%{assigns: %{current_user: %{} = user}}) do
     {user.timezone,
      DateTime.utc_now()
      |> DateTime.shift_zone!(user.timezone)
@@ -134,5 +129,45 @@ defmodule HousekeepingBookWeb.RecordLive.Helper do
       [] -> nil
       [{_date, [record | _]} | _] -> record
     end
+  end
+
+  def change_record(record, params \\ %{}, opts \\ [])
+
+  def change_record(%Households.Record{} = record, params, opts) do
+    record
+    |> for_create_or_update(params, opts[:live_action] || :new)
+  end
+
+  defp for_create_or_update(record, params, live_action) do
+    case live_action do
+      :edit ->
+        record
+        |> AshPhoenix.Form.for_update(:update,
+          as: "record",
+          prepare_params: &prepare_params/2
+        )
+        |> AshPhoenix.Form.validate(params)
+
+      :new ->
+        Households.Record
+        |> AshPhoenix.Form.for_create(:create,
+          as: "record",
+          prepare_params: &prepare_params/2
+        )
+        |> AshPhoenix.Form.validate(params)
+    end
+  end
+
+  defp prepare_params(%{"date" => date, "timezone" => timezone} = params, :validate) do
+    date = Households.cast_datetime_with_timezone(date, timezone)
+
+    params
+    |> Map.put("date", date)
+  end
+
+  defp prepare_params(params, :validate), do: params
+
+  def delete_record!(record) do
+    Households.Record.delete!(record)
   end
 end

@@ -41,13 +41,17 @@ defmodule HousekeepingBook.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:picosat_elixir, "~> 0.2"},
+      {:ash_authentication, "~> 4.1"},
+      {:ash_authentication_phoenix, "~> 2.0"},
       {:bcrypt_elixir, "~> 3.0"},
       {:bandit, "~> 1.0"},
       {:phoenix, "~> 1.7.10"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 3.3"},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20.1"},
       {:floki, ">= 0.30.0", only: :test},
@@ -61,18 +65,20 @@ defmodule HousekeepingBook.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:plug_cowboy, "~> 2.5"},
       {:boundary, "~> 0.10", runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 1.2"},
-      {:flop_phoenix, "~> 0.22.4"},
       {:ex_cldr, "~> 2.37"},
       {:ex_cldr_numbers, ">= 0.0.0"},
       {:ex_cldr_dates_times, ">= 0.0.0"},
       {:ua_parser, "~> 1.0"},
-      {:phoenix_storybook, "~> 0.5.0"},
+      {:phoenix_storybook, "~> 0.6.0"},
       {:tzdata, ">= 0.0.0"},
-      {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"}
+      {:site_encrypt, git: "https://github.com/sasa1977/site_encrypt.git", branch: "master"},
+      {:ash, "~> 3.0"},
+      {:ash_postgres, "~> 2.0"},
+      {:ash_phoenix, "~> 2.0"}
     ]
   end
 

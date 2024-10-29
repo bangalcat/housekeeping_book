@@ -1,5 +1,4 @@
 defmodule HousekeepingBook.Accounts.UserTokens do
-  use Ecto.Schema
   import Ecto.Query
   alias HousekeepingBook.Schema.UserToken
 

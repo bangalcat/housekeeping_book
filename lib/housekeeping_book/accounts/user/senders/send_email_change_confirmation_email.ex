@@ -1,0 +1,13 @@
+defmodule HousekeepingBook.Accounts.User.Senders.SendEmailChangeConfirmationEmail do
+  use AshAuthentication.Sender
+
+  @impl true
+  def send(user, token, _opts) do
+    url = HousekeepingBook.Accounts.web_paths().user_confirmation_path(token)
+
+    HousekeepingBook.Accounts.UserNotifier.deliver_confirmation_instructions(
+      user,
+      url
+    )
+  end
+end

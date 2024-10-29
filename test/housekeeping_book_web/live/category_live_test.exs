@@ -2,13 +2,14 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
   use HousekeepingBookWeb.ConnCase
 
   import Phoenix.LiveViewTest
+  import HousekeepingBook.CategoriesFixtures
 
   @create_attrs %{name: "some name", type: "income"}
   @update_attrs %{name: "some updated name", type: "expense"}
   @invalid_attrs %{name: nil}
 
   defp create_category(_) do
-    category = insert!(:category)
+    category = category_fixture()
     %{category: category}
   end
 
@@ -32,7 +33,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert index_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#category-form", category: @create_attrs)
@@ -55,7 +56,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert index_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert index_live
              |> form("#category-form", category: @update_attrs)
@@ -96,7 +97,7 @@ defmodule HousekeepingBookWeb.CategoryLiveTest do
 
       assert show_live
              |> form("#category-form", category: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> render_change() =~ "is required"
 
       assert show_live
              |> form("#category-form", category: @update_attrs)

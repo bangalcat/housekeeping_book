@@ -10,7 +10,7 @@ config :bcrypt_elixir, :log_rounds, 1
 # Run `mix help test` for more information.
 config :housekeeping_book, HousekeepingBook.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "rootpassword",
   hostname: "localhost",
   database: "housekeeping_book_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
@@ -18,12 +18,15 @@ config :housekeeping_book, HousekeepingBook.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
+secret_key_base = "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/"
+
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   https: [port: 4001],
-  secret_key_base: "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/",
+  secret_key_base: secret_key_base,
   server: false
 
+config :housekeeping_book, :accounts, signing_secret: secret_key_base
 # In test we don't send emails.
 config :housekeeping_book, HousekeepingBook.Mailer, adapter: Swoosh.Adapters.Test
 
@@ -37,3 +40,6 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :housekeeping_book, :secret_code, ""
+
+config :ash, :disable_async?, true
+config :ash, :missed_notifications, :ignore

@@ -2,8 +2,6 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
   use HousekeepingBookWeb, :live_view
   import HousekeepingBookWeb.RecordLive.Helper
 
-  alias HousekeepingBook.Records
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket |> assign_timezone()}
@@ -19,7 +17,7 @@ defmodule HousekeepingBookWeb.RecordLive.Show do
      |> assign(:return_to, return_to)
      |> assign(
        :record,
-       Records.get_record!(id, %{with_category: true, with_subject: true, with_tags: true})
+       Ash.get!(HousekeepingBook.Households.Record, id, load: [:category, :subject, :tags])
      )}
   end
 

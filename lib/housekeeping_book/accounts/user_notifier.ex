@@ -21,7 +21,7 @@ defmodule HousekeepingBook.Accounts.UserNotifier do
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+    deliver(to_string(user.email), "Confirmation instructions", """
 
     ==============================
 
@@ -41,7 +41,7 @@ defmodule HousekeepingBook.Accounts.UserNotifier do
   Deliver instructions to reset a user password.
   """
   def deliver_reset_password_instructions(user, url) do
-    deliver(user.email, "Reset password instructions", """
+    deliver(to_string(user.email), "Reset password instructions", """
 
     ==============================
 

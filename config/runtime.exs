@@ -74,6 +74,8 @@ if config_env() == :prod do
     domains: System.fetch_env!("DOMAINS") |> String.split(","),
     emails: System.fetch_env!("EMAILS") |> String.split(",")
 
+  config :housekeeping_book, :accounts, signing_secret: secret_key_base
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

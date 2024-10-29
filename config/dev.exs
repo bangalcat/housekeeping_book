@@ -16,6 +16,8 @@ config :housekeeping_book, HousekeepingBook.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
+secret_key_base = "3749x9GQ1uJcudagG+Cab/ayYDmzXcz3X5m3ywPkE9wxaaiRR0sJkHKU2v/xvyO0"
+
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -24,12 +26,14 @@ config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "3749x9GQ1uJcudagG+Cab/ayYDmzXcz3X5m3ywPkE9wxaaiRR0sJkHKU2v/xvyO0",
+  secret_key_base: secret_key_base,
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]},
     storybook_tailwind: {Tailwind, :install_and_run, [:storybook, ~w(--watch)]}
   ]
+
+config :housekeeping_book, :accounts, signing_secret: secret_key_base
 
 # ## SSL Support
 #
@@ -83,3 +87,5 @@ config :phoenix_live_view, :debug_heex_annotations, true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :ash_authentication, debug_authentication_failures?: true

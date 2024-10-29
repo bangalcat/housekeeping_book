@@ -1,7 +1,13 @@
 defmodule HousekeepingBook do
   use Boundary,
-    deps: [Ecto, Ecto.Changeset, Ecto.Repo, Ecto.Schema],
-    exports: [Accounts, Records, Categories, Tags, {Schema, []}, Repo, Gettext]
+    deps: [Ecto, Ecto.Query, Ecto.Changeset, Ecto.Repo, Ecto.Schema],
+    exports: [
+      {Accounts, []},
+      {Schema, []},
+      Repo,
+      Gettext,
+      {Households, []}
+    ]
 
   @moduledoc """
   HousekeepingBook keeps the contexts that define your domain

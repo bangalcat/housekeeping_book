@@ -47,7 +47,7 @@
         </.link>
       </:menu_item>
       <:menu_item :if={!@current_user}>
-        <.link href={~p"/users/log_in"}>
+        <.link href={~p"/sign-in"}>
           Log In
         </.link>
       </:menu_item>
@@ -59,7 +59,9 @@
           >
             <img src="https://source.unsplash.com/uJ8LNVCBjFQ/400x400" />
           </button>
-          <span class="text-xs flex justify-center dark:text-white"><%= @current_user.name %></span>
+          <span class="text-xs flex justify-center dark:text-white">
+            <%= @current_user.name %>
+          </span>
         </div>
         <button
           phx-click={JS.hide(to: ".profile-openable")}
@@ -77,8 +79,7 @@
             Settings
           </.link>
           <.link
-            method="DELETE"
-            href={~p"/users/log_out"}
+            href={~p"/sign-out"}
             class="block px-4 py-2 account-link hover:text-zinc-100"
           >
             Log Out
@@ -86,10 +87,10 @@
         </div>
       </:top_profile>
       <:top_profile :if={!@current_user}>
-        <.link href={~p"/users/log_in"} class="block px-4 py-2 hover:text-zinc-100">
+        <.link href={~p"/sign-in"} class="block px-4 py-2 hover:text-zinc-100">
           Log In
         </.link>
-        <.link href={~p"/users/register"} class="block px-4 py-2 hover:text-zinc-100">
+        <.link href={~p"/auth/register"} class="block px-4 py-2 hover:text-zinc-100">
           Register
         </.link>
       </:top_profile>
