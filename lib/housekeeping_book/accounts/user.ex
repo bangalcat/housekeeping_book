@@ -241,6 +241,7 @@ defmodule HousekeepingBook.Accounts.User do
 
       add_ons do
         confirmation :confirm_new_user do
+          require_interaction? true
           monitor_fields [:email]
           confirm_on_create? true
           confirm_on_update? false
@@ -248,6 +249,7 @@ defmodule HousekeepingBook.Accounts.User do
         end
 
         confirmation :confirm_change do
+          require_interaction? true
           monitor_fields [:email]
           confirm_on_create? false
           confirm_on_update? true
