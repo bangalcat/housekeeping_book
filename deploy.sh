@@ -2,6 +2,8 @@
 set -e
 
 # This script is for deploying the app to a baremetal server.
+# Set APP_DIR environment variable or default to /opt/housekeeping_book
+APP_DIR=${APP_DIR:-/opt/housekeeping_book}
 
 # Update to latest version of code
 cd $APP_DIR

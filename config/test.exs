@@ -9,16 +9,18 @@ config :bcrypt_elixir, :log_rounds, 1
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :housekeeping_book, HousekeepingBook.Repo,
-  username: "postgres",
-  password: "rootpassword",
-  hostname: "localhost",
+  username: System.get_env("TEST_DB_USER", "postgres"),
+  password: System.get_env("TEST_DB_PASSWORD", "postgres"),
+  hostname: System.get_env("TEST_DB_HOST", "localhost"),
   database: "housekeeping_book_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-secret_key_base = "RHEn/0vWX7oQLWlVa4FDSOrdqWRVuk8uP1SgmN52HmHyrXA+/JN3Olq7u5VNdLN/"
+# Generate a new secret with: mix phx.gen.secret
+# Or use environment variable: System.get_env("TEST_SECRET_KEY_BASE")
+secret_key_base = "p6Es8iDsm6lteeic8h9fw7IhOmsSYzz0WIvgfyAz3pGQO8UmUf2NLYPSc7Fv59YY"
 
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],

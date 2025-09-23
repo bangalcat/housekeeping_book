@@ -67,7 +67,7 @@ if config_env() == :prod do
     https: [port: https_port, cipher_suite: :strong],
     secret_key_base: secret_key_base
 
-  config :housekeeping_book, :cert_path, "/opt/site_encrypt_db"
+  config :housekeeping_book, :cert_path, System.get_env("CERT_PATH", "/opt/site_encrypt_db")
   config :housekeeping_book, :cert_mode, "production"
 
   config :housekeeping_book, :site_encrypt,

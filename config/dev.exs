@@ -2,9 +2,9 @@ import Config
 
 # Configure your database
 config :housekeeping_book, HousekeepingBook.Repo,
-  username: "postgres",
-  password: "rootpassword",
-  hostname: "localhost",
+  username: System.get_env("DEV_DB_USER", "postgres"),
+  password: System.get_env("DEV_DB_PASSWORD", "postgres"),
+  hostname: System.get_env("DEV_DB_HOST", "localhost"),
   database: "housekeeping_book_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
@@ -16,7 +16,9 @@ config :housekeeping_book, HousekeepingBook.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-secret_key_base = "3749x9GQ1uJcudagG+Cab/ayYDmzXcz3X5m3ywPkE9wxaaiRR0sJkHKU2v/xvyO0"
+# Generate a new secret with: mix phx.gen.secret
+# Or use environment variable: System.get_env("DEV_SECRET_KEY_BASE")
+secret_key_base = "O8U21GseO25lFMDhtm9d1k59lzuo0bwawNI+5qse+icRWBCmaXG9t1zx236hmqoP"
 
 config :housekeeping_book, HousekeepingBookWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.

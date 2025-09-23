@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Set APP_DIR environment variable or default to /opt/housekeeping_book
+APP_DIR=${APP_DIR:-/opt/housekeeping_book}
+
 # Navigate to app directory
 cd $APP_DIR
 

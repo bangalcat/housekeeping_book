@@ -6,17 +6,17 @@ user_1 = %{
   name: "user1",
   email: "user1@example.com",
   type: :normal,
-  password: "thisisfortest",
-  password_confirmation: "thisisfortest",
+  password: "changeme123456",
+  password_confirmation: "changeme123456",
   secret_code: secret_code
 }
 
 share_user = %{
-  name: "share",
+  name: "shared",
   email: "shared@example.com",
   type: :shared,
-  password: "thisisfortest",
-  password_confirmation: "thisisfortest",
+  password: "changeme123456",
+  password_confirmation: "changeme123456",
   secret_code: secret_code
 }
 
