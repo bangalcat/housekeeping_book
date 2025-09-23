@@ -11,14 +11,14 @@ A multi-user expense tracking application built with Phoenix LiveView and Ash Fr
 - Phoenix LiveView 0.20.1 - Real-time server-rendered UI without JavaScript
 - Ash Framework 3.0 - Declarative domain modeling and resource management
 - Domain-Driven Design - Clear bounded contexts with enforced boundaries
-- Modern Patterns - CQRS, Repository pattern, Hexagonal Architecture
+- Modern Patterns - Repository pattern, Hexagonal Architecture
 
 **Core Functionality:**
 
 - Multi-user expense tracking with shared access
 - Hierarchical category system with tree structures
 - Flexible tagging for enhanced organization
-- Monthly/yearly reporting and budgeting
+- Monthly/yearly reporting and analytics
 - CSV import/export capabilities
 
 ## 🏗️ Architecture
@@ -69,7 +69,7 @@ lib/housekeeping_book/
 - **Monthly Reports**:
   - Selectable month view
   - Income/expense breakdown
-  - Budget tracking (planned feature)
+  - Daily aggregation views
 - **Yearly Reports**:
   - Annual financial summary
   - Category-based analytics
@@ -92,7 +92,6 @@ lib/housekeeping_book/
 | **Record**   | Financial transaction entries         | Belongs to User, Category; Has many Tags |
 | **Category** | Hierarchical classification system    | Self-referential tree structure          |
 | **Tag**      | Flexible labeling system              | Many-to-many with Records                |
-| **Budget**   | Monthly/yearly financial planning     | Belongs to Category                      |
 
 ### Schema Details
 
@@ -106,7 +105,7 @@ lib/housekeeping_book/
 
 - Types: expense, income, saving
 - Parent-child relationships
-- Cascading budget inheritance
+- Hierarchical organization
 
 **Record**: Transaction tracking
 
@@ -114,11 +113,11 @@ lib/housekeeping_book/
 - Timezone-aware date handling
 - Tag-based organization
 
-**Budget** (Planned): Financial planning
+**Tag**: Flexible labeling system
 
-- Category-specific limits
-- Monthly/yearly scopes
-- Variance tracking
+- Simple name-based tags
+- Many-to-many relationship with records
+- Enhanced search and filtering capabilities
 
 ## 🚀 Getting Started
 
