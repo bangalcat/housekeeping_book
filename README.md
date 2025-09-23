@@ -1,152 +1,203 @@
 # HousekeepingBook
 
-This is my personal shared housekeeping book service for me and my partner.
-I will use it to track my and my partner's expenses and income.
+> ⚠️ **Development Status**: Learning project for exploring Elixir/Phoenix patterns. Not production-ready.
 
-The key feature that I want is to be able to share
-the housekeeping book with my partner.
-So that we can both add and edit records.
+A multi-user expense tracking application built with Phoenix LiveView and Ash Framework, demonstrating modern Elixir architectural patterns and domain-driven design principles.
 
-## Pages
+## 🎯 Project Purpose
 
-### Home (Dashboard)
+**Learning Focus:**
 
-This should be the default page. It contains the following items:
+- Phoenix LiveView 0.20.1 - Real-time server-rendered UI without JavaScript
+- Ash Framework 3.0 - Declarative domain modeling and resource management
+- Domain-Driven Design - Clear bounded contexts with enforced boundaries
+- Modern Patterns - CQRS, Repository pattern, Hexagonal Architecture
 
-- Total Balance
-- Total Expense
-- Total Income
-- Monthly Expense
-- Monthly Income
-- Yearly Expense
-- Yearly Income
-- Recent 10 Records
-- Daily Expense Chart
-- 5 categories with the highest expense
+**Core Functionality:**
 
-### Record List Page
+- Multi-user expense tracking with shared access
+- Hierarchical category system with tree structures
+- Flexible tagging for enhanced organization
+- Monthly/yearly reporting and budgeting
+- CSV import/export capabilities
 
-I think it would be great to show a calendar on this page.
-The calendar should highlight the days that have records.
-Clicking on a day should show the records of that day.
+## 🏗️ Architecture
 
-There should be a button to add a new record.
+### Tech Stack
 
-The record list should be paginated.
+- **Framework**: Phoenix 1.7.10 with LiveView
+- **Domain Layer**: Ash Framework 3.0
+- **Database**: PostgreSQL with Ecto
+- **Authentication**: Ash Authentication with BCrypt
+- **Styling**: Tailwind CSS
+- **Testing**: ExUnit (~40% coverage)
 
-Also, there should be a search bar to search records.
+### Domain Structure
 
-I need one more feature, which is to import and export records as a CSV file.
+```
+lib/housekeeping_book/
+├── accounts/          # User management domain
+│   ├── user.ex       # Ash resource
+│   └── user_token.ex # Token management
+├── households/        # Financial tracking domain
+│   ├── record.ex     # Transaction records
+│   ├── category.ex   # Hierarchical categories
+│   └── tag.ex        # Flexible tagging
+└── infrastructure/    # Cross-cutting concerns
+```
 
-### Record Detail Page
+## 📱 Application Features
 
-- Date
-- Category
-- Amount
-- Description
-- Edit Button
-- Delete Button
-- Back Button
-- Next Button
-- Previous Button
+### Dashboard
 
-### Monthly Report Page
+- Financial overview with balance, income, and expense totals
+- Recent transaction history (10 most recent)
+- Daily expense visualization
+- Top 5 spending categories
+- Real-time updates via Phoenix LiveView
 
-This page should show a monthly report of the selected month.
-It contains the following items:
+### Record Management
 
-- Monthly Total Balance
-- Monthly Total Expense
-- Monthly Total Income
+- **List View**: Calendar-based navigation with daily transaction highlights
+- **CRUD Operations**: Create, read, update, delete financial records
+- **Search & Filter**: Tag-based search and category filtering
+- **Import/Export**: CSV file support for bulk operations
+- **Pagination**: Keyset-based pagination for large datasets
 
-I want to add a feature that allows users to select a month and
-then show the monthly report of that month.
+### Reporting
 
-Also, it would be grate to make a budget for each month and
-show the budget on this page.
+- **Monthly Reports**:
+  - Selectable month view
+  - Income/expense breakdown
+  - Budget tracking (planned feature)
+- **Yearly Reports**:
+  - Annual financial summary
+  - Category-based analytics
+  - Trend visualization
 
-### Yearly Report Page
+### Navigation Structure
 
-This page should show a yearly report of the selected year.
-It contains the following items:
+- Home (Dashboard)
+- Records
+- Monthly Reports
+- Yearly Reports
 
-- Yearly Total Balance
-- Yearly Total Expense
-- Yearly Total Income
+## 📊 Data Model
 
-### Navigation
+### Core Entities
 
-The navigation bar is on the top of the page. It contains the following items:
+| Entity       | Purpose                               | Key Relationships                        |
+| ------------ | ------------------------------------- | ---------------------------------------- |
+| **User**     | Account management and authentication | Has many Records                         |
+| **Record**   | Financial transaction entries         | Belongs to User, Category; Has many Tags |
+| **Category** | Hierarchical classification system    | Self-referential tree structure          |
+| **Tag**      | Flexible labeling system              | Many-to-many with Records                |
+| **Budget**   | Monthly/yearly financial planning     | Belongs to Category                      |
 
-- Home
-- Record List
-- Monthly Report
-- Yearly Report
+### Schema Details
 
-## Design
+**User**: Authentication and multi-user support
 
-## Data Model
+- Ash Authentication integration
+- Normal and shared account types
+- Token-based session management
 
-### User
+**Category**: Tree-structured classification
 
-The user who spends money or earns money.
+- Types: expense, income, saving
+- Parent-child relationships
+- Cascading budget inheritance
 
-- id: int
-- name: string
-- email: string
-- created_at: datetime
-- updated_at: datetime
+**Record**: Transaction tracking
 
-### Category
+- Payment types: card, cash, transfer, other
+- Timezone-aware date handling
+- Tag-based organization
 
-Categories are used to classify records. There are tree structures for categories.
-That means a category can have a parent category and child categories.
+**Budget** (Planned): Financial planning
 
-The top level category is the root category.
+- Category-specific limits
+- Monthly/yearly scopes
+- Variance tracking
 
-Some level of categories are more important, because I will structure the
-report page and dashboard page according to those categories.
+## 🚀 Getting Started
 
-Also, I want a feature that allows users to make a budget for each category.
+### Prerequisites
 
-- id: int
-- name: string
-- parent_id: int
-- type: string (expense or income or saving)
-- created_at: datetime
-- updated_at: datetime
+- Elixir 1.14+
+- Erlang/OTP 25+
+- PostgreSQL 13+
+- Node.js 18+ (for assets)
 
-### Tag
+### Installation
 
-This is a tag that can be attached to a record.
-Tags will be useful when searching records.
+```bash
+# Clone repository
+git clone https://github.com/yourusername/housekeeping_book.git
+cd housekeeping_book
 
-- id: int
-- name: string
-- created_at: datetime
-- updated_at: datetime
+# Install dependencies
+mix deps.get
+mix assets.setup
 
-### Record
+# Setup database
+mix ecto.setup
 
-- id: int
-- subject_id::User: int
-- category_id::Category: int
-- amount: int
-- description: string
-- date: datetime
-- created_at: datetime
-- updated_at: datetime
-- tag_ids::Tag[]: int[]
+# Start Phoenix server
+mix phx.server
+```
 
-### Budget
+Visit [`localhost:4000`](http://localhost:4000) to access the application.
 
-Budgets are used to set a budget for each category for each month or year.
+## 📁 Project Documentation
 
-- id: int
-- category_id::Category: int
-- type: string (income or expense)
-- amount: int
-- created_at: datetime
-- updated_at: datetime
-- year: int
-- month: int
+Detailed documentation available in `/docs`:
+
+- **ARCHITECTURE.md** - System design and technology decisions
+- **DOMAIN_BOUNDARIES.md** - DDD implementation with Ash
+- **PATTERNS_AND_PRACTICES.md** - Code patterns and best practices
+- **REQUIREMENTS.md** - Functional and non-functional requirements
+- **TEST_COVERAGE_AND_QUALITY.md** - Testing metrics and quality analysis
+
+## 🧪 Development
+
+### Running Tests
+
+```bash
+mix test                  # Run test suite
+mix test --cover         # Generate coverage report
+mix credo --strict       # Code quality checks
+mix dialyzer            # Type checking
+```
+
+### Key Commands
+
+```bash
+mix phx.routes          # List all routes
+mix ash.list           # Show Ash resources
+mix boundary.validate  # Check module boundaries
+```
+
+## 📝 Learning Notes
+
+This project explores several advanced Elixir/Phoenix concepts:
+
+- **Ash Framework**: Declarative resource modeling with built-in validations
+- **LiveView Streams**: Efficient real-time updates for large datasets
+- **Boundary Enforcement**: Module dependency management
+- **Keyset Pagination**: Scalable pagination for large result sets
+- **CLDR Integration**: Internationalization and number formatting
+
+## ⚠️ Limitations
+
+As a learning project, this application has intentional limitations:
+
+- No multi-tenancy support (all users share data)
+- Limited to ~40% test coverage
+- No production deployment configuration
+- Missing advanced features (bank sync, OCR, etc.)
+- No CI/CD pipeline setup
+
+## 📄 License
+
+This is a personal learning project. Feel free to explore the code and patterns, but please note it's not intended for production use.
